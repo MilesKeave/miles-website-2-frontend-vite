@@ -9,7 +9,14 @@ const API_BASE_URL = 'http://localhost:8080/api';
 export const apiService = {
   async getProfile(): Promise<ProfileData> {
     try {
-      const response = await fetch(`${API_BASE_URL}/profile`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/profile`, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -19,13 +26,23 @@ export const apiService = {
       return data;
     } catch (error) {
       console.error('Error fetching profile:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timed out - backend may be having connectivity issues');
+      }
       throw error;
     }
   },
 
   async downloadResume(resumeUrl: string): Promise<void> {
     try {
-      const response = await fetch(resumeUrl);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      const response = await fetch(resumeUrl, {
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -42,6 +59,9 @@ export const apiService = {
       document.body.removeChild(a);
     } catch (error) {
       console.error('Error downloading resume:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Download timed out');
+      }
       throw error;
     }
   }

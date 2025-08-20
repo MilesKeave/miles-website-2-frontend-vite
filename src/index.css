@@ -3,3 +3,15 @@
 @tailwind utilities;
 
 /* Custom styles can go here */
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: black;
+}
+
+/* Ensure proper transparency support for images */
+img {
+  background: transparent;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
