@@ -1,12 +1,11 @@
 import { useState } from 'react';
 import { LandingPage } from './components/LandingPage';
-import { HomePage } from './components/HomePage';
 import { PortfolioPage } from './components/PortfolioPage';
 import { FloatingDocNav } from './components/ui/floating-doc-nav';
 import './App.css';
 
 function App(): React.JSX.Element {
-  const [currentPage, setCurrentPage] = useState<'landing' | 'home' | 'portfolio'>('landing');
+  const [currentPage, setCurrentPage] = useState<'home' | 'portfolio'>('home');
 
   const handleNavigate = (page: string) => {
     if (page === 'home') {
@@ -18,10 +17,8 @@ function App(): React.JSX.Element {
 
   const renderPage = () => {
     switch (currentPage) {
-      case 'landing':
-        return <LandingPage />;
       case 'home':
-        return <HomePage />;
+        return <LandingPage />;
       case 'portfolio':
         return <PortfolioPage />;
       default:
@@ -30,9 +27,9 @@ function App(): React.JSX.Element {
   };
 
   return (
-    <div className="min-h-screen w-full bg-black p-8">
+    <div className="min-h-screen w-full bg-black">
       {renderPage()}
-      <FloatingDocNav onNavigate={handleNavigate} />
+      <FloatingDocNav onNavigate={handleNavigate} currentPage={currentPage} />
     </div>
   );
 }
