@@ -5,103 +5,92 @@ import { cn } from "../../lib/utils";
 
 export const BackgroundBeams = React.memo(
   ({ className }: { className?: string }) => {
-    // Screen dimensions
-    const screenWidth = 1200;
-    const screenHeight = 800;
-    
-    // Content area to avoid (centered)
-    const contentWidth = 450;
-    const contentHeight = 200;
-    const contentLeft = (screenWidth - contentWidth) / 2;
-    const contentRight = contentLeft + contentWidth;
-    const contentTop = (screenHeight - contentHeight) / 2;
-    const contentBottom = contentTop + contentHeight;
-    const contentCenterX = screenWidth / 2;
-    const contentCenterY = screenHeight / 2;
-
-    // Generate organic flowing paths
-    const generateFlowingPaths = () => {
-      const paths = [];
-      const numPaths = 25;
+    // Mirrored paths that flow from right top to bottom left - moved further right
+    const paths = [
+      // Top paths - flow over the content (moved further right)
+      "M1776 -389C1776 -389 1708 16 1044 343C588 470 520 875 520 875",
+      "M1769 -397C1769 -397 1701 8 1037 335C573 462 505 867 505 867",
+      "M1762 -405C1762 -405 1694 0 1030 327C566 454 498 859 498 859",
       
-      for (let i = 0; i < numPaths; i++) {
-        // Start from off-screen with slight variations
-        const startX = -150 - i * 8;
-        const startY = -100 - i * 6;
-        
-        // Create a flowing path that curves around the content
-        const path = createFlowingPath(startX, startY, i);
-        paths.push(path);
-      }
+      // Right side paths - flow around the right side (moved further right)
+      "M1755 -413C1755 -413 1687 -8 1023 319C559 446 491 851 491 851",
+      "M1748 -421C1748 -421 1680 -16 1016 311C552 438 484 843 484 843",
+      "M1741 -429C1741 -429 1673 -24 1009 303C545 430 477 835 477 835",
       
-      return paths;
-    };
-
-    const createFlowingPath = (startX: number, startY: number, index: number) => {
-      const points = [];
+      // Left side paths - flow around the left side (moved further right)
+      "M1734 -437C1734 -437 1666 -32 1002 295C538 422 470 827 470 827",
+      "M1727 -445C1727 -445 1659 -40 995 287C531 414 463 819 463 819",
+      "M1720 -453C1720 -453 1652 -48 988 279C524 406 456 811 456 811",
       
-      // Add starting point
-      points.push(`M${startX} ${startY}`);
+      // Bottom paths - flow under the content (moved further right)
+      "M1713 -461C1713 -461 1645 -56 981 271C517 398 449 803 449 803",
+      "M1706 -469C1706 -469 1638 -64 974 263C510 390 442 795 442 795",
+      "M1699 -477C1699 -477 1631 -72 967 255C503 382 435 787 435 787",
       
-      // Generate control points that create organic curves
-      const numSegments = 8;
-      let currentX = startX;
-      let currentY = startY;
+      // Curved paths that wrap around the center (moved further right)
+      "M1692 -485C1692 -485 1624 -80 960 247C496 374 428 779 428 779",
+      "M1685 -493C1685 -493 1617 -88 953 239C489 366 421 771 421 771",
+      "M1678 -501C1678 -501 1610 -96 946 231C482 358 414 763 414 763",
       
-      for (let segment = 0; segment < numSegments; segment++) {
-        const progress = segment / (numSegments - 1);
-        
-        // Calculate target position (flowing around content)
-        let targetX, targetY;
-        
-        if (progress < 0.3) {
-          // First third: flow towards content area
-          targetX = contentLeft - 100 + segment * 50;
-          targetY = contentTop - 80 + segment * 30;
-        } else if (progress < 0.7) {
-          // Middle: flow around content
-          const angle = (progress - 0.3) / 0.4 * Math.PI * 2;
-          const radius = 120 + index * 3; // Varying radius for different paths
-          targetX = contentCenterX + Math.cos(angle) * radius;
-          targetY = contentCenterY + Math.sin(angle) * radius;
-        } else {
-          // Last third: flow away from content
-          targetX = contentRight + 100 + (segment - 5) * 60;
-          targetY = contentBottom + 80 + (segment - 5) * 40;
-        }
-        
-        // Add some organic variation
-        const variation = Math.sin(segment * 0.8 + index * 0.3) * 20;
-        targetX += variation;
-        targetY += Math.cos(segment * 0.6 + index * 0.2) * 15;
-        
-        // Create control points for smooth curves
-        const control1X = currentX + (targetX - currentX) * 0.3 + Math.sin(segment + index) * 30;
-        const control1Y = currentY + (targetY - currentY) * 0.3 + Math.cos(segment + index) * 25;
-        const control2X = currentX + (targetX - currentX) * 0.7 + Math.sin(segment + index + 1) * 30;
-        const control2Y = currentY + (targetY - currentY) * 0.7 + Math.cos(segment + index + 1) * 25;
-        
-        // Add curve segment
-        points.push(`C${control1X} ${control1Y} ${control2X} ${control2Y} ${targetX} ${targetY}`);
-        
-        currentX = targetX;
-        currentY = targetY;
-      }
+      // Outer perimeter paths (moved further right)
+      "M1671 -509C1671 -509 1603 -104 939 223C475 350 407 755 407 755",
+      "M1664 -517C1664 -517 1596 -112 932 215C468 342 400 747 400 747",
+      "M1657 -525C1657 -525 1589 -120 925 207C461 334 393 739 393 739",
       
-      // Continue path off-screen
-      const endX = screenWidth + 150 + index * 10;
-      const endY = screenHeight + 100 + index * 8;
-      const finalControl1X = currentX + (endX - currentX) * 0.3;
-      const finalControl1Y = currentY + (endY - currentY) * 0.3;
-      const finalControl2X = currentX + (endX - currentX) * 0.7;
-      const finalControl2Y = currentY + (endY - currentY) * 0.7;
+      // Diagonal paths that avoid center (moved further right)
+      "M1650 -533C1650 -533 1582 -128 918 199C454 326 386 731 386 731",
+      "M1643 -541C1643 -541 1575 -136 911 191C447 318 379 723 379 723",
+      "M1636 -549C1636 -549 1568 -144 904 183C440 310 372 715 372 715",
       
-      points.push(`C${finalControl1X} ${finalControl1Y} ${finalControl2X} ${finalControl2Y} ${endX} ${endY}`);
+      // Corner paths (moved further right)
+      "M1629 -557C1629 -557 1561 -152 897 175C433 302 365 707 365 707",
+      "M1622 -565C1622 -565 1554 -160 890 167C426 294 358 699 358 699",
+      "M1615 -573C1615 -573 1547 -168 883 159C419 286 351 691 351 691",
       
-      return points.join(' ');
-    };
-
-    const paths = generateFlowingPaths();
+      // Additional flow paths (moved further right)
+      "M1608 -581C1608 -581 1540 -176 876 151C412 278 344 683 344 683",
+      "M1601 -589C1601 -589 1533 -184 869 143C405 270 337 675 337 675",
+      "M1594 -597C1594 -597 1526 -192 862 135C398 262 330 667 330 667",
+      
+      // More perimeter paths (moved further right)
+      "M1587 -605C1587 -605 1519 -200 855 127C391 254 323 659 323 659",
+      "M1580 -613C1580 -613 1512 -208 848 119C384 246 316 651 316 651",
+      "M1573 -621C1573 -621 1505 -216 841 111C377 238 309 643 309 643",
+      
+      // Final flow paths (moved further right)
+      "M1566 -629C1566 -629 1498 -224 834 103C370 230 302 635 302 635",
+      "M1559 -637C1559 -637 1491 -232 827 95C363 222 295 627 295 627",
+      "M1552 -645C1552 -645 1484 -240 820 87C356 214 288 619 288 619",
+      
+      // Additional curved paths (moved further right)
+      "M1545 -653C1545 -653 1477 -248 813 79C349 206 281 611 281 611",
+      "M1538 -661C1538 -661 1470 -256 806 71C342 198 274 603 274 603",
+      "M1531 -669C1531 -669 1463 -264 799 63C335 190 267 595 267 595",
+      
+      // More perimeter flows (moved further right)
+      "M1524 -677C1524 -677 1456 -272 792 55C328 182 260 587 260 587",
+      "M1517 -685C1517 -685 1449 -280 785 47C321 174 253 579 253 579",
+      "M1510 -693C1510 -693 1442 -288 778 39C314 166 246 571 246 571",
+      
+      // Final set of paths (moved further right)
+      "M1503 -701C1503 -701 1435 -296 771 31C307 158 239 563 239 563",
+      "M1496 -709C1496 -709 1428 -304 764 23C300 150 232 555 232 555",
+      "M1489 -717C1489 -717 1421 -312 757 15C293 142 225 547 225 547",
+      
+      // Additional flow paths (moved further right)
+      "M1482 -725C1482 -725 1414 -320 750 7C286 134 218 539 218 539",
+      "M1475 -733C1475 -733 1407 -328 743 -1C279 126 211 531 211 531",
+      "M1468 -741C1468 -741 1400 -336 736 -9C272 118 204 523 204 523",
+      
+      // More perimeter flows (moved further right)
+      "M1461 -749C1461 -749 1393 -344 729 -17C265 110 197 515 197 515",
+      "M1454 -757C1454 -757 1386 -352 722 -25C258 102 190 507 190 507",
+      "M1447 -765C1447 -765 1379 -360 715 -33C251 94 183 499 183 499",
+      
+      // Final perimeter paths (moved further right)
+      "M1440 -773C1440 -773 1372 -368 708 -41C244 86 176 491 176 491",
+      "M1433 -781C1433 -781 1365 -376 701 -49C237 78 169 483 169 483",
+    ];
     
     return (
       <div
@@ -114,49 +103,53 @@ export const BackgroundBeams = React.memo(
           className="pointer-events-none absolute z-0 h-full w-full"
           width="100%"
           height="100%"
-          viewBox={`0 0 ${screenWidth} ${screenHeight}`}
+          viewBox="0 0 696 316"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
         >
+          <path
+            d="M1776 -389C1776 -389 1708 16 1044 343C588 470 520 875 520 875M1769 -397C1769 -397 1701 8 1037 335C573 462 505 867 505 867M1762 -405C1762 -405 1694 0 1030 327C566 454 498 859 498 859M1755 -413C1755 -413 1687 -8 1023 319C559 446 491 851 491 851M1748 -421C1748 -421 1680 -16 1016 311C552 438 484 843 484 843M1741 -429C1741 -429 1673 -24 1009 303C545 430 477 835 477 835M1734 -437C1734 -437 1666 -32 1002 295C538 422 470 827 470 827M1727 -445C1727 -445 1659 -40 995 287C531 414 463 819 463 819M1720 -453C1720 -453 1652 -48 988 279C524 406 456 811 456 811M1713 -461C1713 -461 1645 -56 981 271C517 398 449 803 449 803M1706 -469C1706 -469 1638 -64 974 263C510 390 442 795 442 795M1699 -477C1699 -477 1631 -72 967 255C503 382 435 787 435 787M1692 -485C1692 -485 1624 -80 960 247C496 374 428 779 428 779M1685 -493C1685 -493 1617 -88 953 239C489 366 421 771 421 771M1678 -501C1678 -501 1610 -96 946 231C482 358 414 763 414 763M1671 -509C1671 -509 1603 -104 939 223C475 350 407 755 407 755M1664 -517C1664 -517 1596 -112 932 215C468 342 400 747 400 747M1657 -525C1657 -525 1589 -120 925 207C461 334 393 739 393 739M1650 -533C1650 -533 1582 -128 918 199C454 326 386 731 386 731M1643 -541C1643 -541 1575 -136 911 191C447 318 379 723 379 723M1636 -549C1636 -549 1568 -144 904 183C440 310 372 715 372 715M1629 -557C1629 -557 1561 -152 897 175C433 302 365 707 365 707M1622 -565C1622 -565 1554 -160 890 167C426 294 358 699 358 699M1615 -573C1615 -573 1547 -168 883 159C419 286 351 691 351 691M1608 -581C1608 -581 1540 -176 876 151C412 278 344 683 344 683M1601 -589C1601 -589 1533 -184 869 143C405 270 337 675 337 675M1594 -597C1594 -597 1526 -192 862 135C398 262 330 667 330 667M1587 -605C1587 -605 1519 -200 855 127C391 254 323 659 323 659M1580 -613C1580 -613 1512 -208 848 119C384 246 316 651 316 651M1573 -621C1573 -621 1505 -216 841 111C377 238 309 643 309 643M1566 -629C1566 -629 1498 -224 834 103C370 230 302 635 302 635M1559 -637C1559 -637 1491 -232 827 95C363 222 295 627 295 627M1552 -645C1552 -645 1484 -240 820 87C356 214 288 619 288 619M1545 -653C1545 -653 1477 -248 813 79C349 206 281 611 281 611M1538 -661C1538 -661 1470 -256 806 71C342 198 274 603 274 603M1531 -669C1531 -669 1463 -264 799 63C335 190 267 595 267 595M1524 -677C1524 -677 1456 -272 792 55C328 182 260 587 260 587M1517 -685C1517 -685 1449 -280 785 47C321 174 253 579 253 579M1510 -693C1510 -693 1442 -288 778 39C314 166 246 571 246 571M1503 -701C1503 -701 1435 -296 771 31C307 158 239 563 239 563M1496 -709C1496 -709 1428 -304 764 23C300 150 232 555 232 555M1489 -717C1489 -717 1421 -312 757 15C293 142 225 547 225 547M1482 -725C1482 -725 1414 -320 750 7C286 134 218 539 218 539M1475 -733C1475 -733 1407 -328 743 -1C279 126 211 531 211 531M1468 -741C1468 -741 1400 -336 736 -9C272 118 204 523 204 523M1461 -749C1461 -749 1393 -344 729 -17C265 110 197 515 197 515M1454 -757C1454 -757 1386 -352 722 -25C258 102 190 507 190 507M1447 -765C1447 -765 1379 -360 715 -33C251 94 183 499 183 499M1440 -773C1440 -773 1372 -368 708 -41C244 86 176 491 176 491M1433 -781C1433 -781 1365 -376 701 -49C237 78 169 483 169 483"
+            stroke="url(#paint0_radial_242_278)"
+            strokeOpacity="0.05"
+            strokeWidth="0.5"
+          ></path>
+
           {paths.map((path, index) => (
             <motion.path
-              key={`path-${index}`}
+              key={`path-` + index}
               d={path}
               stroke={`url(#linearGradient-${index})`}
               strokeOpacity="0.4"
-              strokeWidth="1.5"
-              fill="none"
-            />
+              strokeWidth="0.5"
+            ></motion.path>
           ))}
-          
           <defs>
             {paths.map((path, index) => (
               <motion.linearGradient
                 id={`linearGradient-${index}`}
                 key={`gradient-${index}`}
                 initial={{
-                  x1: "0%",
-                  x2: "100%",
-                  y1: "0%",
-                  y2: "0%",
+                  x1: "50%",
+                  x2: "55%",
+                  y1: "50%",
+                  y2: "57%",
                 }}
                 animate={{
-                  x1: ["0%", "100%", "0%"],
-                  x2: ["100%", "0%", "100%"],
-                  y1: ["0%", "50%", "0%"],
-                  y2: ["0%", "50%", "0%"],
+                  x1: ["50%", "0%", "100%", "50%"],
+                  x2: ["55%", "5%", "100%", "55%"],
+                  y1: ["50%", "0%", "100%", "50%"],
+                  y2: ["57%", "7%", `${93 + Math.random() * 8}%`, "57%"],
                 }}
                 transition={{
-                  duration: Math.random() * 6 + 15,
+                  duration: Math.random() * 30 + 40, // Much slower animation (40-70 seconds)
                   ease: "easeInOut",
                   repeat: Infinity,
-                  delay: Math.random() * 8,
+                  delay: Math.random() * 20, // Longer delays between starts
                 }}
               >
                 <stop stopColor="#18CCFC" stopOpacity="0"></stop>
                 <stop stopColor="#18CCFC"></stop>
-                <stop offset="40%" stopColor="#6344F5"></stop>
-                <stop offset="70%" stopColor="#AE48FF"></stop>
+                <stop offset="32.5%" stopColor="#6344F5"></stop>
                 <stop offset="100%" stopColor="#AE48FF" stopOpacity="0"></stop>
               </motion.linearGradient>
             ))}
@@ -167,7 +160,7 @@ export const BackgroundBeams = React.memo(
               cy="0"
               r="1"
               gradientUnits="userSpaceOnUse"
-              gradientTransform="translate(600 400) rotate(90) scale(400 800)"
+              gradientTransform="translate(352 34) rotate(90) scale(555 1560.62)"
             >
               <stop offset="0.0666667" stopColor="#d4d4d4"></stop>
               <stop offset="0.243243" stopColor="#d4d4d4"></stop>

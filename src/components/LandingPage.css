@@ -1,0 +1,147 @@
+.landing-page {
+  min-height: 100vh;
+  background-color: black;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-container {
+  min-height: 100vh;
+  background-color: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loading-content {
+  text-align: center;
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+  border-radius: 50%;
+  height: 3rem;
+  width: 3rem;
+  border-bottom: 2px solid white;
+  margin: 0 auto;
+}
+
+.loading-text {
+  color: white;
+  margin-top: 1rem;
+}
+
+.top-left-quadrant {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.name-text {
+  
+  padding-top: 120px;
+  color: white;
+  font-size: 2.3125rem;
+  font-weight: 600;
+  text-align: left;
+  padding-left: 120px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  z-index: 10;
+}
+.description-text {
+  
+  padding-top: 10px;
+  color: white;
+  font-size: 1.15rem;
+  font-weight: 200;
+  text-align: justify;
+  padding-left: 120px;
+  max-width: 700px;
+  padding-right: 20px;
+  line-height: 1.6;
+  display: block;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  z-index: 10;
+}
+
+.button-container {
+  padding-top: 40px;
+  padding-left: 120px;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.top-right-quadrant {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.top-right-child-1 {
+  height: auto;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.top-right-child-2 {
+  height: auto;
+}
+
+.profile-image-container {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 10;
+  padding-left: 100px;
+}
+
+.profile-image {
+  width: 27rem;
+  height: 27rem;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .profile-image {
+    width: 27rem;
+    height: 27rem;
+  }
+  
+  .name-text {
+    font-size: 2.8125rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .name-text {
+    font-size: 3.3125rem;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+} 
