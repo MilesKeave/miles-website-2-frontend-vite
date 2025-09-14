@@ -1,20 +1,68 @@
 import { useProfile } from '../hooks/useProfile';
 import { TechDiffPage } from './TechDiffPage';
 import { BackgroundBeams } from './ui/background-beams';
-import { FlipWords } from './ui/flip-words';
+import { HomePage } from './HomePage';
+import { ProjectsPage } from './ProjectsPage';
+import { useState, useRef } from 'react';
 import './LandingPage.css';
 
-export const LandingPage = (): React.JSX.Element => {
-  const { profile, loading, error, showTechDiff } = useProfile();
+interface LandingPageProps {
+  currentPage: 'home' | 'portfolio';
+  onPageChange: (page: 'home' | 'portfolio') => void;
+}
 
-  const rotatingWords = [
-    "adventurer",
-    "designer", 
-    "engineer",
-    "developer",
-    "photographer",
-    "soccer player"
-  ];
+export const LandingPage = ({ currentPage, onPageChange }: LandingPageProps): React.JSX.Element => {
+  const { loading, showTechDiff } = useProfile();
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Simple functions that work like the buttons
+  const goToPortfolio = () => {
+    if (isTransitioning) return;
+    console.log('Going to portfolio page');
+    setIsTransitioning(true);
+    onPageChange('portfolio');
+    setTimeout(() => setIsTransitioning(false), 600);
+  };
+
+  const goToHome = () => {
+    if (isTransitioning) return;
+    console.log('Going to home page');
+    setIsTransitioning(true);
+    onPageChange('home');
+    setTimeout(() => setIsTransitioning(false), 600);
+  };
+
+  // Alternative approach: Use wheel events for trackpad gestures
+  const handleWheel = (e: React.WheelEvent) => {
+    // Check if it's a trackpad gesture (deltaY will be larger for trackpad)
+    if (Math.abs(e.deltaY) > 50) {
+      e.preventDefault();
+      
+      if (e.deltaY > 0 && currentPage === 'home') {
+        // Scroll down (wheel down) - go to portfolio
+        console.log('Wheel down detected - going to portfolio');
+        goToPortfolio();
+      } else if (e.deltaY < 0 && currentPage === 'portfolio') {
+        // Scroll up (wheel up) - go to home
+        console.log('Wheel up detected - going to home');
+        goToHome();
+      }
+    }
+  };
+
+  // Simple click/tap detection for mobile
+  const handleClick = (e: React.MouseEvent) => {
+    // Only trigger on the main container, not on buttons
+    if (e.target === e.currentTarget) {
+      console.log('Container clicked - toggling page');
+      if (currentPage === 'home') {
+        goToPortfolio();
+      } else {
+        goToHome();
+      }
+    }
+  };
 
   // Show tech diff page if loading for more than 4 seconds
   if (showTechDiff) {
@@ -33,44 +81,53 @@ export const LandingPage = (): React.JSX.Element => {
   }
 
   return (
-    <div className="landing-page">
+    <div 
+      className="landing-page"
+      ref={containerRef}
+      onWheel={handleWheel}
+      onClick={handleClick}
+      style={{ touchAction: 'none' }}
+    >
+      {/* Fixed Background - Always visible */}
       <BackgroundBeams />
       
-      {/* Name Text - Full Width */}
-      <div className="name-text">
-        Miles Keaveny, <FlipWords words={rotatingWords} duration={2500} className="text-white" />
-      </div>
-      <div className="description-text">
-        {profile?.description}
+      {/* Page Container with Transition Effects */}
+      <div className="page-container">
+        {/* Home Page */}
+        <div 
+          className={`page-wrapper home-page-wrapper ${currentPage === 'home' ? 'active' : currentPage === 'portfolio' ? 'slide-up' : ''}`}
+        >
+          <HomePage />
+        </div>
+
+        {/* Portfolio Page */}
+        <div 
+          className={`page-wrapper projects-page-wrapper ${currentPage === 'portfolio' ? 'active' : currentPage === 'home' ? 'slide-down' : ''}`}
+        >
+          <ProjectsPage />
+        </div>
       </div>
 
-      {/* Button Container */}
-      <div className="button-container">
-        <button className="px-6 py-3 bg-white text-black font-semibold rounded-lg">
-          Get In Touch
-        </button>
-        <button className="px-6 py-3 bg-gray-800 text-white font-semibold rounded-lg ml-8 flex items-center gap-2">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          Resume
-        </button>
-      </div>
+      {/* Swipe Indicators */}
+      {currentPage === 'home' && (
+        <div className="swipe-indicator">
+          <div className="swipe-hint">
+            <svg className="swipe-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+            </svg>
+            <span>Scroll down or click to continue</span>
+          </div>
+        </div>
+      )}
 
-      
-      {/* Profile Image - Bottom Left Corner (centered in left 50% of screen) */}
-      {profile?.profileImageUrl && (
-        <div className="profile-image-container">
-          <img
-            src={profile.profileImageUrl}
-            alt="Miles Keaveny"
-            className="profile-image"
-            style={{ mixBlendMode: 'normal' }}
-            onError={(e) => {
-              console.log('Image failed to load:', profile.profileImageUrl);
-              e.currentTarget.style.display = 'none';
-            }}
-          />
+      {currentPage === 'portfolio' && (
+        <div className="swipe-indicator">
+          <div className="swipe-hint">
+            <svg className="swipe-icon swipe-down" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            <span>Scroll up or click to go back</span>
+          </div>
         </div>
       )}
     </div>

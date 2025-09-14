@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { LandingPage } from './components/LandingPage';
-import { PortfolioPage } from './components/PortfolioPage';
 import { FloatingDocNav } from './components/ui/floating-doc-nav';
 import './App.css';
 
@@ -15,20 +14,12 @@ function App(): React.JSX.Element {
     }
   };
 
-  const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <LandingPage />;
-      case 'portfolio':
-        return <PortfolioPage />;
-      default:
-        return <LandingPage />;
-    }
-  };
-
   return (
     <div className="min-h-screen w-full bg-black">
-      {renderPage()}
+      <LandingPage 
+        currentPage={currentPage} 
+        onPageChange={setCurrentPage}
+      />
       <FloatingDocNav onNavigate={handleNavigate} currentPage={currentPage} />
     </div>
   );
