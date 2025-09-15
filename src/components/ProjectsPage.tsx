@@ -136,15 +136,15 @@ export const ProjectsPage = (): React.JSX.Element => {
                     </div>
 
                     {/* Content */}
-                    <div className="transition duration-200 group-hover:translate-x-2 relative z-20">
-                      <div className="flex items-center gap-2 text-neutral-300 mb-2">
+                    <div className="transition duration-200 group-hover:translate-x-2">
+                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-2">
                         {getCategoryIcon(project.projectName)}
                         <span className="text-xs">Project</span>
                       </div>
-                      <div className="mt-2 mb-2 font-sans font-bold text-white">
+                      <div className="mt-2 mb-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
                         {project.projectName}
                       </div>
-                      <div className="font-sans text-xs font-normal text-neutral-200">
+                      <div className="font-sans text-xs font-normal text-neutral-600 dark:text-neutral-300">
                         {project.paragraph}
                       </div>
                     </div>
