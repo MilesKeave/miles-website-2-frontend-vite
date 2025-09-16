@@ -1,4 +1,4 @@
-import { BentoGrid, BentoGridItem } from "./ui/bento-grid";
+import { BentoGrid } from "./ui/bento-grid";
 import { CardSpotlight } from "./ui/card-spotlight";
 import { IconCode, IconDatabase, IconGlobe, IconDeviceMobile, IconRobot, IconBrandGithub, IconBrandYoutube } from "@tabler/icons-react";
 import { useProjects } from "../hooks/useProjects";
@@ -87,15 +87,15 @@ export const ProjectsPage = (): React.JSX.Element => {
         ) : (
           <div className="max-w-7xl mx-auto">
             {/* Scrollable container for projects */}
-            <div className="h-[39rem] overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600 scrollbar-track-transparent hover:scrollbar-thumb-slate-400 dark:hover:scrollbar-thumb-slate-500">
-              <BentoGrid className="max-w-7xl mx-auto pb-8">
+            <div className="h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b transparent' }}>
+              <BentoGrid className="max-w-7xl mx-auto pb-8 pt-6">
                 {projects.map((project, index) => (
                   <CardSpotlight
                     key={project.id}
                     className={`h-full flex flex-col justify-between space-y-4 ${index === 0 ? "md:col-span-2" : ""}`}
                   >
                     {/* Header with image */}
-                    <div className="relative h-32 w-full overflow-hidden rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
+                    <div className="relative z-10 h-32 w-full overflow-hidden rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
                       {project.projectImageUrl ? (
                         <img
                           src={project.projectImageUrl}
@@ -109,7 +109,7 @@ export const ProjectsPage = (): React.JSX.Element => {
                           </div>
                         </div>
                       )}
-                      <div className="absolute top-2 right-2 flex gap-1">
+                      <div className="absolute top-2 right-2 flex gap-1 z-20">
                         {project.githubLink && (
                           <a
                             href={project.githubLink}
@@ -136,7 +136,7 @@ export const ProjectsPage = (): React.JSX.Element => {
                     </div>
 
                     {/* Content */}
-                    <div className="transition duration-200 group-hover:translate-x-2">
+                    <div className="relative z-50 transition duration-200 group-hover:translate-x-2">
                       <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-2">
                         {getCategoryIcon(project.projectName)}
                         <span className="text-xs">Project</span>
