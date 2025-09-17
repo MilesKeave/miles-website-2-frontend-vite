@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { LandingPage } from './components/LandingPage';
 import { FloatingDocNav } from './components/ui/floating-doc-nav';
+import type { PageId } from './types/pages';
 import './App.css';
 
 function App(): React.JSX.Element {
-  const [currentPage, setCurrentPage] = useState<'home' | 'portfolio'>('home');
+  const [currentPage, setCurrentPage] = useState<PageId>('home');
+  const [isDirectNavigation, setIsDirectNavigation] = useState(false);
 
   const handleNavigate = (page: string) => {
-    if (page === 'home') {
-      setCurrentPage('home');
-    } else if (page === 'portfolio') {
-      setCurrentPage('portfolio');
+    // Type-safe navigation - only allow valid page IDs
+    if (['home', 'portfolio', 'work'].includes(page)) {
+      setIsDirectNavigation(true); // Flag for direct navigation
+      setCurrentPage(page as PageId);
     }
   };
 
@@ -18,7 +20,11 @@ function App(): React.JSX.Element {
     <div className="min-h-screen w-full bg-black">
       <LandingPage 
         currentPage={currentPage} 
-        onPageChange={setCurrentPage}
+        onPageChange={(page) => {
+          setIsDirectNavigation(false); // Reset flag for swipe navigation
+          setCurrentPage(page);
+        }}
+        isDirectNavigation={isDirectNavigation}
       />
       <FloatingDocNav onNavigate={handleNavigate} currentPage={currentPage} />
     </div>

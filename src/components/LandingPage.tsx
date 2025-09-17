@@ -1,66 +1,101 @@
 import { useProfile } from '../hooks/useProfile';
 import { TechDiffPage } from './TechDiffPage';
 import { BackgroundBeams } from './ui/background-beams';
-import { HomePage } from './HomePage';
-import { ProjectsPage } from './ProjectsPage';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import type { PageId, TransitionMode } from '../types/pages';
+import { PAGE_CONFIG, getNextPage, getPreviousPage, getPageOrder, getTotalPages } from '../config/pages';
 import './LandingPage.css';
 
 interface LandingPageProps {
-  currentPage: 'home' | 'portfolio';
-  onPageChange: (page: 'home' | 'portfolio') => void;
+  currentPage: PageId;
+  onPageChange: (page: PageId) => void;
+  isDirectNavigation?: boolean;
 }
 
-export const LandingPage = ({ currentPage, onPageChange }: LandingPageProps): React.JSX.Element => {
+export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: LandingPageProps): React.JSX.Element => {
   const { loading, showTechDiff } = useProfile();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [transitionMode, setTransitionMode] = useState<TransitionMode>('sequential');
+  const [previousPage, setPreviousPage] = useState<PageId | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Simple functions that work like the buttons
-  const goToPortfolio = () => {
-    if (isTransitioning) return;
-    console.log('Going to portfolio page');
+  // Dynamic navigation functions
+  const navigateToPage = (targetPageId: PageId, mode: TransitionMode = 'direct') => {
+    if (isTransitioning || targetPageId === currentPage) return;
+    
+    console.log(`Navigating to ${targetPageId} page with ${mode} transition`);
     setIsTransitioning(true);
-    onPageChange('portfolio');
-    setTimeout(() => setIsTransitioning(false), 600);
+    setTransitionMode(mode);
+    setPreviousPage(currentPage);
+    
+    // For sequential transitions, delay the page change to allow current page to transition out
+    if (mode === 'sequential') {
+      setTimeout(() => {
+        onPageChange(targetPageId);
+        setTimeout(() => {
+          setIsTransitioning(false);
+          setTransitionMode('sequential');
+          setPreviousPage(null);
+        }, 600);
+      }, 50); // Small delay to start the transition
+    } else {
+      // For direct transitions, change immediately
+      onPageChange(targetPageId);
+      setTimeout(() => {
+        setIsTransitioning(false);
+        setTransitionMode('sequential');
+        setPreviousPage(null);
+      }, 600);
+    }
   };
 
-  const goToHome = () => {
-    if (isTransitioning) return;
-    console.log('Going to home page');
-    setIsTransitioning(true);
-    onPageChange('home');
-    setTimeout(() => setIsTransitioning(false), 600);
+  const goToNextPage = () => {
+    const nextPage = getNextPage(currentPage);
+    if (nextPage) {
+      navigateToPage(nextPage.id as PageId, 'sequential');
+    }
   };
 
-  // Alternative approach: Use wheel events for trackpad gestures
+  const goToPreviousPage = () => {
+    const prevPage = getPreviousPage(currentPage);
+    if (prevPage) {
+      navigateToPage(prevPage.id as PageId, 'sequential');
+    }
+  };
+
+  // Update transition mode based on navigation type
+  useEffect(() => {
+    if (isDirectNavigation) {
+      setTransitionMode('direct');
+    } else {
+      setTransitionMode('sequential');
+    }
+  }, [isDirectNavigation]);
+
+  // Dynamic wheel event handler for trackpad gestures
   const handleWheel = (e: React.WheelEvent) => {
     // Check if it's a trackpad gesture (deltaY will be larger for trackpad)
     if (Math.abs(e.deltaY) > 50) {
       e.preventDefault();
       
-      if (e.deltaY > 0 && currentPage === 'home') {
-        // Scroll down (wheel down) - go to portfolio
-        console.log('Wheel down detected - going to portfolio');
-        goToPortfolio();
-      } else if (e.deltaY < 0 && currentPage === 'portfolio') {
-        // Scroll up (wheel up) - go to home
-        console.log('Wheel up detected - going to home');
-        goToHome();
+      if (e.deltaY > 0) {
+        // Scroll down - go to next page
+        console.log('Wheel down detected - going to next page');
+        goToNextPage();
+      } else if (e.deltaY < 0) {
+        // Scroll up - go to previous page
+        console.log('Wheel up detected - going to previous page');
+        goToPreviousPage();
       }
     }
   };
 
-  // Simple click/tap detection for mobile
+  // Dynamic click/tap detection for mobile
   const handleClick = (e: React.MouseEvent) => {
     // Only trigger on the main container, not on buttons
     if (e.target === e.currentTarget) {
-      console.log('Container clicked - toggling page');
-      if (currentPage === 'home') {
-        goToPortfolio();
-      } else {
-        goToHome();
-      }
+      console.log('Container clicked - going to next page');
+      goToNextPage();
     }
   };
 
@@ -91,45 +126,89 @@ export const LandingPage = ({ currentPage, onPageChange }: LandingPageProps): Re
       {/* Fixed Background - Always visible */}
       <BackgroundBeams />
       
-      {/* Page Container with Transition Effects */}
+      {/* Page Container with Teleportation Transition Effects */}
       <div className="page-container">
-        {/* Home Page */}
-        <div 
-          className={`page-wrapper home-page-wrapper ${currentPage === 'home' ? 'active' : currentPage === 'portfolio' ? 'slide-up' : ''}`}
-        >
-          <HomePage />
-        </div>
-
-        {/* Portfolio Page */}
-        <div 
-          className={`page-wrapper projects-page-wrapper ${currentPage === 'portfolio' ? 'active' : currentPage === 'home' ? 'slide-down' : ''}`}
-        >
-          <ProjectsPage />
-        </div>
+        {PAGE_CONFIG.map((pageConfig) => {
+          const PageComponent = pageConfig.component;
+          const currentOrder = getPageOrder(currentPage);
+          const pageOrder = pageConfig.order;
+          const isCurrentPage = pageConfig.id === currentPage;
+          const isPreviousPage = pageConfig.id === previousPage;
+          
+          // Determine the CSS class based on page position and transition mode
+          let pageClass = 'page-wrapper';
+          
+          if (isCurrentPage) {
+            pageClass += ' active';
+          } else if (isPreviousPage && isTransitioning) {
+            // Previous page during transition - determine exit direction
+            const prevOrder = getPageOrder(previousPage!);
+            const direction = prevOrder < currentOrder ? 'up' : 'down';
+            
+            if (transitionMode === 'direct') {
+              pageClass += ` direct-${direction}`;
+            } else {
+              pageClass += ` sequential-${direction}`;
+            }
+          } else {
+            // Other pages - determine position relative to current page
+            const direction = pageOrder < currentOrder ? 'up' : 'down';
+            
+            if (transitionMode === 'direct') {
+              pageClass += ` direct-${direction}`;
+            } else {
+              pageClass += ` sequential-${direction}`;
+            }
+          }
+          
+          // Add page-specific class for styling
+          pageClass += ` ${pageConfig.id}-page-wrapper`;
+          
+          return (
+            <div key={pageConfig.id} className={pageClass}>
+              <PageComponent />
+            </div>
+          );
+        })}
       </div>
 
-      {/* Swipe Indicators */}
-      {currentPage === 'home' && (
-        <div className="swipe-indicator">
-          <div className="swipe-hint">
-            <svg className="swipe-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-            </svg>
-            <span>Scroll down or click to continue</span>
-          </div>
-        </div>
-      )}
-
-      {currentPage === 'portfolio' && (
-        <div className="swipe-indicator">
-          <div className="swipe-hint">
-            <svg className="swipe-icon swipe-down" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-            <span>Scroll up or click to go back</span>
-          </div>
-        </div>
-      )}
+      {/* Dynamic Swipe Indicators */}
+      {(() => {
+        const currentOrder = getPageOrder(currentPage);
+        const totalPages = getTotalPages();
+        const hasNextPage = currentOrder < totalPages - 1;
+        const hasPreviousPage = currentOrder > 0;
+        
+        // Show down indicator if there's a next page
+        if (hasNextPage) {
+          return (
+            <div className="swipe-indicator">
+              <div className="swipe-hint">
+                <svg className="swipe-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
+                </svg>
+                <span>Scroll down or click to continue</span>
+              </div>
+            </div>
+          );
+        }
+        
+        // Show up indicator if we're on the last page and there's a previous page
+        if (!hasNextPage && hasPreviousPage) {
+          return (
+            <div className="swipe-indicator">
+              <div className="swipe-hint">
+                <svg className="swipe-icon swipe-down" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+                <span>Scroll up or click to go back</span>
+              </div>
+            </div>
+          );
+        }
+        
+        return null;
+      })()}
     </div>
   );
 }; 

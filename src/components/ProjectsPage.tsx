@@ -73,8 +73,7 @@ export const ProjectsPage = (): React.JSX.Element => {
             My Projects
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            A collection of projects showcasing my skills in full-stack development, 
-            AI/ML, mobile development, and emerging technologies.
+            A collection of projects showcasing my skills in full-stack development.
           </p>
         </div>
 

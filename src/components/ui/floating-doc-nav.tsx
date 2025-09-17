@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "../../lib/utils";
-import { Home, FolderOpen, Github, Linkedin } from "lucide-react";
+import { Home, FolderOpen, Briefcase, Github, Linkedin } from "lucide-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -10,29 +10,41 @@ import {
   useTransform,
 } from "motion/react";
 import { useRef, useState } from "react";
+import type { PageId } from "../../types/pages";
+import { PAGE_CONFIG } from "../../config/pages";
 
 interface FloatingDocNavProps {
   className?: string;
   onNavigate: (page: string) => void;
-  currentPage: 'home' | 'portfolio';
+  currentPage: PageId;
 }
 
 export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingDocNavProps) => {
-  const items = [
-    {
-      title: "Home",
-      icon: <Home className="h-5 w-5" />,
-      action: () => onNavigate('home'),
-      isLink: false,
-      isActive: currentPage === 'home'
-    },
-    {
-      title: "Portfolio",
-      icon: <FolderOpen className="h-5 w-5" />,
-      action: () => onNavigate('portfolio'),
-      isLink: false,
-      isActive: currentPage === 'portfolio'
-    },
+  // Dynamic icon mapping
+  const getIconForPage = (pageId: PageId) => {
+    switch (pageId) {
+      case 'home':
+        return <Home className="h-5 w-5" />;
+      case 'portfolio':
+        return <FolderOpen className="h-5 w-5" />;
+      case 'work':
+        return <Briefcase className="h-5 w-5" />;
+      default:
+        return <Home className="h-5 w-5" />;
+    }
+  };
+
+  // Generate navigation items dynamically from page configuration
+  const navigationItems = PAGE_CONFIG.map(pageConfig => ({
+    title: pageConfig.title,
+    icon: getIconForPage(pageConfig.id as PageId),
+    action: () => onNavigate(pageConfig.id as PageId),
+    isLink: false,
+    isActive: currentPage === pageConfig.id
+  }));
+
+  // Static external links
+  const externalLinks = [
     {
       title: "GitHub",
       icon: <Github className="h-5 w-5" />,
@@ -48,6 +60,9 @@ export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingD
       isActive: false
     }
   ];
+
+  // Combine navigation items and external links
+  const items = [...navigationItems, ...externalLinks];
 
   return (
     <div className={cn("fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50", className)}>
