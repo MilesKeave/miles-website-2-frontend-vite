@@ -18,6 +18,19 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
   const [transitionMode, setTransitionMode] = useState<TransitionMode>('sequential');
   const [previousPage, setPreviousPage] = useState<PageId | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const lastScrollTime = useRef<number>(0);
+  const scrollCooldown = 800; // 800ms cooldown between scroll transitions
+  const scrollGestureState = useRef<{
+    isActive: boolean;
+    startPosition: number;
+    startContainer: HTMLElement | null;
+    lastEventTime: number;
+  }>({
+    isActive: false,
+    startPosition: 0,
+    startContainer: null,
+    lastEventTime: 0
+  });
 
   // Dynamic navigation functions
   const navigateToPage = (targetPageId: PageId, mode: TransitionMode = 'direct') => {
@@ -36,8 +49,8 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
           setIsTransitioning(false);
           setTransitionMode('sequential');
           setPreviousPage(null);
-        }, 600);
-      }, 50); // Small delay to start the transition
+        }, 400);
+      }, 10); // Minimal delay to start the transition
     } else {
       // For direct transitions, change immediately
       onPageChange(targetPageId);
@@ -45,7 +58,7 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
         setIsTransitioning(false);
         setTransitionMode('sequential');
         setPreviousPage(null);
-      }, 600);
+      }, 400);
     }
   };
 
@@ -74,9 +87,97 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
 
   // Dynamic wheel event handler for trackpad gestures
   const handleWheel = (e: React.WheelEvent) => {
-    // Check if it's a trackpad gesture (deltaY will be larger for trackpad)
-    if (Math.abs(e.deltaY) > 50) {
+    const now = Date.now();
+    
+    // Check if scrolling is happening within a scrollable container
+    const target = e.target as HTMLElement;
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
+    
+    if (scrollableContainer) {
+      const container = scrollableContainer as HTMLElement;
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+      
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      const isScrollingUp = e.deltaY < 0;
+      const isScrollingDown = e.deltaY > 0;
+      const isStrongScroll = Math.abs(e.deltaY) > 30;
+      
+      // Check if this is a new scroll gesture (gap in time or different container)
+      const isNewGesture = !scrollGestureState.current.isActive || 
+                          scrollGestureState.current.startContainer !== container ||
+                          (now - scrollGestureState.current.lastEventTime) > 200;
+      
+      if (isNewGesture) {
+        // Start tracking a new scroll gesture - record where it starts
+        scrollGestureState.current = {
+          isActive: true,
+          startPosition: scrollTop,
+          startContainer: container,
+          lastEventTime: now
+        };
+        console.log('New scroll gesture started at position:', scrollTop);
+      } else {
+        // Continue tracking existing gesture
+        scrollGestureState.current.lastEventTime = now;
+      }
+      
+      // Check if we're at a boundary and trying to scroll beyond it
+      if ((isAtTop && isScrollingUp) || (isAtBottom && isScrollingDown)) {
+        // We're at a boundary and trying to scroll beyond it
+        const startedAtTop = scrollGestureState.current.startPosition === 0;
+        const startedAtBottom = scrollGestureState.current.startPosition + clientHeight >= scrollHeight - 1;
+        
+        // Only allow page transition if:
+        // 1. The scroll gesture started at the boundary we're trying to scroll beyond
+        // 2. It's a strong scroll gesture
+        // 3. We're not in cooldown
+        const canTransitionToPrevious = startedAtTop && isAtTop && isScrollingUp;
+        const canTransitionToNext = startedAtBottom && isAtBottom && isScrollingDown;
+        
+        if ((canTransitionToPrevious || canTransitionToNext) && isStrongScroll && (now - lastScrollTime.current) > scrollCooldown) {
+          e.preventDefault();
+          e.stopPropagation();
+          lastScrollTime.current = now;
+          
+          if (canTransitionToNext) {
+            console.log('Started at bottom, now at bottom scrolling down - transitioning to next page');
+            goToNextPage();
+          } else if (canTransitionToPrevious) {
+            console.log('Started at top, now at top scrolling up - transitioning to previous page');
+            goToPreviousPage();
+          }
+          
+          // Reset gesture state after transition
+          scrollGestureState.current.isActive = false;
+        } else {
+          // Prevent parent scroll but don't transition
+          e.preventDefault();
+          e.stopPropagation();
+          console.log('At boundary but gesture did not start at boundary - preventing parent scroll only');
+        }
+      } else if (!isAtTop && !isAtBottom) {
+        // User is scrolling in the middle - let container handle it normally
+        console.log('Scrolling in middle - allowing normal container scroll');
+      } else {
+        // User is at boundary but scrolling in opposite direction - prevent parent scroll
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('At boundary but scrolling opposite direction - preventing parent scroll only');
+      }
+      
+      return;
+    }
+    
+    // Reset gesture state when not in scrollable container
+    scrollGestureState.current.isActive = false;
+    
+    // Not in a scrollable container - use normal page transition logic
+    if (Math.abs(e.deltaY) > 10 && (now - lastScrollTime.current) > scrollCooldown) {
       e.preventDefault();
+      lastScrollTime.current = now;
       
       if (e.deltaY > 0) {
         // Scroll down - go to next page

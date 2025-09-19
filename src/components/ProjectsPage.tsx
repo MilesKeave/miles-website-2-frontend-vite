@@ -86,7 +86,7 @@ export const ProjectsPage = (): React.JSX.Element => {
         ) : (
           <div className="max-w-7xl mx-auto">
             {/* Scrollable container for projects */}
-            <div className="h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b transparent' }}>
+            <div className="h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b transparent', overscrollBehavior: 'contain' }}>
               <BentoGrid className="max-w-7xl mx-auto pb-8 pt-6">
                 {projects.map((project, index) => (
                   <CardSpotlight
