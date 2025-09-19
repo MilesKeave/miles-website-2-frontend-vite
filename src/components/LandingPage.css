@@ -44,7 +44,6 @@
 }
 
 .name-text {
-  
   padding-top: 120px;
   color: white;
   font-size: 2.3125rem;
@@ -54,8 +53,8 @@
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   z-index: 10;
 }
+
 .description-text {
-  
   padding-top: 10px;
   color: white;
   font-size: 1.15rem;
@@ -76,6 +75,95 @@
   z-index: 10;
   display: flex;
   justify-content: flex-start;
+}
+
+.button-container button {
+  width: 200px;
+  min-width: 200px;
+  max-width: 200px;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 640px) {
+  .name-text {
+    padding-top: 60px;
+    padding-left: 20px;
+    font-size: 1.5rem;
+    padding-right: 20px;
+  }
+  
+  .description-text {
+    padding-left: 20px;
+    padding-right: 20px;
+    font-size: 1rem;
+    max-width: none;
+  }
+  
+  .button-container {
+    padding-left: 20px;
+    padding-right: 20px;
+    flex-direction: column;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  
+  .button-container button {
+    width: 180px;
+    min-width: 180px;
+    max-width: 180px;
+    margin-left: 0 !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .name-text {
+    padding-top: 80px;
+    padding-left: 40px;
+    font-size: 1.8rem;
+    padding-right: 40px;
+  }
+  
+  .description-text {
+    padding-left: 40px;
+    padding-right: 40px;
+    font-size: 1.1rem;
+  }
+  
+  .button-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+  
+  .button-container button {
+    width: 190px;
+    min-width: 190px;
+    max-width: 190px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .name-text {
+    padding-top: 100px;
+    padding-left: 80px;
+    font-size: 2rem;
+    padding-right: 80px;
+  }
+  
+  .description-text {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  
+  .button-container {
+    padding-left: 80px;
+    padding-right: 80px;
+  }
+  
+  .button-container button {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+  }
 }
 
 .top-right-quadrant {
@@ -118,6 +206,75 @@
   width: 27rem;
   height: 27rem;
   object-fit: contain;
+}
+
+/* Mobile responsive profile image */
+@media (max-width: 360px) {
+  .profile-image-container {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .profile-image {
+    width: 12rem;
+    height: 12rem;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 480px) {
+  .profile-image-container {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .profile-image {
+    width: 14rem;
+    height: 14rem;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+  .profile-image-container {
+    width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+  }
+  
+  .profile-image {
+    width: 16rem;
+    height: 16rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  .profile-image-container {
+    width: 100%;
+    padding-left: 40px;
+    padding-right: 40px;
+    padding-bottom: 40px;
+  }
+  
+  .profile-image {
+    width: 18rem;
+    height: 18rem;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .profile-image-container {
+    width: 50%;
+    padding-left: 60px;
+  }
+  
+  .profile-image {
+    width: 22rem;
+    height: 22rem;
+  }
 }
 
 @media (min-width: 768px) {
@@ -190,11 +347,11 @@
 }
 
 /* Page-specific wrapper classes for any additional styling */
-.home-page-wrapper,
+/* .home-page-wrapper,
 .portfolio-page-wrapper,
 .work-page-wrapper {
-  /* Any page-specific styles can go here */
-}
+  Any page-specific styles can go here
+} */
 
 /* Page Content Styles */
 .home-page, .projects-page, .work-experience-page {
