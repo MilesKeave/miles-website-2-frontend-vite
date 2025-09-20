@@ -20,7 +20,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
     }
   }, [sortedWorkExperiences, activeExperienceId]);
 
-  // Set active experience with sliding animation
+  // Set active experience with smooth sliding animation
   const setActiveExperience = useCallback((targetExperienceId: string) => {
     if (isTransitioning || targetExperienceId === activeExperienceId) return;
     
@@ -31,30 +31,59 @@ export const WorkExperiencePage = (): React.JSX.Element => {
     
     setIsTransitioning(true);
     
-    // Calculate the direction and number of steps
+    // If adjacent, do direct transition
+    if (Math.abs(targetIndex - currentIndex) === 1) {
+      setActiveExperienceId(targetExperienceId);
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 500);
+      return;
+    }
+    
+    // For non-adjacent, create continuous sliding animation
     const direction = targetIndex > currentIndex ? 1 : -1;
     const steps = Math.abs(targetIndex - currentIndex);
+    const totalDuration = steps * 350; // Total duration for the entire animation
+    const frameRate = 16; // ~60fps
+    const totalFrames = Math.floor(totalDuration / frameRate);
     
-    // Animate through each step
-    let currentStep = 0;
-    const animateStep = () => {
-      if (currentStep < steps) {
-        const nextIndex = currentIndex + (direction * (currentStep + 1));
-        const nextExperienceId = sortedWorkExperiences[nextIndex]?.id;
+    let currentFrame = 0;
+    
+    const animateFrame = () => {
+      if (currentFrame < totalFrames) {
+        // Calculate progress (0 to 1)
+        const progress = currentFrame / totalFrames;
         
-        if (nextExperienceId) {
-          setActiveExperienceId(nextExperienceId);
-          currentStep++;
-          setTimeout(animateStep, 600); // 600ms delay between each step for more noticeable pitstops (CSS transition is 500ms)
+        // Calculate which tile should be active based on progress
+        const tileProgress = progress * steps;
+        const currentTileIndex = Math.floor(tileProgress);
+        
+        // Determine which experience to show
+        let experienceToShow;
+        if (currentTileIndex >= steps) {
+          // We've reached the end
+          experienceToShow = targetExperienceId;
         } else {
-          setIsTransitioning(false);
+          // Show intermediate tile (but keep it transparent via carousel logic)
+          const intermediateIndex = currentIndex + (direction * (currentTileIndex + 1));
+          experienceToShow = sortedWorkExperiences[intermediateIndex].id;
         }
+        
+        setActiveExperienceId(experienceToShow);
+        
+        currentFrame++;
+        setTimeout(animateFrame, frameRate);
       } else {
-        setIsTransitioning(false);
+        // Ensure we end on the target
+        setActiveExperienceId(targetExperienceId);
+        setTimeout(() => {
+          setIsTransitioning(false);
+        }, 100);
       }
     };
     
-    animateStep();
+    // Start the animation
+    setTimeout(animateFrame, frameRate);
   }, [activeExperienceId, sortedWorkExperiences, isTransitioning]);
 
   // Loading state
@@ -132,29 +161,36 @@ export const WorkExperiencePage = (): React.JSX.Element => {
             />
           </div>
 
-          {/* Desktop Layout - Side by Side */}
-          <div className="hidden sm:flex gap-4 sm:gap-6 lg:gap-8 h-[calc(100vh-8rem)] sm:h-[calc(100vh-10rem)] lg:h-[calc(100vh-12rem)]">
-            {/* Left Side - Title and Company List */}
-            <div className="w-64 sm:w-80 lg:w-96 flex-shrink-0 flex flex-col justify-center">
+          {/* Desktop Layout - Stacked with Two Columns Below */}
+          <div className="hidden sm:block">
+            {/* Top Section - Title */}
+            <div className="mb-6 sm:mb-8 lg:mb-10">
               <WorkExperienceHeader isMobile={false} />
-              <CompanyList 
-                workExperiences={sortedWorkExperiences}
-                activeExperienceId={activeExperienceId}
-                isTransitioning={isTransitioning}
-                onExperienceSelect={setActiveExperience}
-                isMobile={false}
-              />
             </div>
+            
+            {/* Bottom Section - Two Columns */}
+            <div className="flex gap-4 sm:gap-6 lg:gap-8 h-[calc(100vh-16rem)] sm:h-[calc(100vh-18rem)] lg:h-[calc(100vh-20rem)]">
+              {/* Left Column - Company List */}
+              <div className="w-64 sm:w-80 lg:w-96 flex-shrink-0 flex flex-col justify-start pt-6 sm:pt-9 lg:pt-12">
+                <CompanyList 
+                  workExperiences={sortedWorkExperiences}
+                  activeExperienceId={activeExperienceId}
+                  isTransitioning={isTransitioning}
+                  onExperienceSelect={setActiveExperience}
+                  isMobile={false}
+                />
+              </div>
 
-            {/* Right Side - Work experience carousel container */}
-            <div className="flex-1">
-              <WorkExperienceCarousel
-                workExperiences={sortedWorkExperiences}
-                activeExperienceId={activeExperienceId}
-                isTransitioning={isTransitioning}
-                onCardClick={setActiveExperience}
-                isMobile={false}
-              />
+              {/* Right Column - Work experience carousel container */}
+              <div className="flex-1">
+                <WorkExperienceCarousel
+                  workExperiences={sortedWorkExperiences}
+                  activeExperienceId={activeExperienceId}
+                  isTransitioning={isTransitioning}
+                  onCardClick={setActiveExperience}
+                  isMobile={false}
+                />
+              </div>
             </div>
           </div>
         </div>
