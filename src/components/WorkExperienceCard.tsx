@@ -17,6 +17,7 @@ interface WorkExperienceCardProps {
   isMobile?: boolean;
   hasTransparentBackground?: boolean;
   backgroundClass?: string;
+  isClickable?: boolean;
 }
 
 export const WorkExperienceCard = ({

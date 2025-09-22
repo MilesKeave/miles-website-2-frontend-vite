@@ -280,7 +280,7 @@ export const VerticalWorkExperienceCarousel = ({
               >
                 {/* Shadow overlay for cards not at visual index */}
                 {index !== visualIndex && (
-                  <div className={`absolute inset-0 z-10 rounded-lg sm:rounded-xl transition-all duration-500 ease-out ${shadowClass}`}></div>
+                  <div className={`absolute inset-0 z-10 rounded-lg sm:rounded-xl transition-all duration-500 ease-out pointer-events-none ${shadowClass}`}></div>
                 )}
                 <WorkExperienceCard
                   experience={experience}
@@ -294,10 +294,10 @@ export const VerticalWorkExperienceCarousel = ({
                   scaleClass={scaleClass}
                   zIndexClass=""
                   onCardClick={() => {
-                    if (!isTransitioning) {
-                      onCardClick(experience.id);
-                    }
+                    console.log('Tile clicked:', experience.companyName);
+                    onCardClick(experience.id);
                   }}
+                  isClickable={true}
                   isMobile={isMobile}
                   hasTransparentBackground={false}
                   backgroundClass={backgroundClass}
