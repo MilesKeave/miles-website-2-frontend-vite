@@ -53,12 +53,15 @@ export const VerticalWorkExperienceCarousel = ({
     if (!firstCard) return;
     
     const cardHeight = firstCard.offsetHeight;
-    const gap = 16; // Gap between cards (from gap-4 class)
+    const gap = 4; // Gap between cards (from gap-1 class)
     const cardSpacing = cardHeight + gap;
     
-    // Calculate scroll position to put the target card at the top of the container
+    // Calculate scroll position to put the target card lower in the container
+    // This allows users to see both previous and next cards
     const targetCardTop = targetIndex * cardSpacing;
-    const scrollPosition = targetCardTop; // No offset needed - we want card at top
+    const containerHeight = container.clientHeight;
+    const offsetFromTop = (containerHeight - cardHeight) / 2; // Center the card vertically
+    const scrollPosition = targetCardTop - offsetFromTop;
     
     container.scrollTo({
       top: Math.max(0, scrollPosition),
@@ -80,7 +83,7 @@ export const VerticalWorkExperienceCarousel = ({
     if (!firstCard) return;
     
     const cardHeight = firstCard.offsetHeight;
-    const gap = 16; // Gap between cards (from gap-4 class)
+    const gap = 4; // Gap between cards (from gap-1 class)
     const cardSpacing = cardHeight + gap;
     
     // Calculate which card is closest to the top for visual effects only
@@ -103,7 +106,7 @@ export const VerticalWorkExperienceCarousel = ({
     if (!firstCard) return;
     
     const cardHeight = firstCard.offsetHeight;
-    const gap = 16; // Gap between cards (from gap-4 class)
+    const gap = 4; // Gap between cards (from gap-1 class)
     const cardSpacing = cardHeight + gap;
     
     // Calculate which card is closest to the top
@@ -133,16 +136,18 @@ export const VerticalWorkExperienceCarousel = ({
     if (!firstCard) return;
     
     const cardHeight = firstCard.offsetHeight;
-    const gap = 16; // Gap between cards (from gap-4 class)
+    const gap = 4; // Gap between cards (from gap-1 class)
     const cardSpacing = cardHeight + gap;
     
     // Calculate which card should be active based on scroll position
     const nearestIndex = Math.round(containerTop / cardSpacing);
     const clampedIndex = Math.max(0, Math.min(nearestIndex, workExperiences.length - 1));
     
-    // Snap to the nearest card at the top of the container
+    // Snap to the nearest card positioned lower in the container
     const targetCardTop = clampedIndex * cardSpacing;
-    const targetScrollPosition = targetCardTop;
+    const containerHeight = container.clientHeight;
+    const offsetFromTop = (containerHeight - cardHeight) / 2; // Center the card vertically
+    const targetScrollPosition = targetCardTop - offsetFromTop;
     
     container.scrollTo({
       top: Math.max(0, targetScrollPosition),
@@ -229,7 +234,7 @@ export const VerticalWorkExperienceCarousel = ({
         ref={carouselRef}
         onScroll={handleScroll}
       >
-        <div className="flex flex-col justify-start gap-4">
+        <div className="flex flex-col justify-start gap-1">
           {workExperiences.map((experience, index) => {
             const isActive = experience.id === activeExperienceId;
             const isPrevious = index === currentIndex - 1;
@@ -258,7 +263,7 @@ export const VerticalWorkExperienceCarousel = ({
                                     distanceFromActive === 2 ? 'bg-black/50' : 'bg-black/70';
               shadowClass = shadowIntensity;
               opacityClass = 'opacity-100';
-              scaleClass = 'scale-80'; // 0.8 size for all non-visual-index cards
+              scaleClass = 'scale-90'; // 0.9 size for all non-visual-index cards
               backgroundClass = 'bg-transparent';
             }
             

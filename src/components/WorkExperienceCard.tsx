@@ -36,9 +36,9 @@ export const WorkExperienceCard = ({
   hasTransparentBackground = false,
   backgroundClass = ''
 }: WorkExperienceCardProps): React.JSX.Element => {
-  const cardHeight = isMobile ? "h-[20rem]" : "h-[24rem] sm:h-[28rem] md:h-[32rem] lg:h-[36rem]";
+  const cardHeight = isMobile ? "h-[17.1rem]" : "h-[20.41rem] sm:h-[23.81rem] md:h-[27.22rem] lg:h-[30.62rem]";
   const cardPadding = isMobile ? "p-3" : "p-3 sm:p-4 lg:p-6";
-  const cardGap = isMobile ? "gap-2" : "gap-3 sm:gap-4 lg:gap-6";
+  const cardGap = isMobile ? "gap-1" : "gap-1 sm:gap-1.5 lg:gap-2";
   const cardRounded = isMobile ? "rounded-lg" : "rounded-lg sm:rounded-xl";
   
   return (
@@ -51,7 +51,7 @@ export const WorkExperienceCard = ({
       <div 
         className={`relative ${cardHeight} w-full max-w-full ${cardRounded} border-2 border-slate-600/40 transition-all duration-500 ease-out transform-gpu origin-center ${backgroundClass} shadow-2xl`}
         style={{
-          transform: scaleClass === 'scale-80' ? 'scale(0.8)' : 'scale(1)',
+          transform: scaleClass === 'scale-90' ? 'scale(0.9)' : 'scale(1)',
         }}
       >
         <GlowingEffect
