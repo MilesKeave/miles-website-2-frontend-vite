@@ -167,10 +167,10 @@ export const VerticalWorkExperienceCarousel = ({
       clearTimeout(scrollTimeoutRef.current);
     }
     
-    // Set new timeout to detect when scrolling stops - longer delay for more natural scrolling
+    // Set new timeout to detect when scrolling stops - shorter delay for quicker snapping
     scrollTimeoutRef.current = setTimeout(() => {
       snapToNearestCard();
-    }, 800); // 800ms delay after scrolling stops - allows free scrolling
+    }, 300); // 300ms delay after scrolling stops - quicker snapping
   }, [updateVisualIndex, snapToNearestCard]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
