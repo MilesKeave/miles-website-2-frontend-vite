@@ -15,11 +15,11 @@
   },
   "dependencies": {
     "@react-three/fiber": "^9.0.0-alpha.8",
-    "@tabler/icons-react": "^3.34.1",
+    "@tabler/icons-react": "^3.35.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.540.0",
-    "motion": "^12.23.12",
+    "motion": "^12.23.18",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "tailwind-merge": "^3.3.1",

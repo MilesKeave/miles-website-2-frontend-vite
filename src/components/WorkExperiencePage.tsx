@@ -2,7 +2,7 @@ import { useWorkExperience } from "../hooks/useWorkExperience";
 import { useState, useEffect, useCallback } from "react";
 import { WorkExperienceHeader } from "./WorkExperienceHeader";
 import { CompanyList } from "./CompanyList";
-import { WorkExperienceCarousel } from "./WorkExperienceCarousel";
+import { VerticalWorkExperienceCarousel } from "./VerticalWorkExperienceCarousel";
 import { sortWorkExperiencesByDate } from "../utils/workExperienceUtils";
 
 export const WorkExperiencePage = (): React.JSX.Element => {
@@ -20,71 +20,20 @@ export const WorkExperiencePage = (): React.JSX.Element => {
     }
   }, [sortedWorkExperiences, activeExperienceId]);
 
-  // Set active experience with smooth sliding animation
+  // Set active experience with smooth carousel animation
   const setActiveExperience = useCallback((targetExperienceId: string) => {
     if (isTransitioning || targetExperienceId === activeExperienceId) return;
     
-    const currentIndex = sortedWorkExperiences.findIndex(exp => exp.id === activeExperienceId);
-    const targetIndex = sortedWorkExperiences.findIndex(exp => exp.id === targetExperienceId);
-    
-    if (currentIndex === -1 || targetIndex === -1) return;
-    
     setIsTransitioning(true);
     
-    // If adjacent, do direct transition
-    if (Math.abs(targetIndex - currentIndex) === 1) {
-      setActiveExperienceId(targetExperienceId);
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 500);
-      return;
-    }
+    // Direct transition - the smooth carousel handles the animation
+    setActiveExperienceId(targetExperienceId);
     
-    // For non-adjacent, create continuous sliding animation
-    const direction = targetIndex > currentIndex ? 1 : -1;
-    const steps = Math.abs(targetIndex - currentIndex);
-    const totalDuration = steps * 350; // Total duration for the entire animation
-    const frameRate = 16; // ~60fps
-    const totalFrames = Math.floor(totalDuration / frameRate);
-    
-    let currentFrame = 0;
-    
-    const animateFrame = () => {
-      if (currentFrame < totalFrames) {
-        // Calculate progress (0 to 1)
-        const progress = currentFrame / totalFrames;
-        
-        // Calculate which tile should be active based on progress
-        const tileProgress = progress * steps;
-        const currentTileIndex = Math.floor(tileProgress);
-        
-        // Determine which experience to show
-        let experienceToShow;
-        if (currentTileIndex >= steps) {
-          // We've reached the end
-          experienceToShow = targetExperienceId;
-        } else {
-          // Show intermediate tile (but keep it transparent via carousel logic)
-          const intermediateIndex = currentIndex + (direction * (currentTileIndex + 1));
-          experienceToShow = sortedWorkExperiences[intermediateIndex].id;
-        }
-        
-        setActiveExperienceId(experienceToShow);
-        
-        currentFrame++;
-        setTimeout(animateFrame, frameRate);
-      } else {
-        // Ensure we end on the target
-        setActiveExperienceId(targetExperienceId);
-        setTimeout(() => {
-          setIsTransitioning(false);
-        }, 100);
-      }
-    };
-    
-    // Start the animation
-    setTimeout(animateFrame, frameRate);
-  }, [activeExperienceId, sortedWorkExperiences, isTransitioning]);
+    // Reset transition state after animation completes
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 600); // Slightly longer to account for smooth animation
+  }, [activeExperienceId, isTransitioning]);
 
   // Loading state
   if (loading) {
@@ -152,7 +101,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
               onExperienceSelect={setActiveExperience}
               isMobile={true}
             />
-            <WorkExperienceCarousel
+            <VerticalWorkExperienceCarousel
               workExperiences={sortedWorkExperiences}
               activeExperienceId={activeExperienceId}
               isTransitioning={isTransitioning}
@@ -183,13 +132,13 @@ export const WorkExperiencePage = (): React.JSX.Element => {
 
               {/* Right Column - Work experience carousel container */}
               <div className="flex-1">
-                <WorkExperienceCarousel
-                  workExperiences={sortedWorkExperiences}
-                  activeExperienceId={activeExperienceId}
-                  isTransitioning={isTransitioning}
-                  onCardClick={setActiveExperience}
-                  isMobile={false}
-                />
+              <VerticalWorkExperienceCarousel
+                workExperiences={sortedWorkExperiences}
+                activeExperienceId={activeExperienceId}
+                isTransitioning={isTransitioning}
+                onCardClick={setActiveExperience}
+                isMobile={false}
+              />
               </div>
             </div>
           </div>

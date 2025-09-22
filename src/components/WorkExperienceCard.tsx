@@ -15,6 +15,7 @@ interface WorkExperienceCardProps {
   zIndexClass: string;
   onCardClick: () => void;
   isMobile?: boolean;
+  hasTransparentBackground?: boolean;
 }
 
 export const WorkExperienceCard = ({
@@ -29,7 +30,8 @@ export const WorkExperienceCard = ({
   scaleClass,
   zIndexClass,
   onCardClick,
-  isMobile = false
+  isMobile = false,
+  hasTransparentBackground = false
 }: WorkExperienceCardProps): React.JSX.Element => {
   const cardHeight = isMobile ? "h-[20rem]" : "h-[24rem] sm:h-[28rem] md:h-[32rem] lg:h-[36rem]";
   const cardPadding = isMobile ? "p-3" : "p-3 sm:p-4 lg:p-6";
@@ -38,12 +40,19 @@ export const WorkExperienceCard = ({
   
   return (
     <div
-      className={`w-full transition-all duration-500 ${positionClass} ${opacityClass} ${scaleClass} ${zIndexClass} ${
+      className={`w-full transition-all duration-500 ${positionClass} ${opacityClass} ${zIndexClass} ${
         isVisible ? 'block' : 'hidden'
       } ${isPrevious || isNext ? (isTransitioning ? 'cursor-not-allowed' : 'cursor-pointer hover:opacity-50') : ''}`}
       onClick={onCardClick}
     >
-      <div className={`relative ${cardHeight} w-full ${cardRounded} border-2 border-slate-600/40 bg-slate-900 shadow-2xl`}>
+      <div 
+        className={`relative ${cardHeight} w-full max-w-full ${cardRounded} border-2 border-slate-600/40 transition-all duration-500 ease-out transform-gpu origin-center ${
+          hasTransparentBackground ? 'bg-transparent' : 'bg-slate-900'
+        } shadow-2xl`}
+        style={{
+          transform: scaleClass === 'scale-80' ? 'scale(0.8)' : 'scale(1)',
+        }}
+      >
         <GlowingEffect
           spread={80}
           glow={true}
