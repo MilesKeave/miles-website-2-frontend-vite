@@ -240,22 +240,26 @@ export const VerticalWorkExperienceCarousel = ({
             const distanceFromActive = Math.abs(index - visualIndex);
             
             // Determine shadow/transparency level and scale based on distance from visual index
+            // All effects should be perfectly synchronized
             let shadowClass = '';
             let opacityClass = '';
             let scaleClass = '';
+            let backgroundClass = '';
             
             if (index === visualIndex) {
-              // Card at visual index - fully visible, no shadow, full size
+              // Card at visual index - fully visible, no shadow, full size, solid background
               shadowClass = '';
               opacityClass = 'opacity-100';
               scaleClass = 'scale-100';
+              backgroundClass = 'bg-slate-900';
             } else {
-              // All other cards - 0.8 size with varying shadow intensity
+              // All other cards - 0.8 size with varying shadow intensity and transparent background
               const shadowIntensity = distanceFromActive === 1 ? 'bg-black/30' : 
                                     distanceFromActive === 2 ? 'bg-black/50' : 'bg-black/70';
               shadowClass = shadowIntensity;
               opacityClass = 'opacity-100';
               scaleClass = 'scale-80'; // 0.8 size for all non-visual-index cards
+              backgroundClass = 'bg-transparent';
             }
             
             return (
@@ -295,7 +299,8 @@ export const VerticalWorkExperienceCarousel = ({
                     }
                   }}
                   isMobile={isMobile}
-                  hasTransparentBackground={index !== visualIndex}
+                  hasTransparentBackground={false}
+                  backgroundClass={backgroundClass}
                 />
               </motion.div>
             );
