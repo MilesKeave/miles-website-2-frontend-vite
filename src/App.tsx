@@ -10,7 +10,7 @@ function App(): React.JSX.Element {
 
   const handleNavigate = (page: string) => {
     // Type-safe navigation - only allow valid page IDs
-    if (['home', 'portfolio', 'work'].includes(page)) {
+    if (['home', 'portfolio', 'work', 'photography'].includes(page)) {
       setIsDirectNavigation(true); // Flag for direct navigation
       setCurrentPage(page as PageId);
     }

@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "../../lib/utils";
-import { Home, FolderOpen, Briefcase, Github, Linkedin } from "lucide-react";
+import { Home, FolderOpen, Briefcase, Camera, Github, Linkedin } from "lucide-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -29,6 +29,8 @@ export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingD
         return <FolderOpen className="h-5 w-5" />;
       case 'work':
         return <Briefcase className="h-5 w-5" />;
+      case 'photography':
+        return <Camera className="h-5 w-5" />;
       default:
         return <Home className="h-5 w-5" />;
     }

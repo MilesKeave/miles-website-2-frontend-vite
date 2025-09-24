@@ -1,6 +1,6 @@
 import React from 'react';
 
-export type PageId = 'home' | 'portfolio' | 'work';
+export type PageId = 'home' | 'portfolio' | 'work' | 'photography';
 
 export type TransitionMode = 'sequential' | 'direct';
 

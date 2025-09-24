@@ -1,7 +1,10 @@
 import { BentoGrid } from "./ui/bento-grid";
 import { CardSpotlight } from "./ui/card-spotlight";
+import { ProjectPopup } from "./ui/project-popup";
 import { IconCode, IconDatabase, IconGlobe, IconDeviceMobile, IconRobot, IconBrandGithub, IconBrandYoutube } from "@tabler/icons-react";
 import { useProjects } from "../hooks/useProjects";
+import { useState } from "react";
+import type { Project } from "../services/projectApi";
 
 // Icon mapping for different project categories (based on project name or content)
 const getCategoryIcon = (projectName: string) => {
@@ -21,6 +24,15 @@ const getCategoryIcon = (projectName: string) => {
 
 export const ProjectsPage = (): React.JSX.Element => {
   const { projects, loading, error, refreshProjects } = useProjects();
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const handleProjectClick = (project: Project) => {
+    setSelectedProject(project);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedProject(null);
+  };
 
   if (loading) {
     return (
@@ -91,61 +103,32 @@ export const ProjectsPage = (): React.JSX.Element => {
                 {projects.map((project, index) => (
                   <CardSpotlight
                     key={project.id}
-                    className={`h-full flex flex-col justify-between space-y-4 ${index === 0 ? "md:col-span-2" : ""}`}
+                    className={`h-full flex flex-col cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-0 ${index === 0 ? "md:col-span-2" : ""}`}
+                    onClick={() => handleProjectClick(project)}
                   >
-                    {/* Header with image */}
-                    <div className="relative z-10 h-32 w-full overflow-hidden rounded-lg bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
+                    {/* Image section */}
+                    <div className="relative h-3/4 w-full overflow-hidden rounded-lg pt-8 px-8">
                       {project.projectImageUrl ? (
                         <img
                           src={project.projectImageUrl}
                           alt={project.projectName}
-                          className="h-full w-full object-cover"
+                          className="h-full w-full object-cover rounded-lg select-none pointer-events-none"
+                          draggable={false}
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center">
+                        <div className="flex h-full items-center justify-center rounded-lg">
                           <div className="text-4xl text-slate-500 dark:text-slate-400">
                             {getCategoryIcon(project.projectName)}
                           </div>
                         </div>
                       )}
-                      <div className="absolute top-2 right-2 flex gap-1 z-20">
-                        {project.githubLink && (
-                          <a
-                            href={project.githubLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
-                            title="View on GitHub"
-                          >
-                            <IconBrandGithub className="h-3 w-3 text-slate-700" />
-                          </a>
-                        )}
-                        {project.youtubeLink && (
-                          <a
-                            href={project.youtubeLink}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-1 rounded-full bg-white/80 hover:bg-white transition-colors"
-                            title="Watch on YouTube"
-                          >
-                            <IconBrandYoutube className="h-3 w-3 text-slate-700" />
-                          </a>
-                        )}
-                      </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="relative z-50 transition duration-200 group-hover:translate-x-2">
-                      <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 mb-2">
-                        {getCategoryIcon(project.projectName)}
-                        <span className="text-xs">Project</span>
-                      </div>
-                      <div className="mt-2 mb-2 font-sans font-bold text-neutral-600 dark:text-neutral-200">
+                    {/* Title section */}
+                    <div className="flex-1 flex items-center justify-center px-4 relative z-10">
+                      <h3 className="text-slate-900 dark:text-slate-100 font-bold text-lg text-center">
                         {project.projectName}
-                      </div>
-                      <div className="font-sans text-xs font-normal text-neutral-600 dark:text-neutral-300">
-                        {project.paragraph}
-                      </div>
+                      </h3>
                     </div>
                   </CardSpotlight>
                 ))}
@@ -160,6 +143,14 @@ export const ProjectsPage = (): React.JSX.Element => {
           </p>
         </div>
       </div>
+
+      {/* Project Popup */}
+      {selectedProject && (
+        <ProjectPopup
+          project={selectedProject}
+          onClose={handleClosePopup}
+        />
+      )}
     </div>
   );
 };

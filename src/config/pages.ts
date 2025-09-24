@@ -2,6 +2,7 @@ import React from 'react';
 import { HomePage } from '../components/HomePage';
 import { ProjectsPage } from '../components/ProjectsPage';
 import { WorkExperiencePage } from '../components/WorkExperiencePage';
+import { PhotographyPage } from '../components/PhotographyPage';
 
 export interface PageConfig {
   id: string;
@@ -28,6 +29,12 @@ export const PAGE_CONFIG: PageConfig[] = [
     title: 'Work Experience',
     component: WorkExperiencePage,
     order: 2
+  },
+  {
+    id: 'photography',
+    title: 'My Photography',
+    component: PhotographyPage,
+    order: 3
   }
 ];
 
