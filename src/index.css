@@ -9,6 +9,54 @@ html, body {
   background-color: black;
 }
 
+/* Animation for selected folder sliding in from collapsed position */
+@keyframes slide-in-from-collapsed {
+  0% {
+    transform: scale(0.3) translateX(-50%) translateY(-50%);
+    opacity: 0.1;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+/* Animation for first photo sliding from collapsed position to grid position */
+@keyframes slide-from-collapsed-to-grid {
+  0% {
+    /* Start at collapsed position - transform will be set dynamically */
+  }
+  100% {
+    transform: none;
+  }
+}
+
+.animate-slide-in-from-collapsed {
+  animation: slide-in-from-collapsed 0.7s ease-in-out forwards;
+  /* Start from collapsed state */
+  transform: scale(0.3) translateX(-50%) translateY(-50%);
+  opacity: 0.1;
+}
+
+.animate-from-collapsed-to-grid {
+  animation: slide-from-collapsed-to-grid 0.7s ease-in-out forwards;
+}
+
+/* Animation for expanding folders from collapsed state */
+@keyframes expand-from-collapsed {
+  0% {
+    /* Start from collapsed position - transform will be set dynamically */
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.animate-expand-from-collapsed {
+  animation: expand-from-collapsed 0.7s ease-in-out forwards;
+}
+
 /* Ensure proper transparency support for images */
 img {
   background: transparent;
