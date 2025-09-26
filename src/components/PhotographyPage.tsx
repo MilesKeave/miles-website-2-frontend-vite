@@ -26,6 +26,7 @@ export function PhotographyPage() {
   const [shouldEmergeRemainingPhotos, setShouldEmergeRemainingPhotos] = useState(false);
   const [shouldRenderRemainingPhotos, setShouldRenderRemainingPhotos] = useState(false);
   const [firstPhotoReady, setFirstPhotoReady] = useState(false);
+  const [isForwardTransition, setIsForwardTransition] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -46,6 +47,7 @@ export function PhotographyPage() {
     setShouldRenderRemainingPhotos(false);
     setShouldEmergeRemainingPhotos(false);
     setFirstPhotoReady(false);
+    setIsForwardTransition(true); // Forward transition: folder to photo
     setFolderAnimationState('collapsing'); // Start collapse animation
   };
 
@@ -56,6 +58,7 @@ export function PhotographyPage() {
     setShouldEmergeRemainingPhotos(false);
     setShouldRenderRemainingPhotos(false);
     setFirstPhotoReady(false);
+    setIsForwardTransition(false); // Reverse transition: photo to folder
   };
 
   // State-driven animation flow - no setTimeout dependencies
@@ -117,6 +120,7 @@ export function PhotographyPage() {
         setShouldRenderRemainingPhotos(false);
         setShouldEmergeRemainingPhotos(false);
         setFirstPhotoReady(false);
+        setIsForwardTransition(false);
       }, 700);
       return () => clearTimeout(timer);
     }
@@ -182,6 +186,7 @@ export function PhotographyPage() {
                     shouldEmergeRemainingPhotos={shouldEmergeRemainingPhotos}
                     shouldRenderRemainingPhotos={shouldRenderRemainingPhotos}
                     firstPhotoReady={firstPhotoReady}
+                    isForwardTransition={isForwardTransition}
                   />
             </>
           )}
@@ -202,7 +207,7 @@ export function PhotographyPage() {
 }
 
 // Photo Grid Component - matches FocusCards layout exactly
-function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders, shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos, firstPhotoReady }: { 
+function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders, shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos, firstPhotoReady, isForwardTransition }: { 
   photos: string[], 
   folderName: string,
   isTransitioningToPhotos?: boolean,
@@ -211,7 +216,8 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
   isTransitioningBackToFolders?: boolean,
   shouldEmergeRemainingPhotos?: boolean,
   shouldRenderRemainingPhotos?: boolean,
-  firstPhotoReady?: boolean
+  firstPhotoReady?: boolean,
+  isForwardTransition?: boolean
 }) {
   const firstPhotoRef = useRef<HTMLDivElement>(null);
   const remainingPhotoRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -309,8 +315,15 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
         const shouldAnimateBackToFolder = isSelectedPhoto && isTransitioningBackToFolders && collapsedFolderPosition && firstPhotoPosition;
         const shouldEmergeFromBehind = !isSelectedPhoto && shouldEmergeRemainingPhotos && shouldRenderRemainingPhotos;
         
-        // First photo should be hidden until both folder is ready to disappear AND photo is ready to appear
-        const shouldHideFirstPhoto = isSelectedPhoto && (!firstPhotoReady || !shouldAnimateFirstPhoto);
+        // Different opacity rules for forward vs reverse transitions
+        const shouldHideFirstPhoto = isSelectedPhoto && (
+          // Forward transition: hide until ready to animate from collapsed position
+          (isForwardTransition && (!firstPhotoReady || !shouldAnimateFirstPhoto || !shouldAnimateFromCollapsed)) ||
+          // Reverse transition: never hide (always visible during transition)
+          (!isForwardTransition && false)
+        );
+        
+        
         
         // Only render remaining photos when they should be rendered AND should emerge
         if (!isSelectedPhoto && (!shouldRenderRemainingPhotos || !shouldEmergeRemainingPhotos)) {
@@ -324,7 +337,7 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
               remainingPhotoRefs.current[index] = ref;
             } : undefined)}
             className={`rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full ${
-              shouldAnimateFromCollapsed ? 'transition-all duration-700 ease-in-out animate-from-collapsed-to-grid' : ''
+              shouldAnimateFromCollapsed ? 'transition-transform duration-700 ease-in-out animate-from-collapsed-to-grid' : ''
             } ${
               shouldAnimateBackToFolder ? 'transition-all duration-700 ease-in-out animate-from-grid-to-collapsed' : ''
             } ${
