@@ -45,7 +45,6 @@ export const HomePage = (): React.JSX.Element => {
             className="profile-image"
             style={{ mixBlendMode: 'normal' }}
             onError={(e) => {
-              console.log('Image failed to load:', profile.profileImageUrl);
               e.currentTarget.style.display = 'none';
             }}
           />

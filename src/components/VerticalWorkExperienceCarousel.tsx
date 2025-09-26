@@ -299,7 +299,6 @@ export const VerticalWorkExperienceCarousel = ({
                   scaleClass={scaleClass}
                   zIndexClass=""
                   onCardClick={() => {
-                    console.log('Tile clicked:', experience.companyName);
                     onCardClick(experience.id);
                   }}
                   isClickable={true}

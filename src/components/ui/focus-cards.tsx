@@ -41,16 +41,6 @@ export const Card = React.memo(
       const deltaX = selectedFolderPosition.x - cardPosition.x;
       const deltaY = selectedFolderPosition.y - cardPosition.y;
       
-      console.log(`Card ${card.title} transform:`, {
-        cardPosition: cardPosition,
-        targetPosition: selectedFolderPosition,
-        deltaX: deltaX,
-        deltaY: deltaY,
-        animationState: animationState,
-        shouldCollapse: shouldCollapse,
-        shouldExpand: shouldExpand,
-        isCollapsed: isCollapsed
-      });
       
       // For collapsing: move to selected folder position
       if (shouldCollapse) {
@@ -148,7 +138,6 @@ export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, on
   const [selectedFolderPosition, setSelectedFolderPosition] = useState<{ x: number; y: number } | null>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
-  console.log('FocusCards animationState:', animationState);
 
 
   // Calculate selected folder position immediately when selectedFolder changes
@@ -165,14 +154,6 @@ export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, on
             const x = cardRect.left + cardRect.width / 2;
             const y = cardRect.top + cardRect.height / 2;
             
-            console.log('Selected folder card rect:', {
-              left: cardRect.left,
-              top: cardRect.top,
-              width: cardRect.width,
-              height: cardRect.height,
-              centerX: x,
-              centerY: y
-            });
             setSelectedFolderPosition({ x, y });
             onPositionUpdate?.({ x, y });
           }

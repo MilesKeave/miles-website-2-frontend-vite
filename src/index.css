@@ -87,6 +87,34 @@ html, body {
   animation: emerge-from-behind-first-photo 0.6s ease-out forwards;
 }
 
+/* Animation for remaining photos collapsing back to behind first photo */
+@keyframes collapse-to-behind-first-photo {
+  0% {
+    /* Start from current position - transform will be set dynamically */
+  }
+  100% {
+    /* End at first photo position - transform will be set dynamically */
+  }
+}
+
+.animate-collapse-to-behind {
+  animation: collapse-to-behind-first-photo 0.7s ease-in-out forwards;
+}
+
+/* Animation for remaining photos collapsing back to behind first photo */
+@keyframes collapse-to-first-photo {
+  0% {
+    transform: none;
+  }
+  100% {
+    transform: var(--collapse-transform, none);
+  }
+}
+
+.animate-collapse-to-first {
+  animation: collapse-to-first-photo 0.7s ease-in-out forwards;
+}
+
 /* Ensure proper transparency support for images */
 img {
   background: transparent;

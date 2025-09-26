@@ -36,7 +36,6 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
   const navigateToPage = (targetPageId: PageId, mode: TransitionMode = 'direct') => {
     if (isTransitioning || targetPageId === currentPage) return;
     
-    console.log(`Navigating to ${targetPageId} page with ${mode} transition`);
     setIsTransitioning(true);
     setTransitionMode(mode);
     setPreviousPage(currentPage);
@@ -118,7 +117,6 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
           startContainer: container,
           lastEventTime: now
         };
-        console.log('New scroll gesture started at position:', scrollTop);
       } else {
         // Continue tracking existing gesture
         scrollGestureState.current.lastEventTime = now;
@@ -143,10 +141,8 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
           lastScrollTime.current = now;
           
           if (canTransitionToNext) {
-            console.log('Started at bottom, now at bottom scrolling down - transitioning to next page');
             goToNextPage();
           } else if (canTransitionToPrevious) {
-            console.log('Started at top, now at top scrolling up - transitioning to previous page');
             goToPreviousPage();
           }
           
@@ -156,16 +152,13 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
           // Prevent parent scroll but don't transition
           e.preventDefault();
           e.stopPropagation();
-          console.log('At boundary but gesture did not start at boundary - preventing parent scroll only');
         }
       } else if (!isAtTop && !isAtBottom) {
         // User is scrolling in the middle - let container handle it normally
-        console.log('Scrolling in middle - allowing normal container scroll');
       } else {
         // User is at boundary but scrolling in opposite direction - prevent parent scroll
         e.preventDefault();
         e.stopPropagation();
-        console.log('At boundary but scrolling opposite direction - preventing parent scroll only');
       }
       
       return;
