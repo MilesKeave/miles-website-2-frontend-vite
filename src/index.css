@@ -57,6 +57,20 @@ html, body {
   animation: expand-from-collapsed 0.7s ease-in-out forwards;
 }
 
+/* Animation for first photo sliding back to folder position */
+@keyframes slide-from-grid-to-collapsed {
+  0% {
+    transform: none;
+  }
+  100% {
+    /* End at collapsed position - transform will be set dynamically */
+  }
+}
+
+.animate-from-grid-to-collapsed {
+  animation: slide-from-grid-to-collapsed 0.7s ease-in-out forwards;
+}
+
 /* Ensure proper transparency support for images */
 img {
   background: transparent;

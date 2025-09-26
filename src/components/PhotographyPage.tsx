@@ -22,6 +22,7 @@ export function PhotographyPage() {
   const [collapsedFolderPosition, setCollapsedFolderPosition] = useState<{ x: number; y: number } | null>(null);
   const [shouldAnimateFirstPhoto, setShouldAnimateFirstPhoto] = useState(false);
   const [folderAnimationState, setFolderAnimationState] = useState<'normal' | 'collapsing' | 'collapsed' | 'expanding'>('normal');
+  const [isTransitioningBackToFolders, setIsTransitioningBackToFolders] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -57,12 +58,13 @@ export function PhotographyPage() {
   };
 
   const handleBackToFolders = () => {
-    // Step 1: First photo glides back to collapsed position
-    setShowPhotos(false);
+    // Step 1: Start reverse transition - first photo glides back to original folder position
+    setIsTransitioningBackToFolders(true);
     setShouldAnimateFirstPhoto(false); // Stop first photo animation
     
-    // Step 2: After photo glides back, show folder in collapsed state (no animation)
+    // Step 2: After photo glides back, hide photos and show folder in collapsed state
     setTimeout(() => {
+      setShowPhotos(false);
       setIsTransitioningToPhotos(false);
       setFolderAnimationState('collapsed'); // Start in collapsed state
     }, 700); // Match animation duration
@@ -77,6 +79,7 @@ export function PhotographyPage() {
       setSelectedFolder(null);
       setIsAnimating(false);
       setFolderAnimationState('normal');
+      setIsTransitioningBackToFolders(false);
     }, 1500); // 800ms (folder appear) + 700ms (expansion)
   };
 
@@ -130,15 +133,16 @@ export function PhotographyPage() {
           {showPhotos && selectedFolder && (
             <>
               {/* Photo Grid */}
-              <PhotoGrid 
-                photos={selectedFolder.photoUrls}
-                folderName={selectedFolder.name}
-                selectedFolder={selectedFolder}
-                isAnimating={isAnimating}
-                isTransitioningToPhotos={isTransitioningToPhotos}
-                collapsedFolderPosition={collapsedFolderPosition}
-                shouldAnimateFirstPhoto={shouldAnimateFirstPhoto}
-              />
+                  <PhotoGrid 
+                    photos={selectedFolder.photoUrls}
+                    folderName={selectedFolder.name}
+                    selectedFolder={selectedFolder}
+                    isAnimating={isAnimating}
+                    isTransitioningToPhotos={isTransitioningToPhotos}
+                    collapsedFolderPosition={collapsedFolderPosition}
+                    shouldAnimateFirstPhoto={shouldAnimateFirstPhoto}
+                    isTransitioningBackToFolders={isTransitioningBackToFolders}
+                  />
             </>
           )}
         </div>
@@ -158,14 +162,15 @@ export function PhotographyPage() {
 }
 
 // Photo Grid Component - matches FocusCards layout exactly
-function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto }: { 
+function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders }: { 
   photos: string[], 
   folderName: string,
   selectedFolder?: any,
   isAnimating?: boolean,
   isTransitioningToPhotos?: boolean,
   collapsedFolderPosition?: { x: number; y: number } | null,
-  shouldAnimateFirstPhoto?: boolean
+  shouldAnimateFirstPhoto?: boolean,
+  isTransitioningBackToFolders?: boolean
 }) {
   const firstPhotoRef = useRef<HTMLDivElement>(null);
   const [firstPhotoPosition, setFirstPhotoPosition] = useState<{ x: number; y: number } | null>(null);
@@ -203,10 +208,16 @@ function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransiti
       collapsedPosition: collapsedFolderPosition,
       firstPhotoPosition: firstPhotoPosition,
       deltaX: deltaX,
-      deltaY: deltaY
+      deltaY: deltaY,
+      isTransitioningBackToFolders: isTransitioningBackToFolders
     });
     
-    // Start at collapsed position, animate to grid position
+    // For reverse transition: start at grid position, animate to collapsed position
+    if (isTransitioningBackToFolders) {
+      return `translateX(${deltaX}px) translateY(${deltaY}px)`;
+    }
+    
+    // For forward transition: start at collapsed position, animate to grid position
     return `translateX(${deltaX}px) translateY(${deltaY}px)`;
   };
 
@@ -216,6 +227,7 @@ function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransiti
         const isSelectedPhoto = index === 0; // First photo is the selected folder image
         const shouldEmergeFromSelected = isTransitioningToPhotos && !isSelectedPhoto;
         const shouldAnimateFromCollapsed = isSelectedPhoto && shouldAnimateFirstPhoto && collapsedFolderPosition && firstPhotoPosition;
+        const shouldAnimateBackToFolder = isSelectedPhoto && isTransitioningBackToFolders && collapsedFolderPosition && firstPhotoPosition;
         
         return (
           <div
@@ -223,12 +235,14 @@ function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransiti
             ref={isSelectedPhoto ? firstPhotoRef : undefined}
             className={`rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full transition-all duration-700 ease-in-out ${
               shouldAnimateFromCollapsed ? 'animate-from-collapsed-to-grid' : ''
+            } ${
+              shouldAnimateBackToFolder ? 'animate-from-grid-to-collapsed' : ''
             }`}
             style={{
               zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : 20),
               transform: shouldEmergeFromSelected 
                 ? 'scale(0.3) translateX(-50%) translateY(-50%)' 
-                : shouldAnimateFromCollapsed 
+                : (shouldAnimateFromCollapsed || shouldAnimateBackToFolder)
                 ? getFirstPhotoTransform()
                 : 'none',
               opacity: shouldEmergeFromSelected ? 0.1 : (shouldAnimateFromCollapsed ? (firstPhotoVisible ? 1 : 0) : 1),
