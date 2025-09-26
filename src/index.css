@@ -71,6 +71,22 @@ html, body {
   animation: slide-from-grid-to-collapsed 0.7s ease-in-out forwards;
 }
 
+/* Animation for remaining photos emerging from behind first photo */
+@keyframes emerge-from-behind-first-photo {
+  0% {
+    /* Starting position will be set dynamically via inline styles */
+    opacity: 0;
+  }
+  100% {
+    transform: none;
+    opacity: 1;
+  }
+}
+
+.animate-emerge-from-behind {
+  animation: emerge-from-behind-first-photo 0.6s ease-out forwards;
+}
+
 /* Ensure proper transparency support for images */
 img {
   background: transparent;

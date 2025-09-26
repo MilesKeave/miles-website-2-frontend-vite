@@ -23,6 +23,9 @@ export function PhotographyPage() {
   const [shouldAnimateFirstPhoto, setShouldAnimateFirstPhoto] = useState(false);
   const [folderAnimationState, setFolderAnimationState] = useState<'normal' | 'collapsing' | 'collapsed' | 'expanding'>('normal');
   const [isTransitioningBackToFolders, setIsTransitioningBackToFolders] = useState(false);
+  const [shouldEmergeRemainingPhotos, setShouldEmergeRemainingPhotos] = useState(false);
+  const [shouldRenderRemainingPhotos, setShouldRenderRemainingPhotos] = useState(false);
+  const [firstPhotoReady, setFirstPhotoReady] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -31,7 +34,7 @@ export function PhotographyPage() {
     folder: folder
   }));
 
-  const handleFolderClick = (folder: PhotoFolder, event?: React.MouseEvent) => {
+  const handleFolderClick = (folder: PhotoFolder) => {
     console.log('Folder clicked:', folder.name, 'Current animating:', isAnimating);
     
     if (isAnimating) return; // Prevent multiple clicks during animation
@@ -39,49 +42,85 @@ export function PhotographyPage() {
     console.log('Setting animation state...');
     setIsAnimating(true);
     setSelectedFolder(folder);
-    setShouldAnimateFirstPhoto(false); // Reset animation control
+    setShouldAnimateFirstPhoto(false);
+    setShouldRenderRemainingPhotos(false);
+    setShouldEmergeRemainingPhotos(false);
+    setFirstPhotoReady(false);
     setFolderAnimationState('collapsing'); // Start collapse animation
-    
-    // Step 1: After folders collapse (700ms), start transition to photos
-    setTimeout(() => {
-      console.log('Starting transition to photos...');
-      setFolderAnimationState('collapsed'); // Folders are now collapsed
-      setIsTransitioningToPhotos(true);
-      setShouldAnimateFirstPhoto(true); // Explicitly trigger first photo animation
-    }, 700);
-    
-    // Step 2: Show photos after transition completes
-    setTimeout(() => {
-      console.log('Showing photos...');
-      setShowPhotos(true);
-    }, 1400); // 700ms (collapse) + 700ms (transition to photos)
   };
 
   const handleBackToFolders = () => {
-    // Step 1: Start reverse transition - first photo glides back to original folder position
+    // Start reverse transition
     setIsTransitioningBackToFolders(true);
-    setShouldAnimateFirstPhoto(false); // Stop first photo animation
-    
-    // Step 2: After photo glides back, hide photos and show folder in collapsed state
-    setTimeout(() => {
-      setShowPhotos(false);
-      setIsTransitioningToPhotos(false);
-      setFolderAnimationState('collapsed'); // Start in collapsed state
-    }, 700); // Match animation duration
-    
-    // Step 3: After folder appears, expand folders from collapsed state
-    setTimeout(() => {
-      setFolderAnimationState('expanding'); // Start expansion animation
-    }, 800); // Small delay to ensure folder is visible
-    
-    // Step 4: After expansion completes, reset to normal
-    setTimeout(() => {
-      setSelectedFolder(null);
-      setIsAnimating(false);
-      setFolderAnimationState('normal');
-      setIsTransitioningBackToFolders(false);
-    }, 1500); // 800ms (folder appear) + 700ms (expansion)
+    setShouldAnimateFirstPhoto(false);
+    setShouldEmergeRemainingPhotos(false);
+    setShouldRenderRemainingPhotos(false);
+    setFirstPhotoReady(false);
   };
+
+  // State-driven animation flow - no setTimeout dependencies
+  useEffect(() => {
+    if (folderAnimationState === 'collapsing') {
+      // After folders finish collapsing, transition to photos
+      const timer = setTimeout(() => {
+        setFolderAnimationState('collapsed');
+        setIsTransitioningToPhotos(true);
+        setShowPhotos(true);
+        setShouldAnimateFirstPhoto(true);
+        setFirstPhotoReady(true);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [folderAnimationState]);
+
+  useEffect(() => {
+    if (shouldAnimateFirstPhoto && collapsedFolderPosition) {
+      // After first photo starts animating, prepare remaining photos
+      const timer = setTimeout(() => {
+        setShouldRenderRemainingPhotos(true);
+        setShouldEmergeRemainingPhotos(true);
+      }, 700); // Wait for first photo to reach position
+      return () => clearTimeout(timer);
+    }
+  }, [shouldAnimateFirstPhoto, collapsedFolderPosition]);
+
+  useEffect(() => {
+    if (isTransitioningBackToFolders) {
+      // After first photo glides back, hide photos and show folders
+      const timer = setTimeout(() => {
+        setShowPhotos(false);
+        setIsTransitioningToPhotos(false);
+        setFolderAnimationState('collapsed');
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [isTransitioningBackToFolders]);
+
+  useEffect(() => {
+    if (folderAnimationState === 'collapsed' && isTransitioningBackToFolders) {
+      // After folders appear in collapsed state, expand them
+      const timer = setTimeout(() => {
+        setFolderAnimationState('expanding');
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [folderAnimationState, isTransitioningBackToFolders]);
+
+  useEffect(() => {
+    if (folderAnimationState === 'expanding') {
+      // After expansion completes, reset everything
+      const timer = setTimeout(() => {
+        setSelectedFolder(null);
+        setIsAnimating(false);
+        setFolderAnimationState('normal');
+        setIsTransitioningBackToFolders(false);
+        setShouldRenderRemainingPhotos(false);
+        setShouldEmergeRemainingPhotos(false);
+        setFirstPhotoReady(false);
+      }, 700);
+      return () => clearTimeout(timer);
+    }
+  }, [folderAnimationState]);
 
   if (loading) {
     return (
@@ -136,12 +175,13 @@ export function PhotographyPage() {
                   <PhotoGrid 
                     photos={selectedFolder.photoUrls}
                     folderName={selectedFolder.name}
-                    selectedFolder={selectedFolder}
-                    isAnimating={isAnimating}
                     isTransitioningToPhotos={isTransitioningToPhotos}
                     collapsedFolderPosition={collapsedFolderPosition}
                     shouldAnimateFirstPhoto={shouldAnimateFirstPhoto}
                     isTransitioningBackToFolders={isTransitioningBackToFolders}
+                    shouldEmergeRemainingPhotos={shouldEmergeRemainingPhotos}
+                    shouldRenderRemainingPhotos={shouldRenderRemainingPhotos}
+                    firstPhotoReady={firstPhotoReady}
                   />
             </>
           )}
@@ -162,19 +202,21 @@ export function PhotographyPage() {
 }
 
 // Photo Grid Component - matches FocusCards layout exactly
-function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders }: { 
+function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders, shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos, firstPhotoReady }: { 
   photos: string[], 
   folderName: string,
-  selectedFolder?: any,
-  isAnimating?: boolean,
   isTransitioningToPhotos?: boolean,
   collapsedFolderPosition?: { x: number; y: number } | null,
   shouldAnimateFirstPhoto?: boolean,
-  isTransitioningBackToFolders?: boolean
+  isTransitioningBackToFolders?: boolean,
+  shouldEmergeRemainingPhotos?: boolean,
+  shouldRenderRemainingPhotos?: boolean,
+  firstPhotoReady?: boolean
 }) {
   const firstPhotoRef = useRef<HTMLDivElement>(null);
+  const remainingPhotoRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const [firstPhotoPosition, setFirstPhotoPosition] = useState<{ x: number; y: number } | null>(null);
-  const [firstPhotoVisible, setFirstPhotoVisible] = useState(false);
+  const [remainingPhotoPositions, setRemainingPhotoPositions] = useState<{ [key: number]: { x: number; y: number } }>({});
 
   // Calculate first photo position when it mounts
   useEffect(() => {
@@ -187,14 +229,50 @@ function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransiti
     }
   }, []);
 
-  // Control first photo visibility based on explicit animation trigger
+
+  // Calculate remaining photo positions when they should emerge
   useEffect(() => {
-    if (shouldAnimateFirstPhoto && collapsedFolderPosition && firstPhotoPosition) {
-      setTimeout(() => setFirstPhotoVisible(true), 50);
-    } else {
-      setFirstPhotoVisible(false);
+    if (shouldEmergeRemainingPhotos && shouldRenderRemainingPhotos) {
+      // Use requestAnimationFrame to ensure DOM is ready
+      requestAnimationFrame(() => {
+        const newPositions: { [key: number]: { x: number; y: number } } = {};
+        Object.entries(remainingPhotoRefs.current).forEach(([index, ref]) => {
+          if (ref) {
+            const rect = ref.getBoundingClientRect();
+            newPositions[parseInt(index)] = {
+              x: rect.left + rect.width / 2,
+              y: rect.top + rect.height / 2
+            };
+          }
+        });
+        setRemainingPhotoPositions(newPositions);
+      });
     }
-  }, [shouldAnimateFirstPhoto, collapsedFolderPosition, firstPhotoPosition]);
+  }, [shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos]);
+
+  // Calculate transition path for each remaining photo
+  const calculatePhotoTransitionPath = (index: number) => {
+    if (!firstPhotoPosition) return 'none';
+    
+    // Get the current photo's grid position
+    const currentPhotoPosition = remainingPhotoPositions[index];
+    if (!currentPhotoPosition) return 'none';
+    
+    // Calculate the offset to position this photo at the first photo's location (starting position)
+    const deltaX = firstPhotoPosition.x - currentPhotoPosition.x;
+    const deltaY = firstPhotoPosition.y - currentPhotoPosition.y;
+    
+    console.log(`Photo ${index} transition path:`, {
+      firstPhotoPosition: firstPhotoPosition,
+      currentPhotoPosition: currentPhotoPosition,
+      deltaX: deltaX,
+      deltaY: deltaY,
+      transform: `translateX(${deltaX}px) translateY(${deltaY}px)`
+    });
+    
+    // Return the transform that positions this photo at the first photo's location (starting position)
+    return `translateX(${deltaX}px) translateY(${deltaY}px)`;
+  };
 
   // Calculate transform for first photo
   const getFirstPhotoTransform = () => {
@@ -221,33 +299,49 @@ function PhotoGrid({ photos, folderName, selectedFolder, isAnimating, isTransiti
     return `translateX(${deltaX}px) translateY(${deltaY}px)`;
   };
 
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full">
       {photos.map((photo, index) => {
         const isSelectedPhoto = index === 0; // First photo is the selected folder image
-        const shouldEmergeFromSelected = isTransitioningToPhotos && !isSelectedPhoto;
+        const shouldEmergeFromSelected = isTransitioningToPhotos && !isSelectedPhoto && !shouldEmergeRemainingPhotos;
         const shouldAnimateFromCollapsed = isSelectedPhoto && shouldAnimateFirstPhoto && collapsedFolderPosition && firstPhotoPosition;
         const shouldAnimateBackToFolder = isSelectedPhoto && isTransitioningBackToFolders && collapsedFolderPosition && firstPhotoPosition;
+        const shouldEmergeFromBehind = !isSelectedPhoto && shouldEmergeRemainingPhotos && shouldRenderRemainingPhotos;
+        
+        // First photo should be hidden until both folder is ready to disappear AND photo is ready to appear
+        const shouldHideFirstPhoto = isSelectedPhoto && (!firstPhotoReady || !shouldAnimateFirstPhoto);
+        
+        // Only render remaining photos when they should be rendered AND should emerge
+        if (!isSelectedPhoto && (!shouldRenderRemainingPhotos || !shouldEmergeRemainingPhotos)) {
+          return null;
+        }
         
         return (
           <div
             key={index}
-            ref={isSelectedPhoto ? firstPhotoRef : undefined}
-            className={`rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full transition-all duration-700 ease-in-out ${
-              shouldAnimateFromCollapsed ? 'animate-from-collapsed-to-grid' : ''
+            ref={isSelectedPhoto ? firstPhotoRef : (shouldEmergeFromBehind ? (ref) => {
+              remainingPhotoRefs.current[index] = ref;
+            } : undefined)}
+            className={`rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full ${
+              shouldAnimateFromCollapsed ? 'transition-all duration-700 ease-in-out animate-from-collapsed-to-grid' : ''
             } ${
-              shouldAnimateBackToFolder ? 'animate-from-grid-to-collapsed' : ''
+              shouldAnimateBackToFolder ? 'transition-all duration-700 ease-in-out animate-from-grid-to-collapsed' : ''
+            } ${
+              shouldEmergeFromBehind ? 'animate-emerge-from-behind' : ''
             }`}
             style={{
-              zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : 20),
+              zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : (shouldEmergeFromBehind ? 5 : 20)),
               transform: shouldEmergeFromSelected 
-                ? 'scale(0.3) translateX(-50%) translateY(-50%)' 
+                ? calculatePhotoTransitionPath(index)
                 : (shouldAnimateFromCollapsed || shouldAnimateBackToFolder)
                 ? getFirstPhotoTransform()
+                : shouldEmergeFromBehind 
+                ? calculatePhotoTransitionPath(index)
                 : 'none',
-              opacity: shouldEmergeFromSelected ? 0.1 : (shouldAnimateFromCollapsed ? (firstPhotoVisible ? 1 : 0) : 1),
-              animationDelay: shouldEmergeFromSelected ? `${index * 100}ms` : '0ms',
-            }}
+              opacity: shouldEmergeFromBehind ? 0 : (shouldEmergeFromSelected ? 0 : (shouldHideFirstPhoto ? 0 : 1)),
+              animationDelay: shouldEmergeFromSelected ? `${index * 100}ms` : (shouldEmergeFromBehind ? `${(index - 1) * 150}ms` : '0ms'),
+            } as React.CSSProperties}
           >
             <img
               src={photo}
