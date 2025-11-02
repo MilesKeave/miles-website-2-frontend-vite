@@ -9,6 +9,87 @@ html, body {
   background-color: black;
 }
 
+/* Safari-specific optimizations for smooth animations */
+.photo-fade-out {
+  -webkit-animation: fade-out 0.7s ease-in-out forwards;
+  animation: fade-out 0.7s ease-in-out forwards;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  will-change: opacity;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Additional Safari optimizations for all photo elements */
+.photo-container {
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* Safari-specific transition for folder to photo */
+.photo-container.transition-transform {
+  -webkit-transition: transform 0.7s ease-in-out;
+  transition: transform 0.7s ease-in-out;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+
+/* Safari optimizations for folder collapse animations */
+.folder-collapse {
+  -webkit-transition: all 0.7s ease-in-out;
+  transition: all 0.7s ease-in-out;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  will-change: transform, opacity, z-index;
+}
+
+/* Safari optimizations for folder expand animations */
+.folder-expand {
+  -webkit-transition: all 0.7s ease-in-out;
+  transition: all 0.7s ease-in-out;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+  will-change: transform, opacity, z-index;
+}
+
+
 /* Animation for selected folder sliding in from collapsed position */
 @keyframes slide-in-from-collapsed {
   0% {
@@ -21,6 +102,7 @@ html, body {
   }
 }
 
+
 /* Animation for first photo sliding from collapsed position to grid position */
 @keyframes slide-from-collapsed-to-grid {
   0% {
@@ -31,6 +113,17 @@ html, body {
   }
 }
 
+@-webkit-keyframes slide-from-collapsed-to-grid {
+  0% {
+    /* Start at collapsed position - transform will be set dynamically */
+  }
+  100% {
+    -webkit-transform: none;
+    transform: none;
+  }
+}
+
+
 .animate-slide-in-from-collapsed {
   animation: slide-in-from-collapsed 0.7s ease-in-out forwards;
   /* Start from collapsed state */
@@ -40,6 +133,11 @@ html, body {
 
 .animate-from-collapsed-to-grid {
   animation: slide-from-collapsed-to-grid 0.7s ease-in-out forwards;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 /* Animation for expanding folders from collapsed state */
@@ -52,6 +150,7 @@ html, body {
     opacity: 1;
   }
 }
+
 
 .animate-expand-from-collapsed {
   animation: expand-from-collapsed 0.7s ease-in-out forwards;
@@ -67,8 +166,14 @@ html, body {
   }
 }
 
+
 .animate-from-grid-to-collapsed {
   animation: slide-from-grid-to-collapsed 0.7s ease-in-out forwards;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: transform;
 }
 
 /* Animation for remaining photos emerging from behind first photo */
@@ -82,6 +187,7 @@ html, body {
     opacity: 1;
   }
 }
+
 
 .animate-emerge-from-behind {
   animation: emerge-from-behind-first-photo 0.6s ease-out forwards;
@@ -99,6 +205,33 @@ html, body {
 
 .animate-collapse-to-behind {
   animation: collapse-to-behind-first-photo 0.7s ease-in-out forwards;
+}
+
+/* Animation for photos collapsing back to behind first photo (mirror of emerge) */
+@keyframes collapse-to-behind-first-photo {
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    /* Transform will be set dynamically via inline styles */
+    opacity: 0.8;
+  }
+}
+
+.animate-collapse-backwards {
+  animation: collapse-backwards 0.7s ease-in-out forwards;
+}
+
+@keyframes collapse-backwards {
+  0% {
+    transform: none;
+    opacity: 1;
+  }
+  100% {
+    /* Transform will be set dynamically via inline styles */
+    opacity: 0.8;
+  }
 }
 
 /* Animation for remaining photos collapsing back to behind first photo */
@@ -153,3 +286,4 @@ img {
 .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: rgb(240 240 240) !important; /* light grey */
 }
+

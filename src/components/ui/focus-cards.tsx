@@ -81,8 +81,8 @@ export const Card = React.memo(
         className={cn(
           "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full cursor-pointer",
           // Add transition for collapsing and expanding, but not for collapsed state
-          shouldCollapse && "transition-all duration-700 ease-in-out",
-          shouldExpand && "transition-all duration-700 ease-in-out animate-expand-from-collapsed",
+          shouldCollapse && "folder-collapse",
+          shouldExpand && "folder-expand animate-expand-from-collapsed",
           hovered !== null && hovered !== index && !isAnimating && "blur-sm scale-[0.98]"
         )}
         style={{
@@ -90,6 +90,13 @@ export const Card = React.memo(
           transform: getTransform(),
           opacity: (shouldCollapse || shouldExpand || isCollapsed) ? 0.1 : 1,
           border: isSelected ? '2px solid red' : (shouldCollapse || shouldExpand || isCollapsed) ? '2px solid blue' : 'none',
+          // Safari-specific optimizations
+          WebkitTransform: 'translateZ(0)',
+          WebkitBackfaceVisibility: 'hidden',
+          backfaceVisibility: 'hidden',
+          WebkitPerspective: '1000px',
+          perspective: '1000px',
+          willChange: shouldCollapse || shouldExpand ? 'transform, opacity, z-index' : 'auto',
         }}
       >
         <img
@@ -174,7 +181,7 @@ export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, on
           isAnimating={isAnimating}
           selectedFolder={selectedFolder}
           onCardClick={onCardClick}
-          selectedFolderPosition={selectedFolderPosition}
+          selectedFolderPosition={selectedFolderPosition || undefined}
           animationState={animationState}
         />
       ))}

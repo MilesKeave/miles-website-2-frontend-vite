@@ -29,6 +29,8 @@ export function PhotographyPage() {
   const [isForwardTransition, setIsForwardTransition] = useState(false);
   const [shouldCollapseRemainingPhotos, setShouldCollapseRemainingPhotos] = useState(false);
   const [isBackwardsTransition, setIsBackwardsTransition] = useState(false);
+  const [storedBackwardsPaths, setStoredBackwardsPaths] = useState<{ [key: number]: string }>({});
+  const [isTransitioningBackwards, setIsTransitioningBackwards] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -54,12 +56,38 @@ export function PhotographyPage() {
   };
 
   const handleBackToFolders = () => {
-    // Start backwards transition
+    console.log('🔄 handleBackToFolders called - starting backwards transition');
+    // Start backwards transition - set this immediately to prevent flash
+    setIsTransitioningBackwards(true);
     setIsBackwardsTransition(true);
     setShouldCollapseRemainingPhotos(true);
     setShouldEmergeRemainingPhotos(false);
     setShouldRenderRemainingPhotos(true);
     setIsForwardTransition(false);
+    console.log('🔄 State changes applied:', {
+      isTransitioningBackwards: true,
+      isBackwardsTransition: true,
+      shouldCollapseRemainingPhotos: true,
+      shouldEmergeRemainingPhotos: false,
+      shouldRenderRemainingPhotos: true,
+      isForwardTransition: false
+    });
+  };
+
+  // Function to calculate and store backwards paths for each photo
+  const calculateAndStoreBackwardsPaths = (firstPhotoPos: { x: number; y: number }, remainingPositions: { [key: number]: { x: number; y: number } }) => {
+    const paths: { [key: number]: string } = {};
+    
+    Object.entries(remainingPositions).forEach(([index, position]) => {
+      const photoIndex = parseInt(index);
+      // Calculate the path from current position back to first photo position
+      const deltaX = firstPhotoPos.x - position.x;
+      const deltaY = firstPhotoPos.y - position.y;
+      paths[photoIndex] = `translateX(${deltaX}px) translateY(${deltaY}px)`;
+    });
+    
+    setStoredBackwardsPaths(paths);
+    console.log('Stored backwards paths:', paths);
   };
 
   // State-driven animation flow - no setTimeout dependencies
@@ -133,6 +161,7 @@ export function PhotographyPage() {
         setShouldRenderRemainingPhotos(false);
         setShouldEmergeRemainingPhotos(false);
         setFirstPhotoReady(false);
+        setIsTransitioningBackwards(false);
         setIsForwardTransition(false);
         setShouldCollapseRemainingPhotos(false);
         setIsBackwardsTransition(false);
@@ -204,6 +233,9 @@ export function PhotographyPage() {
                     isForwardTransition={isForwardTransition}
                     shouldCollapseRemainingPhotos={shouldCollapseRemainingPhotos}
                     isBackwardsTransition={isBackwardsTransition}
+                    storedBackwardsPaths={storedBackwardsPaths}
+                    onCalculateBackwardsPaths={calculateAndStoreBackwardsPaths}
+                    isTransitioningBackwards={isTransitioningBackwards}
                   />
             </>
           )}
@@ -224,7 +256,7 @@ export function PhotographyPage() {
 }
 
 // Photo Grid Component - matches FocusCards layout exactly
-function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders, shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos, firstPhotoReady, isForwardTransition, shouldCollapseRemainingPhotos, isBackwardsTransition }: { 
+function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolderPosition, shouldAnimateFirstPhoto, isTransitioningBackToFolders, shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos, firstPhotoReady, isForwardTransition, shouldCollapseRemainingPhotos, isBackwardsTransition, storedBackwardsPaths, onCalculateBackwardsPaths, isTransitioningBackwards }: { 
   photos: string[], 
   folderName: string,
   isTransitioningToPhotos?: boolean,
@@ -236,7 +268,10 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
   firstPhotoReady?: boolean,
   isForwardTransition?: boolean,
   shouldCollapseRemainingPhotos?: boolean,
-  isBackwardsTransition?: boolean
+  isBackwardsTransition?: boolean,
+  storedBackwardsPaths?: { [key: number]: string },
+  onCalculateBackwardsPaths?: (firstPhotoPos: { x: number; y: number }, remainingPositions: { [key: number]: { x: number; y: number } }) => void,
+  isTransitioningBackwards?: boolean
 }) {
   const firstPhotoRef = useRef<HTMLDivElement>(null);
   const remainingPhotoRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
@@ -275,6 +310,14 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
     }
   }, [shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos]);
 
+  // Calculate and store backwards paths when forward animation positions are ready
+  useEffect(() => {
+    if (shouldEmergeRemainingPhotos && shouldRenderRemainingPhotos && firstPhotoPosition && Object.keys(remainingPhotoPositions).length > 0 && onCalculateBackwardsPaths) {
+      // Calculate backwards paths from current positions back to first photo position
+      onCalculateBackwardsPaths(firstPhotoPosition, remainingPhotoPositions);
+    }
+  }, [shouldEmergeRemainingPhotos, shouldRenderRemainingPhotos, firstPhotoPosition, remainingPhotoPositions, onCalculateBackwardsPaths]);
+
   // Calculate remaining photo positions when they should collapse
   useEffect(() => {
     if (shouldCollapseRemainingPhotos && shouldRenderRemainingPhotos && Object.keys(remainingPhotoPositions).length === 0) {
@@ -297,17 +340,29 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
   const calculatePhotoTransitionPath = (index: number) => {
     if (!firstPhotoPosition) return 'none';
     
-    // Get the current photo's grid position
+    // For backwards transition, use stored paths calculated during forward animation
+    if (isBackwardsTransition && storedBackwardsPaths && storedBackwardsPaths[index]) {
+      return storedBackwardsPaths[index];
+    }
+    
+    // For forward transition, calculate dynamically
     const currentPhotoPosition = remainingPhotoPositions[index];
     if (!currentPhotoPosition) return 'none';
     
-    // Calculate the offset to position this photo at the first photo's location (starting position)
+    // Calculate the offset to position this photo at the first photo's location
     const deltaX = firstPhotoPosition.x - currentPhotoPosition.x;
     const deltaY = firstPhotoPosition.y - currentPhotoPosition.y;
     
-    
-    // Return the transform that positions this photo at the first photo's location (starting position)
-    return `translateX(${deltaX}px) translateY(${deltaY}px)`;
+    // For forward transition: photos start at first photo position, then animate to natural grid position
+    // For backward transition: photos start at natural grid position, then animate to first photo position
+    if (isBackwardsTransition) {
+      // Backward: move from grid position to first photo position
+      return `translateX(${deltaX}px) translateY(${deltaY}px)`;
+    } else {
+      // Forward: start at first photo position, then animate to natural position
+      // This means we need to position them at the first photo's location initially
+      return `translateX(${deltaX}px) translateY(${deltaY}px)`;
+    }
   };
 
   // Calculate transform for first photo
@@ -318,13 +373,13 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
     const deltaX = collapsedFolderPosition.x - firstPhotoPosition.x;
     const deltaY = collapsedFolderPosition.y - firstPhotoPosition.y;
     
-    
     // For reverse transition: start at grid position, animate to collapsed position
     if (isTransitioningBackToFolders) {
       return `translateX(${deltaX}px) translateY(${deltaY}px)`;
     }
     
     // For forward transition: start at collapsed position, animate to grid position
+    // The CSS animation will handle the transition from collapsed to grid
     return `translateX(${deltaX}px) translateY(${deltaY}px)`;
   };
 
@@ -337,21 +392,48 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
         const shouldAnimateFromCollapsed = isSelectedPhoto && shouldAnimateFirstPhoto && collapsedFolderPosition && firstPhotoPosition;
         const shouldAnimateBackToFolder = isSelectedPhoto && isTransitioningBackToFolders && collapsedFolderPosition && firstPhotoPosition;
         const shouldEmergeFromBehind = !isSelectedPhoto && shouldEmergeRemainingPhotos && shouldRenderRemainingPhotos;
-        const shouldCollapseToFirstPhoto = !isSelectedPhoto && shouldCollapseRemainingPhotos && shouldRenderRemainingPhotos && isBackwardsTransition;
+        const shouldFadeOut = !isSelectedPhoto && shouldCollapseRemainingPhotos && shouldRenderRemainingPhotos && isBackwardsTransition;
+        
+        // Debug logging for backwards transition
+        if (isBackwardsTransition && !isSelectedPhoto) {
+          console.log(`🔍 Photo ${index} state check:`, {
+            shouldEmergeRemainingPhotos,
+            shouldRenderRemainingPhotos,
+            shouldCollapseRemainingPhotos,
+            isBackwardsTransition,
+            shouldEmergeFromBehind,
+            shouldFadeOut,
+            isTransitioningBackwards
+          });
+        }
         
         // Different opacity rules for forward vs reverse transitions
         const shouldHideFirstPhoto = isSelectedPhoto && (
-          // Forward transition: hide until ready to animate from collapsed position
-          (isForwardTransition && (!firstPhotoReady || !shouldAnimateFirstPhoto || !shouldAnimateFromCollapsed)) ||
+          // Forward transition: keep visible during transition (like reverse transition)
+          (isForwardTransition && false) ||
           // Reverse transition: never hide (always visible during transition)
           (!isForwardTransition && false)
         );
         
         // Debug logging for CSS classes and transforms
-        if (!isSelectedPhoto && shouldCollapseToFirstPhoto) {
+        if (isSelectedPhoto) {
+          console.log(`🔍 First Photo (${index}) debug:`, {
+            isForwardTransition,
+            isBackwardsTransition,
+            shouldAnimateFromCollapsed,
+            shouldAnimateBackToFolder,
+            shouldHideFirstPhoto,
+            firstPhotoReady,
+            shouldAnimateFirstPhoto,
+            collapsedFolderPosition: !!collapsedFolderPosition,
+            firstPhotoPosition: !!firstPhotoPosition
+          });
+        }
+        
+        if (!isSelectedPhoto && shouldFadeOut) {
           const calculatedOpacity = shouldEmergeFromBehind ? 0 : (shouldEmergeFromSelected ? 0 : (shouldHideFirstPhoto ? 0 : 1));
           console.log(`Photo ${index} CSS debug:`, {
-            shouldCollapseToFirstPhoto,
+            shouldFadeOut,
             shouldRenderRemainingPhotos,
             shouldCollapseRemainingPhotos,
             isBackwardsTransition,
@@ -360,19 +442,46 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
             shouldEmergeFromSelected,
             shouldHideFirstPhoto,
             calculatedOpacity,
-            zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : (shouldEmergeFromBehind ? 5 : (shouldCollapseToFirstPhoto ? 5 : 20)))
+            zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : (shouldEmergeFromBehind ? 5 : (shouldFadeOut ? 5 : 20)))
           });
         }
         
-        // Only render remaining photos when they should be rendered AND (should emerge OR should collapse OR backwards transition)
-        const shouldRender = shouldRenderRemainingPhotos && (shouldEmergeRemainingPhotos || shouldCollapseToFirstPhoto || isBackwardsTransition);
-        if (!isSelectedPhoto && !shouldRender) {
-          console.log(`Photo ${index} - FILTERED OUT:`, {
+        // Only render remaining photos when they should be rendered AND (should emerge OR should fade out OR backwards transition)
+        const shouldRender = shouldRenderRemainingPhotos && (shouldEmergeRemainingPhotos || shouldFadeOut || isBackwardsTransition);
+        
+        // For backwards transition, always render if we're in backwards mode to prevent flashing
+        const shouldRenderBackwards = isBackwardsTransition && shouldRenderRemainingPhotos;
+        
+        // Additional safety: if we're in backwards transition, always render to prevent flashing
+        const preventFlash = isBackwardsTransition || isTransitioningBackwards;
+        
+        const finalShouldRender = shouldRender || shouldRenderBackwards || preventFlash;
+        
+        // Debug render condition for backwards transition
+        if (isBackwardsTransition && !isSelectedPhoto) {
+          console.log(`🎯 Photo ${index} render check:`, {
+            shouldRender,
+            shouldRenderBackwards,
+            preventFlash,
+            finalShouldRender,
             shouldRenderRemainingPhotos,
             shouldEmergeRemainingPhotos,
-            shouldCollapseToFirstPhoto,
+            shouldCollapseRemainingPhotos,
+            shouldFadeOut,
             isBackwardsTransition,
-            shouldRender
+            isTransitioningBackwards
+          });
+        }
+        
+        if (!isSelectedPhoto && !finalShouldRender) {
+          console.log(`❌ Photo ${index} - FILTERED OUT:`, {
+            shouldRenderRemainingPhotos,
+            shouldEmergeRemainingPhotos,
+            shouldCollapseRemainingPhotos,
+            shouldFadeOut,
+            isBackwardsTransition,
+            shouldRender,
+            finalShouldRender
           });
           return null;
         }
@@ -380,36 +489,97 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
         return (
           <div
             key={index}
-            ref={isSelectedPhoto ? firstPhotoRef : ((shouldEmergeFromBehind || shouldCollapseToFirstPhoto) ? (ref) => {
+            ref={isSelectedPhoto ? firstPhotoRef : ((shouldEmergeFromBehind || shouldFadeOut) ? (ref) => {
               remainingPhotoRefs.current[index] = ref;
             } : undefined)}
-            className={`rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full ${
+            className={`photo-container rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full ${
               shouldAnimateFromCollapsed ? 'transition-transform duration-700 ease-in-out animate-from-collapsed-to-grid' : ''
+            } ${
+              (isSelectedPhoto && (isTransitioningToPhotos || folderAnimationState === 'collapsing') && collapsedFolderPosition && firstPhotoPosition && !shouldAnimateFromCollapsed) ? 'transition-transform duration-700 ease-in-out' : ''
             } ${
               shouldAnimateBackToFolder ? 'transition-all duration-700 ease-in-out animate-from-grid-to-collapsed' : ''
             } ${
               shouldEmergeFromBehind ? 'animate-emerge-from-behind' : ''
             } ${
-              shouldCollapseToFirstPhoto ? 'animate-collapse-to-behind' : ''
+              shouldFadeOut ? 'photo-fade-out' : ''
             }`}
             style={{
-              zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : (shouldEmergeFromBehind ? 5 : (shouldCollapseToFirstPhoto ? 5 : 20))),
+              zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : (shouldEmergeFromBehind ? 5 : (shouldFadeOut ? 5 : 20))),
               transform: (() => {
                 let transform = 'none';
-                if (shouldEmergeFromSelected) {
+                
+                // Only apply positioning transforms during specific animation phases
+                if (shouldEmergeFromSelected && !isBackwardsTransition) {
+                  // Forward: start at first photo position, then animate to natural position
                   transform = calculatePhotoTransitionPath(index);
                 } else if (shouldAnimateFromCollapsed || shouldAnimateBackToFolder) {
-                  transform = getFirstPhotoTransform();
-                } else if (shouldEmergeFromBehind) {
+                  // First photo animation - use Safari-compatible transform
+                  const firstPhotoTransform = getFirstPhotoTransform();
+                  if (firstPhotoTransform !== 'none') {
+                    // For Safari, ensure we have the webkit prefix
+                    transform = firstPhotoTransform;
+                  } else {
+                    transform = 'none';
+                  }
+                } else if (isSelectedPhoto && (isTransitioningToPhotos || folderAnimationState === 'collapsing') && collapsedFolderPosition && firstPhotoPosition) {
+                  // Position first photo at collapsed folder position immediately when transition starts OR during folder collapse
+                  const firstPhotoTransform = getFirstPhotoTransform();
+                  if (firstPhotoTransform !== 'none') {
+                    transform = firstPhotoTransform;
+                  } else {
+                    transform = 'none';
+                  }
+                } else if (isSelectedPhoto && isForwardTransition && collapsedFolderPosition && firstPhotoPosition) {
+                  // For Safari: Position first photo at collapsed folder location immediately when folder is clicked
+                  const firstPhotoTransform = getFirstPhotoTransform();
+                  if (firstPhotoTransform !== 'none') {
+                    transform = firstPhotoTransform;
+                  } else {
+                    transform = 'none';
+                  }
+                } else if (shouldEmergeFromBehind && !isBackwardsTransition) {
+                  // Forward: start at first photo position, then animate to natural position
                   transform = calculatePhotoTransitionPath(index);
-                } else if (shouldCollapseToFirstPhoto) {
-                  // Use the same transform logic as the working forward animation
-                  transform = calculatePhotoTransitionPath(index);
+                } else if (shouldFadeOut) {
+                  // Backward: simple fade out, no transform needed
+                  transform = 'none';
                 }
+                
+                // Debug transform for backwards transition
+                if (isBackwardsTransition && !isSelectedPhoto && shouldFadeOut) {
+                  console.log(`🎯 Photo ${index} transform:`, {
+                    shouldFadeOut,
+                    transform,
+                    storedPath: storedBackwardsPaths?.[index]
+                  });
+                }
+                
                 return transform;
               })(),
-              opacity: shouldEmergeFromBehind ? 0 : (shouldEmergeFromSelected ? 0 : (shouldHideFirstPhoto ? 0 : 1)),
-              animationDelay: shouldEmergeFromSelected ? `${index * 100}ms` : (shouldEmergeFromBehind ? `${(index - 1) * 150}ms` : '0ms'),
+              opacity: (() => {
+                // For fade out, we want to start at opacity 1 and let CSS animation handle it
+                if (shouldFadeOut) {
+                  return 1; // Start at 1, CSS animation will fade to 0
+                }
+                
+                // For other states, use the existing logic
+                const calculatedOpacity = (shouldEmergeFromBehind && !isBackwardsTransition) ? 0 : ((shouldEmergeFromSelected && !isBackwardsTransition) ? 0 : (shouldHideFirstPhoto ? 0 : 1));
+                
+                // Debug opacity for backwards transition
+                if (isBackwardsTransition && !isSelectedPhoto) {
+                  console.log(`👁️ Photo ${index} opacity check:`, {
+                    shouldEmergeFromBehind,
+                    isBackwardsTransition,
+                    shouldEmergeFromSelected,
+                    shouldHideFirstPhoto,
+                    shouldFadeOut,
+                    calculatedOpacity
+                  });
+                }
+                
+                return calculatedOpacity;
+              })(),
+              animationDelay: shouldEmergeFromSelected ? `${index * 100}ms` : (shouldEmergeFromBehind ? `${(index - 1) * 150}ms` : (shouldFadeOut ? `${(index - 1) * 200}ms` : '0ms')),
             } as React.CSSProperties}
           >
             <img
