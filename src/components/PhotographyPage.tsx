@@ -493,7 +493,7 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
               remainingPhotoRefs.current[index] = ref;
             } : undefined)}
             className={`photo-container rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full ${
-              shouldAnimateFromCollapsed ? 'transition-transform duration-700 ease-in-out animate-from-collapsed-to-grid' : ''
+              shouldAnimateFromCollapsed ? 'animate-from-collapsed-to-grid' : ''
             } ${
               (isSelectedPhoto && (isTransitioningToPhotos || folderAnimationState === 'collapsing') && collapsedFolderPosition && firstPhotoPosition && !shouldAnimateFromCollapsed) ? 'transition-transform duration-700 ease-in-out' : ''
             } ${
@@ -505,6 +505,12 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
             }`}
             style={{
               zIndex: isSelectedPhoto ? 50 : (shouldEmergeFromSelected ? 10 : (shouldEmergeFromBehind ? 5 : (shouldFadeOut ? 5 : 20))),
+              // Safari-specific hardware acceleration (CSS only, no functional changes)
+              WebkitBackfaceVisibility: 'hidden',
+              backfaceVisibility: 'hidden',
+              WebkitPerspective: '1000px',
+              perspective: '1000px',
+              willChange: (isSelectedPhoto && isTransitioningToPhotos) || shouldEmergeFromBehind || shouldFadeOut ? 'transform, opacity' : 'auto',
               transform: (() => {
                 let transform = 'none';
                 
