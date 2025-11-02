@@ -497,7 +497,7 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
             } ${
               (isSelectedPhoto && (isTransitioningToPhotos || folderAnimationState === 'collapsing') && collapsedFolderPosition && firstPhotoPosition && !shouldAnimateFromCollapsed) ? 'transition-transform duration-700 ease-in-out' : ''
             } ${
-              shouldAnimateBackToFolder ? 'transition-all duration-700 ease-in-out animate-from-grid-to-collapsed' : ''
+              shouldAnimateBackToFolder ? 'transition-transform duration-700 ease-in-out animate-from-grid-to-collapsed' : ''
             } ${
               shouldEmergeFromBehind ? 'animate-emerge-from-behind' : ''
             } ${
@@ -566,6 +566,11 @@ function PhotoGrid({ photos, folderName, isTransitioningToPhotos, collapsedFolde
                 // For fade out, we want to start at opacity 1 and let CSS animation handle it
                 if (shouldFadeOut) {
                   return 1; // Start at 1, CSS animation will fade to 0
+                }
+                
+                // First photo should NEVER fade in - always fully visible during forward transition
+                if (isSelectedPhoto && isTransitioningToPhotos) {
+                  return 1; // Always fully visible, no fade-in
                 }
                 
                 // For other states, use the existing logic
