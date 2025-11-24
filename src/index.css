@@ -70,6 +70,8 @@ html, body {
   animation: fade-out 1s ease-in-out forwards;
 }
 
+/* Selected folder animation will be created dynamically based on direction */
+
 /* Additional Safari optimizations for all photo elements */
 .photo-container {
   -webkit-transform: translateZ(0);

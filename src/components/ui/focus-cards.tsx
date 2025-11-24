@@ -110,11 +110,35 @@ export const Card = React.memo(
       }
     }
     
-    // Selected: fade out over 2s
-    const fadeOutStyle = isSelected && isAnimatingOut ? {
-      opacity: foldersOpacity,
-      transition: 'opacity 2s ease-in-out'
-    } : {};
+    // Selected: fade out over 1s (delayed 1s), then slide off screen in assigned direction
+    // Timeline: 0-1s delay, 1-2s fade out, 2-3s slide off screen
+    let fadeOutStyle = {};
+    if (isSelected && isAnimatingOut && selectedFolder && !isAnimatingIn) {
+      // Determine slide direction for selected folder based on its position
+      let slideTransform = '';
+      switch (slideOutDirection) {
+        case 'left':
+          slideTransform = 'translateX(-100vw)';
+          break;
+        case 'right':
+          slideTransform = 'translateX(100vw)';
+          break;
+        case 'up':
+          slideTransform = 'translateY(-100vh)';
+          break;
+        case 'down':
+          slideTransform = 'translateY(100vh)';
+          break;
+      }
+      
+      // Use opacity transition for fade (0.7s delay, 0.8s duration)
+      // Then use transform transition for slide (1.5s delay, 1s duration)
+      fadeOutStyle = {
+        opacity: 0,
+        transform: slideTransform,
+        transition: 'opacity 0.8s ease-in-out 0.7s, transform 1s ease-in-out 1.5s'
+      };
+    }
     
     // Default opacity when not animating
     const defaultOpacity = foldersOpacity !== undefined ? foldersOpacity : 1;
