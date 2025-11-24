@@ -261,15 +261,13 @@ function PhotoGrid({ photos, folderName, onPhotoClick, isAnimating, photosOpacit
   isAnimating?: boolean,
   photosOpacity?: number
 }) {
-  const numRows = Math.ceil(photos.length / 3);
-  const maxPhotoHeight = 'calc((100vh - 200px) / 2)';
   const isAnimatingOut = isAnimating && photosOpacity !== undefined && photosOpacity < 1;
   
   return (
     <div 
       className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
       style={{
-        gridTemplateRows: `repeat(${numRows}, minmax(200px, 1fr))`,
+        gridTemplateRows: 'repeat(2, minmax(200px, 1fr))',
         minHeight: 'calc(100vh - 250px)'
       }}
     >
@@ -371,28 +369,23 @@ function PhotoGrid({ photos, folderName, onPhotoClick, isAnimating, photosOpacit
         return (
           <div
             key={index}
-            className="photo-container w-full"
+            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110"
             style={{
               height: '100%',
-              maxHeight: maxPhotoHeight,
               ...(Object.keys(slideInStyle).length > 0 ? slideInStyle : {}),
               ...(Object.keys(slideOutStyle).length > 0 ? slideOutStyle : {})
             }}
+            onClick={() => onPhotoClick?.(index)}
           >
-            <div 
-              onClick={() => onPhotoClick?.(index)}
-              className="cursor-pointer w-full h-full"
+            <DirectionAwareHover 
+              imageUrl={photo}
+              className="absolute inset-0 w-full h-full"
+              imageClassName="h-full w-full"
             >
-              <DirectionAwareHover 
-                imageUrl={photo}
-                className="w-full h-full !h-full !w-full"
-                imageClassName="h-full w-full"
-              >
-                <div className="hidden">
-                  {/* Empty children to maintain component structure */}
-                </div>
-              </DirectionAwareHover>
-            </div>
+              <div className="hidden">
+                {/* Empty children to maintain component structure */}
+              </div>
+            </DirectionAwareHover>
           </div>
         );
       })}
