@@ -1,6 +1,7 @@
 import { FocusCards } from "@/components/ui/focus-cards";
 import { usePhotography } from "../hooks/usePhotography";
 import { useState, useEffect } from "react";
+import { DirectionAwareHover } from "@/components/ui/direction-aware-hover";
 
 interface PhotoFolder {
   id: string;
@@ -39,7 +40,7 @@ export function PhotographyPage() {
     setFoldersOpacity(0); // Start animations (non-selected slide out in 1s, selected fades out in 3s)
     setShowPhotos(true); // Show photos container but positioned off-screen
     
-    // After selected folder fades out (3 seconds), slide in photos
+    // After selected folder fades out (2 seconds), slide in photos (start slightly earlier for smoother transition)
     setTimeout(() => {
       setShowFolders(false);
       // Use requestAnimationFrame to ensure initial state is rendered before animation
@@ -52,7 +53,7 @@ export function PhotographyPage() {
       setTimeout(() => {
         setIsAnimating(false);
       }, 1100); // 1 second slide in + small buffer
-    }, 3000); // 3 seconds to wait for selected folder to fade out
+    }, 1800); // 1.8 seconds - start photos slightly before selected folder fully fades out
   };
 
   const handleBackToFolders = () => {
@@ -370,8 +371,7 @@ function PhotoGrid({ photos, folderName, onPhotoClick, isAnimating, photosOpacit
         return (
           <div
             key={index}
-            onClick={() => onPhotoClick?.(index)}
-            className="photo-container rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden w-full cursor-pointer"
+            className="photo-container w-full"
             style={{
               height: '100%',
               maxHeight: maxPhotoHeight,
@@ -379,16 +379,20 @@ function PhotoGrid({ photos, folderName, onPhotoClick, isAnimating, photosOpacit
               ...(Object.keys(slideOutStyle).length > 0 ? slideOutStyle : {})
             }}
           >
-            <img
-              src={photo}
-              alt={`${folderName} photo ${index + 1}`}
-              className="object-cover object-center absolute inset-0 w-full h-full"
-              style={{
-                objectFit: 'cover',
-                objectPosition: 'center'
-              }}
-              loading="lazy"
-            />
+            <div 
+              onClick={() => onPhotoClick?.(index)}
+              className="cursor-pointer w-full h-full"
+            >
+              <DirectionAwareHover 
+                imageUrl={photo}
+                className="w-full h-full !h-full !w-full"
+                imageClassName="h-full w-full"
+              >
+                <div className="hidden">
+                  {/* Empty children to maintain component structure */}
+                </div>
+              </DirectionAwareHover>
+            </div>
           </div>
         );
       })}

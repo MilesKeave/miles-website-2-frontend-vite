@@ -110,10 +110,10 @@ export const Card = React.memo(
       }
     }
     
-    // Selected: fade out over 3s
+    // Selected: fade out over 2s
     const fadeOutStyle = isSelected && isAnimatingOut ? {
       opacity: foldersOpacity,
-      transition: 'opacity 3s ease-in-out'
+      transition: 'opacity 2s ease-in-out'
     } : {};
     
     // Default opacity when not animating
