@@ -42,6 +42,34 @@ html, body {
   }
 }
 
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  -webkit-animation: fade-in 1s ease-in-out forwards;
+  animation: fade-in 1s ease-in-out forwards;
+}
+
+.fade-out {
+  -webkit-animation: fade-out 1s ease-in-out forwards;
+  animation: fade-out 1s ease-in-out forwards;
+}
+
 /* Additional Safari optimizations for all photo elements */
 .photo-container {
   -webkit-transform: translateZ(0);
@@ -134,19 +162,69 @@ html, body {
 .animate-from-collapsed-to-grid {
   -webkit-animation: slide-from-collapsed-to-grid 0.7s ease-in-out forwards;
   animation: slide-from-collapsed-to-grid 0.7s ease-in-out forwards;
+  -webkit-animation-delay: 250ms;
+  animation-delay: 250ms;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   will-change: transform;
-  /* Safari: Ensure no opacity animation - photo should appear immediately */
   opacity: 1 !important;
+}
+
+/* Fade-in animation for first photo when folder transitions to photo */
+@keyframes first-photo-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@-webkit-keyframes first-photo-fade-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-first-photo-fade-in {
+  -webkit-animation: first-photo-fade-in 1s ease-in-out forwards;
+  animation: first-photo-fade-in 1s ease-in-out forwards;
+}
+
+/* Fade-out animation for first photo when transitioning back to folder */
+@keyframes first-photo-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@-webkit-keyframes first-photo-fade-out {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.animate-first-photo-fade-out {
+  -webkit-animation: first-photo-fade-out 1s ease-in-out forwards;
+  animation: first-photo-fade-out 1s ease-in-out forwards;
 }
 
 /* Animation for expanding folders from collapsed state */
 @keyframes expand-from-collapsed {
   0% {
     /* Start from collapsed position - transform will be set dynamically */
+    opacity: 0;
   }
   100% {
     transform: none;
@@ -154,8 +232,20 @@ html, body {
   }
 }
 
+@-webkit-keyframes expand-from-collapsed {
+  0% {
+    /* Start from collapsed position - transform will be set dynamically */
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: none;
+    transform: none;
+    opacity: 1;
+  }
+}
 
 .animate-expand-from-collapsed {
+  -webkit-animation: expand-from-collapsed 0.7s ease-in-out forwards;
   animation: expand-from-collapsed 0.7s ease-in-out forwards;
 }
 
@@ -171,12 +261,13 @@ html, body {
 
 
 .animate-from-grid-to-collapsed {
-  animation: slide-from-grid-to-collapsed 0.7s ease-in-out forwards;
+  -webkit-animation: slide-from-grid-to-collapsed 0.7s ease-in-out forwards, first-photo-fade-out 1s ease-in-out forwards;
+  animation: slide-from-grid-to-collapsed 0.7s ease-in-out forwards, first-photo-fade-out 1s ease-in-out forwards;
   -webkit-transform: translateZ(0);
   transform: translateZ(0);
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
-  will-change: transform;
+  will-change: transform, opacity;
 }
 
 /* Animation for remaining photos emerging from behind first photo */

@@ -1,6 +1,6 @@
 "use client";
 import { cn } from "../../lib/utils";
-import { Home, FolderOpen, Briefcase, Camera, Github, Linkedin } from "lucide-react";
+import { Home, FolderOpen, Briefcase, Camera } from "lucide-react";
 import {
   AnimatePresence,
   MotionValue,
@@ -45,26 +45,8 @@ export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingD
     isActive: currentPage === pageConfig.id
   }));
 
-  // Static external links
-  const externalLinks = [
-    {
-      title: "GitHub",
-      icon: <Github className="h-5 w-5" />,
-      href: "https://github.com",
-      isLink: true,
-      isActive: false
-    },
-    {
-      title: "LinkedIn",
-      icon: <Linkedin className="h-5 w-5" />,
-      href: "https://linkedin.com",
-      isLink: true,
-      isActive: false
-    }
-  ];
-
-  // Combine navigation items and external links
-  const items = [...navigationItems, ...externalLinks];
+  // Only use navigation items (removed external links)
+  const items = navigationItems;
 
   return (
     <div className={cn("fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50", className)}>
@@ -91,7 +73,16 @@ const FloatingDockDesktop = ({
       )}
     >
       {items.map((item) => (
-        <IconContainer mouseX={mouseX} key={item.title} {...item} />
+        <IconContainer 
+          mouseX={mouseX} 
+          key={item.title} 
+          title={item.title}
+          icon={item.icon}
+          action={item.action}
+          href={item.href}
+          isLink={item.isLink}
+          isActive={item.isActive}
+        />
       ))}
     </motion.div>
   );

@@ -92,9 +92,12 @@ export const Hero = (): React.JSX.Element => {
             </button>
           )}
           
-          <button className="px-8 py-3 border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105">
+          <a 
+            href="mailto:miles.j.keaveny@gmail.com"
+            className="px-8 py-3 border-2 border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 inline-block"
+          >
             Get In Touch
-          </button>
+          </a>
         </div>
 
         <div className="pt-12">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export const Card = React.memo(
@@ -14,6 +14,7 @@ export const Card = React.memo(
     onCardClick,
     selectedFolderPosition,
     animationState,
+    foldersOpacity,
   }: {
     card: any;
     index: number;
@@ -24,79 +25,115 @@ export const Card = React.memo(
     onCardClick?: (card: any) => void;
     selectedFolderPosition?: { x: number; y: number };
     animationState?: 'normal' | 'collapsing' | 'collapsed' | 'expanding';
+    foldersOpacity?: number;
   }) => {
-    const cardRef = useRef<HTMLDivElement>(null);
-    const [cardPosition, setCardPosition] = useState({ x: 0, y: 0 });
-    const isSelected = selectedFolder?.id === card.folder?.id;
-    const shouldCollapse = animationState === 'collapsing' && !isSelected;
-    const shouldExpand = animationState === 'expanding' && !isSelected;
-    const isCollapsed = animationState === 'collapsed' && !isSelected;
+    const isSelected = selectedFolder && card.folder?.id === selectedFolder.id;
+    const isAnimatingOut = isAnimating && selectedFolder && foldersOpacity !== undefined && foldersOpacity < 1;
+    const isAnimatingIn = isAnimating && !selectedFolder && foldersOpacity !== undefined;
     
+    // Determine position in 2x3 grid (0-5)
+    const row = Math.floor(index / 3); // 0 = top row, 1 = bottom row
+    const col = index % 3; // 0 = left, 1 = middle, 2 = right
     
-    // Calculate the path to the selected folder
-    const getTransform = () => {
-      if (!shouldCollapse && !shouldExpand && !isCollapsed) return 'none';
-      if (!selectedFolderPosition) return 'none';
-      
-      const deltaX = selectedFolderPosition.x - cardPosition.x;
-      const deltaY = selectedFolderPosition.y - cardPosition.y;
-      
-      
-      // For collapsing: move to selected folder position
-      if (shouldCollapse) {
-        return `translateX(${deltaX}px) translateY(${deltaY}px) scale(0.3)`;
+    // Assign slide out direction based on position
+    let slideOutDirection = '';
+    if (row === 0) { // Top row
+      if (col === 0) slideOutDirection = 'left';      // Top left
+      else if (col === 1) slideOutDirection = 'up';   // Top middle
+      else slideOutDirection = 'right';                // Top right
+    } else { // Bottom row
+      if (col === 0) slideOutDirection = 'left';      // Bottom left
+      else if (col === 1) slideOutDirection = 'down'; // Bottom middle
+      else slideOutDirection = 'right';                // Bottom right
+    }
+    
+    // Slide in direction is the same as slide out (for going back to folders)
+    let slideInDirection = slideOutDirection;
+    
+    // Non-selected: slide out in assigned direction over 1s
+    let slideOutStyle = {};
+    if (!isSelected && isAnimatingOut) {
+      let transform = '';
+      switch (slideOutDirection) {
+        case 'left':
+          transform = 'translateX(-100vw)';
+          break;
+        case 'right':
+          transform = 'translateX(100vw)';
+          break;
+        case 'up':
+          transform = 'translateY(-100vh)';
+          break;
+        case 'down':
+          transform = 'translateY(100vh)';
+          break;
+      }
+      slideOutStyle = {
+        transform,
+        opacity: 0,
+        transition: 'transform 1s ease-in-out, opacity 1s ease-in-out'
+      };
+    }
+    
+    // Non-selected: slide in from opposite direction over 1s
+    let slideInStyle = {};
+    if (!isSelected && isAnimatingIn && foldersOpacity !== undefined) {
+      let initialTransform = '';
+      switch (slideInDirection) {
+        case 'left':
+          initialTransform = 'translateX(-100vw)';
+          break;
+        case 'right':
+          initialTransform = 'translateX(100vw)';
+          break;
+        case 'up':
+          initialTransform = 'translateY(-100vh)';
+          break;
+        case 'down':
+          initialTransform = 'translateY(100vh)';
+          break;
       }
       
-      // For collapsed state: stay in collapsed position (no animation)
-      if (isCollapsed) {
-        return `translateX(${deltaX}px) translateY(${deltaY}px) scale(0.3)`;
-      }
-      
-      // For expanding: start from selected folder position and animate to original
-      if (shouldExpand) {
-        return `translateX(${deltaX}px) translateY(${deltaY}px) scale(0.3)`;
-      }
-      
-      return 'none';
-    };
-    
-    // Update card position when ref changes or when animation starts
-    useEffect(() => {
-      if (cardRef.current) {
-        const rect = cardRef.current.getBoundingClientRect();
-        const position = {
-          x: rect.left + rect.width / 2,
-          y: rect.top + rect.height / 2
+      if (foldersOpacity === 0) {
+        // Start off-screen with no transition
+        slideInStyle = {
+          transform: initialTransform,
+          opacity: 0
         };
-        setCardPosition(position);
+      } else {
+        // Animate to center position - use keyframes or ensure transition is applied
+        slideInStyle = {
+          transform: 'translateX(0) translateY(0)',
+          opacity: foldersOpacity,
+          transition: 'transform 1s ease-in-out, opacity 1s ease-in-out'
+        };
       }
-    }, [isAnimating]); // Recalculate when animation starts
+    }
+    
+    // Selected: fade out over 3s
+    const fadeOutStyle = isSelected && isAnimatingOut ? {
+      opacity: foldersOpacity,
+      transition: 'opacity 3s ease-in-out'
+    } : {};
+    
+    // Default opacity when not animating
+    const defaultOpacity = foldersOpacity !== undefined ? foldersOpacity : 1;
     
     return (
       <div
-        ref={cardRef}
         onMouseEnter={() => setHovered(index)}
         onMouseLeave={() => setHovered(null)}
         onClick={() => onCardClick?.(card)}
         className={cn(
-          "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden h-60 md:h-96 w-full cursor-pointer",
-          // Add transition for collapsing and expanding, but not for collapsed state
-          shouldCollapse && "folder-collapse",
-          shouldExpand && "folder-expand animate-expand-from-collapsed",
+          "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden w-full cursor-pointer",
           hovered !== null && hovered !== index && !isAnimating && "blur-sm scale-[0.98]"
         )}
         style={{
-          zIndex: isSelected ? 50 : (shouldCollapse || shouldExpand || isCollapsed ? 10 : 20),
-          transform: getTransform(),
-          opacity: (shouldCollapse || shouldExpand || isCollapsed) ? 0.1 : 1,
-          border: isSelected ? '2px solid red' : (shouldCollapse || shouldExpand || isCollapsed) ? '2px solid blue' : 'none',
-          // Safari-specific optimizations
-          WebkitTransform: 'translateZ(0)',
-          WebkitBackfaceVisibility: 'hidden',
-          backfaceVisibility: 'hidden',
-          WebkitPerspective: '1000px',
-          perspective: '1000px',
-          willChange: shouldCollapse || shouldExpand ? 'transform, opacity, z-index' : 'auto',
+          height: '100%',
+          ...(Object.keys(slideInStyle).length > 0 ? slideInStyle : {}),
+          ...(Object.keys(slideOutStyle).length > 0 ? slideOutStyle : {}),
+          ...(Object.keys(fadeOutStyle).length > 0 ? fadeOutStyle : {}),
+          ...(Object.keys(slideInStyle).length === 0 && Object.keys(slideOutStyle).length === 0 && Object.keys(fadeOutStyle).length === 0 ? { opacity: defaultOpacity } : {})
         }}
       >
         <img
@@ -138,39 +175,20 @@ interface FocusCardsProps {
   selectedFolder?: any;
   onPositionUpdate?: (position: { x: number; y: number }) => void;
   animationState?: 'normal' | 'collapsing' | 'collapsed' | 'expanding';
+  foldersOpacity?: number;
 }
 
-export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, onPositionUpdate, animationState }: FocusCardsProps) {
+export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, onPositionUpdate, animationState, foldersOpacity }: FocusCardsProps) {
   const [hovered, setHovered] = useState<number | null>(null);
-  const [selectedFolderPosition, setSelectedFolderPosition] = useState<{ x: number; y: number } | null>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
-
-
-
-  // Calculate selected folder position immediately when selectedFolder changes
-  useEffect(() => {
-    if (selectedFolder && gridRef.current) {
-      const selectedIndex = cards.findIndex(card => card.folder?.id === selectedFolder.id);
-      
-      if (selectedIndex !== -1) {
-        // Use requestAnimationFrame to ensure DOM is ready but still synchronous
-        requestAnimationFrame(() => {
-          const cardElement = gridRef.current?.children[selectedIndex] as HTMLElement;
-          if (cardElement) {
-            const cardRect = cardElement.getBoundingClientRect();
-            const x = cardRect.left + cardRect.width / 2;
-            const y = cardRect.top + cardRect.height / 2;
-            
-            setSelectedFolderPosition({ x, y });
-            onPositionUpdate?.({ x, y });
-          }
-        });
-      }
-    }
-  }, [selectedFolder, cards]);
 
   return (
-    <div ref={gridRef} className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full">
+    <div 
+      className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
+      style={{
+        gridTemplateRows: 'repeat(2, minmax(200px, 1fr))',
+        minHeight: 'calc(100vh - 250px)'
+      }}
+    >
       {cards.map((card, index) => (
         <Card
           key={card.title}
@@ -181,8 +199,9 @@ export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, on
           isAnimating={isAnimating}
           selectedFolder={selectedFolder}
           onCardClick={onCardClick}
-          selectedFolderPosition={selectedFolderPosition || undefined}
+          selectedFolderPosition={undefined}
           animationState={animationState}
+          foldersOpacity={foldersOpacity}
         />
       ))}
     </div>

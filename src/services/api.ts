@@ -33,35 +33,38 @@ export const apiService = {
     }
   },
 
+  async getResumeUrl(): Promise<string | null> {
+    try {
+      const profile = await this.getProfile();
+      return profile.resumeUrl || null;
+    } catch (error) {
+      console.error('Error fetching resume URL:', error);
+      throw error;
+    }
+  },
+
   async downloadResume(resumeUrl: string): Promise<void> {
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      const response = await fetch(resumeUrl, {
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+      if (!resumeUrl) {
+        throw new Error('Resume URL is empty');
       }
+
+      // Use direct download method - works seamlessly without CORS issues
+      // The download attribute will trigger browser download without opening a new tab
+      const link = document.createElement('a');
+      link.href = resumeUrl;
+      link.download = 'Miles_Keaveny_Resume.pdf';
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
       
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'Miles_Keaveny_Resume.pdf';
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      // Clean up immediately
+      setTimeout(() => {
+        document.body.removeChild(link);
+      }, 100);
+      
     } catch (error) {
       console.error('Error downloading resume:', error);
-      if (error instanceof Error && error.name === 'AbortError') {
-        throw new Error('Download timed out');
-      }
       throw error;
     }
   }

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { LandingPage } from './components/LandingPage';
 import { FloatingDocNav } from './components/ui/floating-doc-nav';
+import { SocialIcons } from './components/ui/social-icons';
 import type { PageId } from './types/pages';
 import './App.css';
 
@@ -27,6 +28,7 @@ function App(): React.JSX.Element {
         isDirectNavigation={isDirectNavigation}
       />
       <FloatingDocNav onNavigate={handleNavigate} currentPage={currentPage} />
+      <SocialIcons />
     </div>
   );
 }
