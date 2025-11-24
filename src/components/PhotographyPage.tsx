@@ -135,7 +135,48 @@ export function PhotographyPage() {
   return (
     <div className="h-screen bg-black overflow-hidden">
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
-        <h1 className="text-4xl font-bold text-white text-center mb-8 flex-shrink-0">My Photography</h1>
+        {/* Title and Button Container - Always present to maintain layout */}
+        <div className="flex-shrink-0 flex flex-col">
+          <h1 className="text-4xl font-bold text-white text-center">My Photography</h1>
+          
+          {/* Back to Photo Albums Button - Conditionally rendered but container always exists */}
+          {showPhotos && selectedFolder && (
+            <div className="w-full mt-4" style={{
+              animation: 'slideInFromLeft 0.5s ease-out',
+              WebkitAnimation: 'slideInFromLeft 0.5s ease-out'
+            }}>
+              <div className="max-w-5xl mx-auto w-full md:px-8 flex justify-start">
+                <button
+                  onClick={handleBackToFolders}
+                  className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6 text-white inline-block"
+                >
+                <span className="absolute inset-0 overflow-hidden rounded-full">
+                  <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                </span>
+                <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10">
+                  <span>Back to Photo Albums</span>
+                  <svg
+                    fill="none"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M10.75 8.75L14.25 12L10.75 15.25"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="1.5"
+                    />
+                  </svg>
+                </div>
+                <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
         
         <div className="relative flex-1 overflow-y-auto min-h-0 flex items-center">
           {/* Folders - fade out when clicking */}
@@ -146,29 +187,29 @@ export function PhotographyPage() {
                 pointerEvents: foldersOpacity === 0 ? 'none' : 'auto'
               }}
             >
-              <FocusCards 
-                cards={cards} 
-                onCardClick={(card) => handleFolderClick(card.folder)}
-                isAnimating={isAnimating}
-                selectedFolder={selectedFolder}
+            <FocusCards 
+              cards={cards} 
+              onCardClick={(card) => handleFolderClick(card.folder)}
+              isAnimating={isAnimating}
+              selectedFolder={selectedFolder}
                 onPositionUpdate={() => {}}
                 animationState="normal"
                 foldersOpacity={foldersOpacity}
-              />
+            />
             </div>
           )}
           
           {/* Photos - fade in after folders fade out */}
           {showPhotos && selectedFolder && (
             <div 
-              className="w-full absolute inset-0 flex items-center"
+              className="w-full absolute inset-0 flex items-start"
               style={{
                 pointerEvents: photosOpacity === 0 ? 'none' : 'auto'
               }}
             >
-              <PhotoGrid 
-                photos={selectedFolder.photoUrls}
-                folderName={selectedFolder.name}
+                  <PhotoGrid 
+                    photos={selectedFolder.photoUrls}
+                    folderName={selectedFolder.name}
                 onPhotoClick={(index) => setPreviewPhotoIndex(index)}
                 isAnimating={isAnimating}
                 photosOpacity={photosOpacity}
@@ -177,16 +218,6 @@ export function PhotographyPage() {
           )}
         </div>
         
-        {/* Back button */}
-        {showPhotos && selectedFolder && (
-          <button
-            onClick={handleBackToFolders}
-            className="fixed left-4 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors z-50"
-          >
-            ← Back to Folders
-          </button>
-        )}
-
         {/* Photo Preview Modal */}
         {previewPhotoIndex !== null && selectedFolder && selectedFolder.photoUrls && (
           <div 
@@ -240,7 +271,7 @@ export function PhotographyPage() {
                 aria-label="Next photo"
               >
                 ›
-              </button>
+          </button>
             )}
 
             <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/50 rounded-full px-4 py-2 text-sm">
@@ -262,7 +293,7 @@ function PhotoGrid({ photos, folderName, onPhotoClick, isAnimating, photosOpacit
   photosOpacity?: number
 }) {
   const isAnimatingOut = isAnimating && photosOpacity !== undefined && photosOpacity < 1;
-  
+
   return (
     <div 
       className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
