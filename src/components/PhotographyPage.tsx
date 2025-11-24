@@ -23,6 +23,8 @@ export function PhotographyPage() {
   const [previewPhotoIndex, setPreviewPhotoIndex] = useState<number | null>(null);
   const [photosOpacity, setPhotosOpacity] = useState(0);
   const [foldersOpacity, setFoldersOpacity] = useState(1);
+  const [showBackButton, setShowBackButton] = useState(false);
+  const [isButtonTransitioningOut, setIsButtonTransitioningOut] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -39,21 +41,23 @@ export function PhotographyPage() {
     setPhotosOpacity(0); // Start with photos at 0 (they'll be positioned off-screen)
     setFoldersOpacity(0); // Start animations (non-selected slide out in 1s, selected fades out in 3s)
     setShowPhotos(true); // Show photos container but positioned off-screen
+    setShowBackButton(false); // Hide button until photos start sliding in
     
-    // After selected folder fades out (2 seconds), slide in photos (start slightly earlier for smoother transition)
+    // After selected folder fades out (1.5s), slide in photos immediately
     setTimeout(() => {
       setShowFolders(false);
       // Use requestAnimationFrame to ensure initial state is rendered before animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
           setPhotosOpacity(1); // Start slide in animation (from opposite directions)
+          setShowBackButton(true); // Show button when photos start sliding in
         });
       });
       // Allow animation to complete
       setTimeout(() => {
         setIsAnimating(false);
       }, 1100); // 1 second slide in + small buffer
-    }, 1800); // 1.8 seconds - start photos slightly before selected folder fully fades out
+    }, 1600); // 1.6 seconds - start photos right after selected folder fades out (1.5s) + small buffer
   };
 
   const handleBackToFolders = () => {
@@ -63,9 +67,12 @@ export function PhotographyPage() {
     setPhotosOpacity(0); // Start slide out animations
     setFoldersOpacity(0); // Start with folders at 0 (they'll be positioned off-screen)
     setShowFolders(true); // Show folders container but positioned off-screen
+    setIsButtonTransitioningOut(true); // Start button slide-out animation
     
-    // After photos slide out (1 second), hide photos and slide in folders
+    // After button and photos slide out (1 second), hide button and photos, then slide in folders
     setTimeout(() => {
+      setShowBackButton(false); // Hide button after transition
+      setIsButtonTransitioningOut(false); // Reset transition state
       setShowPhotos(false);
       setSelectedFolder(null);
       // Use requestAnimationFrame to ensure initial state is rendered before animation
@@ -137,13 +144,17 @@ export function PhotographyPage() {
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
         {/* Title and Button Container - Always present to maintain layout */}
         <div className="flex-shrink-0 flex flex-col">
-          <h1 className="text-4xl font-bold text-white text-center">My Photography</h1>
+          <h1 className="text-4xl font-bold text-white text-center mt-8">My Photography</h1>
           
           {/* Back to Photo Albums Button - Conditionally rendered but container always exists */}
-          {showPhotos && selectedFolder && (
+          {showPhotos && selectedFolder && showBackButton && (
             <div className="w-full mt-4" style={{
-              animation: 'slideInFromLeft 0.5s ease-out',
-              WebkitAnimation: 'slideInFromLeft 0.5s ease-out'
+              animation: isButtonTransitioningOut 
+                ? 'slideOutLeft 1s ease-out forwards'
+                : 'slideInFromLeft 1s ease-out',
+              WebkitAnimation: isButtonTransitioningOut
+                ? 'slideOutLeft 1s ease-out forwards'
+                : 'slideInFromLeft 1s ease-out'
             }}>
               <div className="max-w-5xl mx-auto w-full md:px-8 flex justify-start">
                 <button

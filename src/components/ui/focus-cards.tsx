@@ -132,11 +132,11 @@ export const Card = React.memo(
       }
       
       // Use opacity transition for fade (0.7s delay, 0.8s duration)
-      // Then use transform transition for slide (1.5s delay, 1s duration)
+      // Then use transform transition for slide (instant once opacity reaches 0)
       fadeOutStyle = {
         opacity: 0,
         transform: slideTransform,
-        transition: 'opacity 0.8s ease-in-out 0.7s, transform 1s ease-in-out 1.5s'
+        transition: 'opacity 0.8s ease-in-out 0.7s, transform 0.1s ease-in-out 1.5s'
       };
     }
     
