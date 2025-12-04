@@ -8,10 +8,12 @@ interface ProjectPopupProps {
     id: string;
     projectName: string;
     projectImageUrl: string;
-    onClickValue: string;
+    projectImageUrl2?: string;
+    liveDemoLink: string;
     paragraph: string;
     githubLink: string;
     youtubeLink: string;
+    websiteLink: string;
     createdAt: string;
     updatedAt: string;
   };
@@ -20,6 +22,7 @@ interface ProjectPopupProps {
 
 export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [showFullImage, setShowFullImage] = useState(false);
 
   useEffect(() => {
     // Trigger grow-in animation on mount
@@ -35,6 +38,11 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
     setTimeout(() => {
       onClose();
     }, 300);
+  };
+
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setShowFullImage(true);
   };
 
   return (
@@ -66,11 +74,12 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
           {/* Image section */}
           <div className="w-1/2">
             <div className="relative h-full">
-              {project.projectImageUrl ? (
+              {project.projectImageUrl2 || project.projectImageUrl ? (
                 <img
-                  src={project.projectImageUrl}
+                  src={project.projectImageUrl2 || project.projectImageUrl}
                   alt={project.projectName}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                  onClick={handleImageClick}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
@@ -97,7 +106,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
 
               {/* Links */}
               <div className="flex flex-wrap gap-3 mb-6">
-                {project.githubLink && (
+                {project.githubLink && project.githubLink.trim() !== "" && (
                   <a
                     href={project.githubLink}
                     target="_blank"
@@ -108,7 +117,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                     GitHub
                   </a>
                 )}
-                {project.youtubeLink && (
+                {project.youtubeLink && project.youtubeLink.trim() !== "" && (
                   <a
                     href={project.youtubeLink}
                     target="_blank"
@@ -119,9 +128,20 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                     YouTube
                   </a>
                 )}
-                {project.onClickValue && (
+                {project.websiteLink && project.websiteLink.trim() !== "" && (
                   <a
-                    href={project.onClickValue}
+                    href={project.websiteLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                  >
+                    <IconExternalLink className="h-4 w-4" />
+                    Website
+                  </a>
+                )}
+                {project.liveDemoLink && project.liveDemoLink.trim() !== "" && (
+                  <a
+                    href={project.liveDemoLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
@@ -133,16 +153,35 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
               </div>
             </div>
 
-            {/* Footer */}
-            <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-              <div className="flex justify-between items-center text-sm text-slate-500 dark:text-slate-400">
-                <span>Created: {new Date(project.createdAt).toLocaleDateString()}</span>
-                <span>Updated: {new Date(project.updatedAt).toLocaleDateString()}</span>
-              </div>
-            </div>
           </div>
         </div>
       </div>
+
+      {/* Full Image Modal */}
+      {showFullImage && (project.projectImageUrl2 || project.projectImageUrl) && (
+        <div 
+          className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4"
+          onClick={() => setShowFullImage(false)}
+        >
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowFullImage(false);
+            }}
+            className="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-[201] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+            aria-label="Close image"
+          >
+            ×
+          </button>
+
+          <img
+            src={project.projectImageUrl2 || project.projectImageUrl}
+            alt={project.projectName}
+            className="max-w-full max-h-full object-contain"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }

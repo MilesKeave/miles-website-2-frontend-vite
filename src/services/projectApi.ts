@@ -4,20 +4,23 @@ export interface Project {
   id: string;
   projectName: string;
   projectImageUrl: string;
-  onClickValue: string;
+  projectImageUrl2?: string;
+  liveDemoLink: string;
   paragraph: string;
   githubLink: string;
   youtubeLink: string;
+  websiteLink: string;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface CreateProjectData {
   projectName: string;
-  onClickValue: string;
+  liveDemoLink: string;
   paragraph: string;
   githubLink: string;
   youtubeLink: string;
+  websiteLink: string;
   projectImage: File;
 }
 
@@ -45,7 +48,7 @@ export const projectApi = {
   async createProject(data: CreateProjectData): Promise<Project> {
     const formData = new FormData();
     formData.append('projectName', data.projectName);
-    formData.append('onClickValue', data.onClickValue);
+    formData.append('liveDemoLink', data.liveDemoLink);
     formData.append('paragraph', data.paragraph);
     formData.append('githubLink', data.githubLink);
     formData.append('youtubeLink', data.youtubeLink);
@@ -72,5 +75,54 @@ export const projectApi = {
     if (!response.ok) {
       throw new Error('Failed to delete project');
     }
+  },
+
+  // Partial update project - only updates fields that are provided
+  async updateProject(
+    projectName: string,
+    data: {
+      liveDemoLink?: string;
+      paragraph?: string;
+      githubLink?: string;
+      youtubeLink?: string;
+      websiteLink?: string;
+      projectImage?: File;
+      projectImage2?: File;
+    }
+  ): Promise<Project> {
+    const formData = new FormData();
+    formData.append('projectName', projectName);
+    
+    if (data.liveDemoLink !== undefined) {
+      formData.append('liveDemoLink', data.liveDemoLink);
+    }
+    if (data.paragraph !== undefined) {
+      formData.append('paragraph', data.paragraph);
+    }
+    if (data.githubLink !== undefined) {
+      formData.append('githubLink', data.githubLink);
+    }
+    if (data.youtubeLink !== undefined) {
+      formData.append('youtubeLink', data.youtubeLink);
+    }
+    if (data.websiteLink !== undefined) {
+      formData.append('websiteLink', data.websiteLink);
+    }
+    if (data.projectImage) {
+      formData.append('projectImage', data.projectImage);
+    }
+    if (data.projectImage2) {
+      formData.append('projectImage2', data.projectImage2);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/projects/update`, {
+      method: 'PATCH',
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to update project');
+    }
+    return response.json();
   },
 };
