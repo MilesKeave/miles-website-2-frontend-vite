@@ -25,6 +25,8 @@ export function PhotographyPage() {
   const [foldersOpacity, setFoldersOpacity] = useState(1);
   const [showBackButton, setShowBackButton] = useState(false);
   const [isButtonTransitioningOut, setIsButtonTransitioningOut] = useState(false);
+  const [showAlbumTitle, setShowAlbumTitle] = useState(false);
+  const [isTitleTransitioning, setIsTitleTransitioning] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -51,11 +53,15 @@ export function PhotographyPage() {
         requestAnimationFrame(() => {
           setPhotosOpacity(1); // Start slide in animation (from opposite directions)
           setShowBackButton(true); // Show button when photos start sliding in
+          // Start title transition at the same time
+          setIsTitleTransitioning(true);
+          setShowAlbumTitle(true);
         });
       });
       // Allow animation to complete
       setTimeout(() => {
         setIsAnimating(false);
+        setIsTitleTransitioning(false);
       }, 1100); // 1 second slide in + small buffer
     }, 1600); // 1.6 seconds - start photos right after selected folder fades out (1.5s) + small buffer
   };
@@ -74,7 +80,9 @@ export function PhotographyPage() {
       setShowBackButton(false); // Hide button after transition
       setIsButtonTransitioningOut(false); // Reset transition state
       setShowPhotos(false);
-      setSelectedFolder(null);
+      // Start title transition back at the same time as folders slide in
+      setIsTitleTransitioning(true);
+      setShowAlbumTitle(false);
       // Use requestAnimationFrame to ensure initial state is rendered before animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -84,6 +92,8 @@ export function PhotographyPage() {
       // Allow animation to complete
       setTimeout(() => {
         setIsAnimating(false);
+        setIsTitleTransitioning(false);
+        setSelectedFolder(null);
       }, 1100); // 1 second slide in + small buffer
     }, 1000); // 1 second slide out duration
   };
@@ -144,7 +154,52 @@ export function PhotographyPage() {
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
         {/* Title and Button Container - Always present to maintain layout */}
         <div className="flex-shrink-0 flex flex-col">
-          <h1 className="text-4xl font-bold text-white text-center mt-8">My Photography</h1>
+          {/* Title Container - Handles sliding animation between "My Photography" and album name */}
+          <div className="relative h-16 mt-8 overflow-hidden">
+            {/* "My Photography" Title */}
+            <h1 
+              className="text-4xl font-bold text-white text-center absolute inset-0 flex items-center justify-center"
+              style={{
+                transform: showAlbumTitle ? 'translateX(-100%)' : 'translateX(0)',
+                opacity: showAlbumTitle ? 0 : 1,
+                animation: showAlbumTitle && isTitleTransitioning
+                  ? 'titleSlideOutLeft 1s ease-out forwards'
+                  : !showAlbumTitle && isTitleTransitioning
+                  ? 'titleSlideInFromLeft 1s ease-out forwards'
+                  : 'none',
+                WebkitAnimation: showAlbumTitle && isTitleTransitioning
+                  ? 'titleSlideOutLeft 1s ease-out forwards'
+                  : !showAlbumTitle && isTitleTransitioning
+                  ? 'titleSlideInFromLeft 1s ease-out forwards'
+                  : 'none'
+              }}
+            >
+              My Photography
+            </h1>
+            
+            {/* Album Name Title */}
+            {selectedFolder && (
+              <h1 
+                className="text-4xl font-bold text-white text-center absolute inset-0 flex items-center justify-center"
+                style={{
+                  transform: showAlbumTitle ? 'translateX(0)' : 'translateX(100%)',
+                  opacity: showAlbumTitle ? 1 : 0,
+                  animation: showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideInFromRight 1s ease-out forwards'
+                    : !showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideOutRight 1s ease-out forwards'
+                    : 'none',
+                  WebkitAnimation: showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideInFromRight 1s ease-out forwards'
+                    : !showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideOutRight 1s ease-out forwards'
+                    : 'none'
+                }}
+              >
+                {selectedFolder.name}
+              </h1>
+            )}
+          </div>
           
           {/* Back to Photo Albums Button - Conditionally rendered but container always exists */}
           {showPhotos && selectedFolder && showBackButton && (
@@ -220,7 +275,6 @@ export function PhotographyPage() {
             >
                   <PhotoGrid 
                     photos={selectedFolder.photoUrls}
-                    folderName={selectedFolder.name}
                 onPhotoClick={(index) => setPreviewPhotoIndex(index)}
                 isAnimating={isAnimating}
                 photosOpacity={photosOpacity}
@@ -296,9 +350,8 @@ export function PhotographyPage() {
 }
 
 // Simplified Photo Grid Component
-function PhotoGrid({ photos, folderName, onPhotoClick, isAnimating, photosOpacity }: { 
+function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: { 
   photos: string[], 
-  folderName: string,
   onPhotoClick?: (photoIndex: number) => void,
   isAnimating?: boolean,
   photosOpacity?: number
