@@ -15,6 +15,7 @@ export const Card = React.memo(
     selectedFolderPosition,
     animationState,
     foldersOpacity,
+    isGoingBackToFolders,
   }: {
     card: any;
     index: number;
@@ -26,10 +27,13 @@ export const Card = React.memo(
     selectedFolderPosition?: { x: number; y: number };
     animationState?: 'normal' | 'collapsing' | 'collapsed' | 'expanding';
     foldersOpacity?: number;
+    isGoingBackToFolders?: boolean;
   }) => {
     const isSelected = selectedFolder && card.folder?.id === selectedFolder.id;
-    const isAnimatingOut = isAnimating && selectedFolder && foldersOpacity !== undefined && foldersOpacity < 1;
-    const isAnimatingIn = isAnimating && !selectedFolder && foldersOpacity !== undefined;
+    // When clicking a folder: selectedFolder is set, foldersOpacity goes from 1 to 0 (slide out)
+    const isAnimatingOut = isAnimating && selectedFolder && foldersOpacity !== undefined && foldersOpacity < 1 && !isGoingBackToFolders;
+    // When going back to folders: isAnimating is true, foldersOpacity transitions from 0 to 1
+    const isAnimatingIn = isAnimating && isGoingBackToFolders && foldersOpacity !== undefined && foldersOpacity >= 0;
     
     // Determine position in 2x3 grid (0-5)
     const row = Math.floor(index / 3); // 0 = top row, 1 = bottom row
@@ -47,7 +51,9 @@ export const Card = React.memo(
       else slideOutDirection = 'right';                // Bottom right
     }
     
-    // Slide in direction is the same as slide out (for going back to folders)
+    // Slide in direction is the opposite of slide out (for going back to folders)
+    // If it slid out to the left, it should slide in from the left (coming from left)
+    // So the slide-in direction is the same as slide-out direction
     let slideInDirection = slideOutDirection;
     
     // Non-selected: slide out in assigned direction over 1s
@@ -75,9 +81,9 @@ export const Card = React.memo(
       };
     }
     
-    // Non-selected: slide in from opposite direction over 1s
+    // All folders: slide in from opposite direction over 1s (including selected when going back)
     let slideInStyle = {};
-    if (!isSelected && isAnimatingIn && foldersOpacity !== undefined) {
+    if (isAnimatingIn && foldersOpacity !== undefined) {
       let initialTransform = '';
       switch (slideInDirection) {
         case 'left':
@@ -112,8 +118,9 @@ export const Card = React.memo(
     
     // Selected: fade out over 1s (delayed 1s), then slide off screen in assigned direction
     // Timeline: 0-1s delay, 1-2s fade out, 2-3s slide off screen
+    // Only apply when going forward (clicking a folder), not when going back
     let fadeOutStyle = {};
-    if (isSelected && isAnimatingOut && selectedFolder && !isAnimatingIn) {
+    if (isSelected && isAnimatingOut && selectedFolder && !isAnimatingIn && !isGoingBackToFolders) {
       // Determine slide direction for selected folder based on its position
       let slideTransform = '';
       switch (slideOutDirection) {
@@ -200,9 +207,10 @@ interface FocusCardsProps {
   onPositionUpdate?: (position: { x: number; y: number }) => void;
   animationState?: 'normal' | 'collapsing' | 'collapsed' | 'expanding';
   foldersOpacity?: number;
+  isGoingBackToFolders?: boolean;
 }
 
-export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, onPositionUpdate, animationState, foldersOpacity }: FocusCardsProps) {
+export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, onPositionUpdate, animationState, foldersOpacity, isGoingBackToFolders }: FocusCardsProps) {
   const [hovered, setHovered] = useState<number | null>(null);
 
   return (
@@ -226,6 +234,7 @@ export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, on
           selectedFolderPosition={undefined}
           animationState={animationState}
           foldersOpacity={foldersOpacity}
+          isGoingBackToFolders={isGoingBackToFolders}
         />
       ))}
     </div>

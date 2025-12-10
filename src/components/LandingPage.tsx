@@ -267,42 +267,6 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
       </div>
 
       {/* Dynamic Swipe Indicators */}
-      {(() => {
-        const currentOrder = getPageOrder(currentPage);
-        const totalPages = getTotalPages();
-        const hasNextPage = currentOrder < totalPages - 1;
-        const hasPreviousPage = currentOrder > 0;
-        
-        // Show down indicator if there's a next page
-        if (hasNextPage) {
-          return (
-            <div className="swipe-indicator">
-              <div className="swipe-hint">
-                <svg className="swipe-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16l-4-4m0 0l4-4m-4 4h18" />
-                </svg>
-                <span>Scroll down or click to continue</span>
-              </div>
-            </div>
-          );
-        }
-        
-        // Show up indicator if we're on the last page and there's a previous page
-        if (!hasNextPage && hasPreviousPage) {
-          return (
-            <div className="swipe-indicator">
-              <div className="swipe-hint">
-                <svg className="swipe-icon swipe-down" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                </svg>
-                <span>Scroll up or click to go back</span>
-              </div>
-            </div>
-          );
-        }
-        
-        return null;
-      })()}
     </div>
   );
 }; 

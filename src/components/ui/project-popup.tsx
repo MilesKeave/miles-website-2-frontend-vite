@@ -12,6 +12,7 @@ interface ProjectPopupProps {
     liveDemoLink: string;
     paragraph: string;
     githubLink: string;
+    githubLink2?: string;
     youtubeLink: string;
     websiteLink: string;
     createdAt: string;
@@ -115,6 +116,17 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                   >
                     <IconBrandGithub className="h-4 w-4" />
                     GitHub
+                  </a>
+                )}
+                {project.githubLink2 && project.githubLink2.trim() !== "" && (
+                  <a
+                    href={project.githubLink2}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                  >
+                    <IconBrandGithub className="h-4 w-4" />
+                    GitHub 2
                   </a>
                 )}
                 {project.youtubeLink && project.youtubeLink.trim() !== "" && (

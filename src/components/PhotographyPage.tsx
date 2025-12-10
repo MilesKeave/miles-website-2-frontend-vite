@@ -27,6 +27,7 @@ export function PhotographyPage() {
   const [isButtonTransitioningOut, setIsButtonTransitioningOut] = useState(false);
   const [showAlbumTitle, setShowAlbumTitle] = useState(false);
   const [isTitleTransitioning, setIsTitleTransitioning] = useState(false);
+  const [isGoingBackToFolders, setIsGoingBackToFolders] = useState(false);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -39,6 +40,7 @@ export function PhotographyPage() {
     if (isAnimating) return;
     
     setIsAnimating(true);
+    setIsGoingBackToFolders(false); // Reset going back state when clicking a folder
     setSelectedFolder(folder);
     setPhotosOpacity(0); // Start with photos at 0 (they'll be positioned off-screen)
     setFoldersOpacity(0); // Start animations (non-selected slide out in 1s, selected fades out in 3s)
@@ -70,6 +72,7 @@ export function PhotographyPage() {
     if (isAnimating) return;
     
     setIsAnimating(true);
+    setIsGoingBackToFolders(true); // Mark that we're going back to folders
     setPhotosOpacity(0); // Start slide out animations
     setFoldersOpacity(0); // Start with folders at 0 (they'll be positioned off-screen)
     setShowFolders(true); // Show folders container but positioned off-screen
@@ -93,6 +96,7 @@ export function PhotographyPage() {
       setTimeout(() => {
         setIsAnimating(false);
         setIsTitleTransitioning(false);
+        setIsGoingBackToFolders(false); // Reset going back state
         setSelectedFolder(null);
       }, 1100); // 1 second slide in + small buffer
     }, 1000); // 1 second slide out duration
@@ -261,6 +265,7 @@ export function PhotographyPage() {
                 onPositionUpdate={() => {}}
                 animationState="normal"
                 foldersOpacity={foldersOpacity}
+                isGoingBackToFolders={isGoingBackToFolders}
             />
             </div>
           )}

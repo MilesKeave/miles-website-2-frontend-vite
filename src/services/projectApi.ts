@@ -8,6 +8,7 @@ export interface Project {
   liveDemoLink: string;
   paragraph: string;
   githubLink: string;
+  githubLink2?: string;
   youtubeLink: string;
   websiteLink: string;
   createdAt: string;
@@ -84,6 +85,7 @@ export const projectApi = {
       liveDemoLink?: string;
       paragraph?: string;
       githubLink?: string;
+      githubLink2?: string;
       youtubeLink?: string;
       websiteLink?: string;
       projectImage?: File;
@@ -101,6 +103,9 @@ export const projectApi = {
     }
     if (data.githubLink !== undefined) {
       formData.append('githubLink', data.githubLink);
+    }
+    if (data.githubLink2 !== undefined) {
+      formData.append('githubLink2', data.githubLink2);
     }
     if (data.youtubeLink !== undefined) {
       formData.append('youtubeLink', data.youtubeLink);
