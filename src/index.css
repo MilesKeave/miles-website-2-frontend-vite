@@ -512,6 +512,37 @@ img {
   background-color: rgb(255 255 255) !important; /* white */
 }
 
+/* Projects page scrollbar - always visible */
+.projects-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.projects-scrollbar::-webkit-scrollbar-track {
+  background-color: rgb(30 41 59); /* slate-800 */
+  border-radius: 4px;
+}
+
+.projects-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(100 116 139); /* slate-500 */
+  border-radius: 4px;
+}
+
+.projects-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(148 163 184); /* slate-400 */
+}
+
+.dark .projects-scrollbar::-webkit-scrollbar-track {
+  background-color: rgb(30 41 59); /* slate-800 */
+}
+
+.dark .projects-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(100 116 139); /* slate-500 */
+}
+
+.dark .projects-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(148 163 184); /* slate-400 */
+}
+
 .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background-color: rgb(240 240 240) !important; /* light grey */
 }

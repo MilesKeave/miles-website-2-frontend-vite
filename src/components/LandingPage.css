@@ -86,32 +86,48 @@
 /* Mobile responsive adjustments */
 @media (max-width: 640px) {
   .name-text {
-    padding-top: 60px;
+    padding-top: calc(60px + 2vh);
     padding-left: 20px;
-    font-size: 1.5rem;
+    font-size: 1.4375rem;
     padding-right: 20px;
   }
   
   .description-text {
     padding-left: 20px;
     padding-right: 20px;
-    font-size: 1rem;
+    font-size: 0.75rem;
     max-width: none;
   }
   
   .button-container {
     padding-left: 20px;
     padding-right: 20px;
-    flex-direction: column;
+    flex-direction: row;
     gap: 12px;
     align-items: flex-start;
   }
   
-  .button-container button {
-    width: 180px;
-    min-width: 180px;
-    max-width: 180px;
+  .button-container button,
+  .button-container a {
+    width: auto;
+    min-width: 100px;
+    max-width: none;
     margin-left: 0 !important;
+    font-size: 0.75rem !important;
+    padding: 0.5rem 0.75rem !important;
+    white-space: nowrap;
+    text-align: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .button-container button svg,
+  .button-container a svg {
+    width: 0.875rem;
+    height: 0.875rem;
+    flex-shrink: 0;
   }
 }
 
@@ -143,13 +159,14 @@
 
 @media (min-width: 769px) and (max-width: 1024px) {
   .name-text {
-    padding-top: 100px;
+    padding-top: 15vh;
     padding-left: 80px;
     font-size: 2rem;
     padding-right: 80px;
   }
   
   .description-text {
+    padding-top: 10px;
     padding-left: 80px;
     padding-right: 80px;
   }
@@ -214,7 +231,7 @@
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 60px;
   }
   
   .profile-image {
@@ -228,7 +245,7 @@
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 60px;
   }
   
   .profile-image {
@@ -242,7 +259,7 @@
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 60px;
   }
   
   .profile-image {
@@ -269,6 +286,7 @@
   .profile-image-container {
     width: 50%;
     padding-left: 60px;
+    padding-bottom: 10vh;
   }
   
   .profile-image {

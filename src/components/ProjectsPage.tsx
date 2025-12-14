@@ -98,7 +98,10 @@ export const ProjectsPage = (): React.JSX.Element => {
         ) : (
           <div className="max-w-7xl mx-auto">
             {/* Scrollable container for projects */}
-            <div className="h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b transparent', overscrollBehavior: 'contain' }}>
+            <div 
+              className="max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4 projects-scrollbar" 
+              style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b #1e293b', overscrollBehavior: 'contain' }}
+            >
               <BentoGrid className="max-w-7xl mx-auto pb-8 pt-6">
                 {projects.map((project, index) => (
                   <CardSpotlight
@@ -136,12 +139,6 @@ export const ProjectsPage = (): React.JSX.Element => {
             </div>
           </div>
         )}
-
-        <div className="mt-16 text-center">
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
-            {projects.length} project{projects.length !== 1 ? 's' : ''} loaded from database
-          </p>
-        </div>
       </div>
 
       {/* Project Popup */}
