@@ -1,6 +1,6 @@
 import { FocusCards } from "@/components/ui/focus-cards";
 import { usePhotography } from "../hooks/usePhotography";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DirectionAwareHover } from "@/components/ui/direction-aware-hover";
 
 interface PhotoFolder {
@@ -28,6 +28,7 @@ export function PhotographyPage() {
   const [showAlbumTitle, setShowAlbumTitle] = useState(false);
   const [isTitleTransitioning, setIsTitleTransitioning] = useState(false);
   const [isGoingBackToFolders, setIsGoingBackToFolders] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
@@ -50,6 +51,10 @@ export function PhotographyPage() {
     // After selected folder fades out (1.5s), slide in photos immediately
     setTimeout(() => {
       setShowFolders(false);
+      // Scroll to top when showing photos
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       // Use requestAnimationFrame to ensure initial state is rendered before animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
@@ -248,11 +253,11 @@ export function PhotographyPage() {
           )}
         </div>
         
-        <div className="relative flex-1 overflow-y-auto min-h-0 flex items-center">
+        <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto min-h-0 flex items-start">
           {/* Folders - fade out when clicking */}
           {showFolders && (
             <div 
-              className="w-full absolute inset-0 flex items-center"
+              className="w-full absolute inset-0 flex items-start"
               style={{ 
                 pointerEvents: foldersOpacity === 0 ? 'none' : 'auto'
               }}
@@ -279,7 +284,7 @@ export function PhotographyPage() {
               }}
             >
                   <PhotoGrid 
-                    photos={selectedFolder.photoUrls}
+                    photos={selectedFolder.photoUrls.slice(0, 6)}
                 onPhotoClick={(index) => setPreviewPhotoIndex(index)}
                 isAnimating={isAnimating}
                 photosOpacity={photosOpacity}
@@ -290,64 +295,70 @@ export function PhotographyPage() {
         
         {/* Photo Preview Modal */}
         {previewPhotoIndex !== null && selectedFolder && selectedFolder.photoUrls && (
-          <div 
-            className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4"
-            onClick={() => setPreviewPhotoIndex(null)}
-          >
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setPreviewPhotoIndex(null);
-              }}
-              className="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-[101] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
-              aria-label="Close preview"
-            >
-              ×
-            </button>
-
-            {selectedFolder.photoUrls.length > 1 && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const prevIndex = previewPhotoIndex === 0 
-                    ? selectedFolder.photoUrls.length - 1 
-                    : previewPhotoIndex - 1;
-                  setPreviewPhotoIndex(prevIndex);
-                }}
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 text-4xl font-bold z-[101] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
-                aria-label="Previous photo"
+          (() => {
+            const displayedPhotos = selectedFolder.photoUrls.slice(0, 6);
+            const maxIndex = Math.min(previewPhotoIndex, displayedPhotos.length - 1);
+            return (
+              <div 
+                className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4"
+                onClick={() => setPreviewPhotoIndex(null)}
               >
-                ‹
-              </button>
-            )}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setPreviewPhotoIndex(null);
+                  }}
+                  className="absolute top-4 right-4 text-white hover:text-gray-300 text-4xl font-bold z-[101] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                  aria-label="Close preview"
+                >
+                  ×
+                </button>
 
-            <img
-              src={selectedFolder.photoUrls[previewPhotoIndex]}
-              alt={`Photo ${previewPhotoIndex + 1} of ${selectedFolder.photoUrls.length}`}
-              className="max-w-full max-h-full object-contain"
-              onClick={(e) => e.stopPropagation()}
-            />
+                {displayedPhotos.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const prevIndex = maxIndex === 0 
+                        ? displayedPhotos.length - 1 
+                        : maxIndex - 1;
+                      setPreviewPhotoIndex(prevIndex);
+                    }}
+                    className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 text-4xl font-bold z-[101] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                    aria-label="Previous photo"
+                  >
+                    ‹
+                  </button>
+                )}
 
-            {selectedFolder.photoUrls.length > 1 && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const nextIndex = previewPhotoIndex === selectedFolder.photoUrls.length - 1 
-                    ? 0 
-                    : previewPhotoIndex + 1;
-                  setPreviewPhotoIndex(nextIndex);
-                }}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 text-4xl font-bold z-[101] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
-                aria-label="Next photo"
-              >
-                ›
-          </button>
-            )}
+                <img
+                  src={displayedPhotos[maxIndex]}
+                  alt={`Photo ${maxIndex + 1} of ${displayedPhotos.length}`}
+                  className="max-w-full max-h-full object-contain"
+                  onClick={(e) => e.stopPropagation()}
+                />
 
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/50 rounded-full px-4 py-2 text-sm">
-              {previewPhotoIndex + 1} / {selectedFolder.photoUrls.length}
-            </div>
-          </div>
+                {displayedPhotos.length > 1 && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const nextIndex = maxIndex === displayedPhotos.length - 1 
+                        ? 0 
+                        : maxIndex + 1;
+                      setPreviewPhotoIndex(nextIndex);
+                    }}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-gray-300 text-4xl font-bold z-[101] bg-black/50 rounded-full w-12 h-12 flex items-center justify-center transition-colors"
+                    aria-label="Next photo"
+                  >
+                    ›
+                  </button>
+                )}
+
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-white bg-black/50 rounded-full px-4 py-2 text-sm">
+                  {maxIndex + 1} / {displayedPhotos.length}
+                </div>
+              </div>
+            );
+          })()
         )}
       </div>
     </div>
@@ -361,117 +372,178 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
   isAnimating?: boolean,
   photosOpacity?: number
 }) {
+  const [isTwoByThreeLayout, setIsTwoByThreeLayout] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
   const isAnimatingOut = isAnimating && photosOpacity !== undefined && photosOpacity < 1;
+
+  // Check if we're in 2x3 layout (3 columns, 2 rows)
+  useEffect(() => {
+    const checkLayout = () => {
+      if (!gridRef.current) return;
+      
+      const computedStyle = window.getComputedStyle(gridRef.current);
+      const gridTemplateColumns = computedStyle.gridTemplateColumns;
+      
+      // Check if we have 3 columns (for lg and up)
+      const columnCount = gridTemplateColumns.split(' ').length;
+      const hasThreeColumns = columnCount === 3;
+      
+      // For 2x3 layout, we need exactly 3 columns and the grid should naturally form 2 rows with 6 items
+      // Check window width to determine if we're in desktop mode (lg breakpoint)
+      const isDesktop = window.innerWidth >= 1024;
+      
+      // Only 2x3 layout if we have 3 columns AND we're on desktop (lg breakpoint)
+      setIsTwoByThreeLayout(hasThreeColumns && isDesktop);
+    };
+
+    // Check on mount and resize
+    checkLayout();
+    const resizeObserver = new ResizeObserver(checkLayout);
+    if (gridRef.current) {
+      resizeObserver.observe(gridRef.current);
+    }
+    window.addEventListener('resize', checkLayout);
+    
+    return () => {
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', checkLayout);
+    };
+  }, []);
 
   return (
     <div 
-      className="grid grid-cols-1 md:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
+      ref={gridRef}
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
       style={{
-        gridTemplateRows: 'repeat(2, minmax(200px, 1fr))',
+        gridTemplateRows: 'auto',
         minHeight: 'calc(100vh - 250px)'
       }}
     >
       {photos.map((photo, index) => {
-        // Determine position in 2x3 grid (0-5)
+        // Use simple fade transitions if NOT in 2x3 layout
+        const useSimpleFade = !isTwoByThreeLayout;
+        
+        // Determine position in 2x3 grid (0-5) - only needed for directional transitions
         const row = Math.floor(index / 3); // 0 = top row, 1 = bottom row
         const col = index % 3; // 0 = left, 1 = middle, 2 = right
         
-        // Assign slide out direction based on position (same pattern as folders)
+        // Assign slide out direction based on position (only for 2x3 layout)
         let slideOutDirection = '';
-        if (row === 0) { // Top row
-          if (col === 0) slideOutDirection = 'left';      // Top left
-          else if (col === 1) slideOutDirection = 'up';   // Top middle
-          else slideOutDirection = 'right';                // Top right
-        } else { // Bottom row
-          if (col === 0) slideOutDirection = 'left';      // Bottom left
-          else if (col === 1) slideOutDirection = 'down'; // Bottom middle
-          else slideOutDirection = 'right';                // Bottom right
+        if (isTwoByThreeLayout) {
+          if (row === 0) { // Top row
+            if (col === 0) slideOutDirection = 'left';      // Top left
+            else if (col === 1) slideOutDirection = 'up';   // Top middle
+            else slideOutDirection = 'right';                // Top right
+          } else { // Bottom row
+            if (col === 0) slideOutDirection = 'left';      // Bottom left
+            else if (col === 1) slideOutDirection = 'down'; // Bottom middle
+            else slideOutDirection = 'right';                // Bottom right
+          }
         }
         
         // Slide in direction is opposite of slide out
         let slideInDirection = '';
-        switch (slideOutDirection) {
-          case 'left':
-            slideInDirection = 'right';
-            break;
-          case 'right':
-            slideInDirection = 'left';
-            break;
-          case 'up':
-            slideInDirection = 'down';
-            break;
-          case 'down':
-            slideInDirection = 'up';
-            break;
-        }
-        
-        // Slide out in assigned direction over 1s
-        let slideOutStyle = {};
-        if (isAnimatingOut) {
-          let transform = '';
+        if (isTwoByThreeLayout) {
           switch (slideOutDirection) {
             case 'left':
-              transform = 'translateX(-100vw)';
+              slideInDirection = 'right';
               break;
             case 'right':
-              transform = 'translateX(100vw)';
+              slideInDirection = 'left';
               break;
             case 'up':
-              transform = 'translateY(-100vh)';
+              slideInDirection = 'down';
               break;
             case 'down':
-              transform = 'translateY(100vh)';
+              slideInDirection = 'up';
               break;
           }
-          slideOutStyle = {
-            transform,
-            opacity: 0,
-            transition: 'transform 1s ease-in-out, opacity 1s ease-in-out'
-          };
         }
         
-        // Slide in from opposite direction over 1s
+        // Slide out in assigned direction over 1s (or simple fade)
+        let slideOutStyle = {};
+        if (isAnimatingOut) {
+          if (useSimpleFade) {
+            // Simple fade out
+            slideOutStyle = {
+              opacity: 0,
+              transition: 'opacity 1s ease-in-out'
+            };
+          } else {
+            // Directional slide out
+            let transform = '';
+            switch (slideOutDirection) {
+              case 'left':
+                transform = 'translateX(-100vw)';
+                break;
+              case 'right':
+                transform = 'translateX(100vw)';
+                break;
+              case 'up':
+                transform = 'translateY(-100vh)';
+                break;
+              case 'down':
+                transform = 'translateY(100vh)';
+                break;
+            }
+            slideOutStyle = {
+              transform,
+              opacity: 0,
+              transition: 'transform 1s ease-in-out, opacity 1s ease-in-out'
+            };
+          }
+        }
+        
+        // Slide in from opposite direction over 1s (or simple fade in)
         const isAnimatingIn = isAnimating && photosOpacity !== undefined && photosOpacity > 0;
         let slideInStyle = {};
         if (isAnimatingIn && photosOpacity !== undefined) {
-          let initialTransform = '';
-          switch (slideInDirection) {
-            case 'left':
-              initialTransform = 'translateX(-100vw)';
-              break;
-            case 'right':
-              initialTransform = 'translateX(100vw)';
-              break;
-            case 'up':
-              initialTransform = 'translateY(-100vh)';
-              break;
-            case 'down':
-              initialTransform = 'translateY(100vh)';
-              break;
-          }
-          
-          if (photosOpacity === 0) {
-            // Start off-screen with no transition
+          if (useSimpleFade) {
+            // Simple fade in
             slideInStyle = {
-              transform: initialTransform,
-              opacity: 0
+              opacity: photosOpacity,
+              transition: 'opacity 1s ease-in-out'
             };
           } else {
-            // Animate to center position
-            slideInStyle = {
-              transform: 'translateX(0) translateY(0)',
-              opacity: photosOpacity,
-              transition: 'transform 1s ease-in-out, opacity 1s ease-in-out'
-            };
+            // Directional slide in
+            let initialTransform = '';
+            switch (slideInDirection) {
+              case 'left':
+                initialTransform = 'translateX(-100vw)';
+                break;
+              case 'right':
+                initialTransform = 'translateX(100vw)';
+                break;
+              case 'up':
+                initialTransform = 'translateY(-100vh)';
+                break;
+              case 'down':
+                initialTransform = 'translateY(100vh)';
+                break;
+            }
+            
+            if (photosOpacity === 0) {
+              // Start off-screen with no transition
+              slideInStyle = {
+                transform: initialTransform,
+                opacity: 0
+              };
+            } else {
+              // Animate to center position
+              slideInStyle = {
+                transform: 'translateX(0) translateY(0)',
+                opacity: photosOpacity,
+                transition: 'transform 1s ease-in-out, opacity 1s ease-in-out'
+              };
+            }
           }
         }
         
         return (
           <div
             key={index}
-            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110"
+            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 h-[calc(100vh-250px)] md:h-auto"
             style={{
-              height: '100%',
               ...(Object.keys(slideInStyle).length > 0 ? slideInStyle : {}),
               ...(Object.keys(slideOutStyle).length > 0 ? slideOutStyle : {})
             }}
