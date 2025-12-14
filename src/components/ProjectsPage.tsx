@@ -1,7 +1,7 @@
 import { BentoGrid } from "./ui/bento-grid";
 import { CardSpotlight } from "./ui/card-spotlight";
 import { ProjectPopup } from "./ui/project-popup";
-import { IconCode, IconDatabase, IconGlobe, IconDeviceMobile, IconRobot, IconBrandGithub, IconBrandYoutube } from "@tabler/icons-react";
+import { IconCode, IconDatabase, IconGlobe, IconDeviceMobile, IconRobot } from "@tabler/icons-react";
 import { useProjects } from "../hooks/useProjects";
 import { useState } from "react";
 import type { Project } from "../services/projectApi";
@@ -106,11 +106,11 @@ export const ProjectsPage = (): React.JSX.Element => {
                 {projects.map((project, index) => (
                   <CardSpotlight
                     key={project.id}
-                    className={`h-full flex flex-col cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-0 ${index === 0 ? "md:col-span-2" : ""}`}
+                    className={`h-full min-h-[280px] md:min-h-0 flex flex-col cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-0 ${index === 0 ? "md:col-span-2" : ""}`}
                     onClick={() => handleProjectClick(project)}
                   >
                     {/* Image section */}
-                    <div className="relative h-3/4 w-full overflow-hidden rounded-lg pt-8 px-8">
+                    <div className="relative h-[200px] md:h-3/4 w-full overflow-hidden rounded-lg pt-8 px-8">
                       {project.projectImageUrl ? (
                         <img
                           src={project.projectImageUrl}

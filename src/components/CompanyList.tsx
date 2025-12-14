@@ -68,60 +68,101 @@ export const CompanyList = ({
           }
         }
       `}</style>
-      <div className={containerClass}>
-        {workExperiences.map((experience, index) => {
-          const isActive = activeExperienceId === experience.id;
-          
-          return (
-            <div
-              key={experience.id}
-              onClick={() => handleClick(experience.id)}
-              className={`${shelfItemClass} ${
-                isTransitioning ? 'cursor-not-allowed' : ''
-              }`}
-            >
-              {/* Floating shelf with light effect */}
-              <div className="relative">
-                {/* Bottom border shelf */}
-                <div className={`absolute bottom-0 left-0 right-0 h-px ${
-                  isActive 
-                    ? 'bg-purple-400/60 dark:bg-purple-400/70' 
-                    : 'bg-slate-300 dark:bg-slate-600'
-                }`}></div>
+      {isMobile ? (
+        // Mobile: Dot navigation
+        <div className="flex justify-center items-center gap-3">
+          {workExperiences.map((experience, index) => {
+            const isActive = activeExperienceId === experience.id;
+            
+            return (
+              <button
+                key={experience.id}
+                onClick={() => handleClick(experience.id)}
+                disabled={isTransitioning}
+                className={`relative transition-all duration-300 ${
+                  isTransitioning ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
+                }`}
+                aria-label={`Navigate to experience ${index + 1}`}
+              >
+                {/* Dot */}
+                <div
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    isActive
+                      ? 'bg-purple-400 dark:bg-purple-400 scale-125'
+                      : 'bg-slate-400 dark:bg-slate-600 hover:bg-slate-500 dark:hover:bg-slate-500'
+                  }`}
+                ></div>
                 
-                {/* Click flash animation - expands horizontally from center */}
+                {/* Click flash animation */}
                 {clickedItemId === experience.id && (
                   <div 
-                    className="absolute inset-y-0 left-1/2 transform -translate-x-1/2 bg-purple-400/20"
+                    className="absolute inset-0 rounded-full bg-purple-400/30"
                     style={{
-                      width: '0%',
-                      animation: 'expandHorizontal 0.8s ease-out forwards'
+                      animation: 'expandHorizontal 0.6s ease-out forwards'
                     }}
                   ></div>
                 )}
-                
-                {/* Text content */}
-                <div className={`relative z-10 text-left ${
-                  isActive 
-                    ? 'text-purple-600 dark:text-purple-400' 
-                    : 'group-hover:text-slate-900 dark:group-hover:text-slate-100'
-                }`} style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem', paddingLeft: '0.5rem' }}>
-                  {/* Bullet point indicator - positioned absolutely to not affect text layout */}
-                  {isActive && (
-                    <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-purple-600 dark:bg-purple-400 rounded-full -ml-3"></div>
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        // Desktop: Company name list
+        <div className={containerClass}>
+          {workExperiences.map((experience, index) => {
+            const isActive = activeExperienceId === experience.id;
+            
+            return (
+              <div
+                key={experience.id}
+                onClick={() => handleClick(experience.id)}
+                className={`${shelfItemClass} ${
+                  isTransitioning ? 'cursor-not-allowed' : ''
+                }`}
+              >
+                {/* Floating shelf with light effect */}
+                <div className="relative">
+                  {/* Bottom border shelf */}
+                  <div className={`absolute bottom-0 left-0 right-0 h-px ${
+                    isActive 
+                      ? 'bg-purple-400/60 dark:bg-purple-400/70' 
+                      : 'bg-slate-300 dark:bg-slate-600'
+                  }`}></div>
+                  
+                  {/* Click flash animation - expands horizontally from center */}
+                  {clickedItemId === experience.id && (
+                    <div 
+                      className="absolute inset-y-0 left-1/2 transform -translate-x-1/2 bg-purple-400/20"
+                      style={{
+                        width: '0%',
+                        animation: 'expandHorizontal 0.8s ease-out forwards'
+                      }}
+                    ></div>
                   )}
-                  <div className={companyNameClass}>{experience.companyName}</div>
+                  
+                  {/* Text content */}
+                  <div className={`relative z-10 text-left ${
+                    isActive 
+                      ? 'text-purple-600 dark:text-purple-400' 
+                      : 'group-hover:text-slate-900 dark:group-hover:text-slate-100'
+                  }`} style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem', paddingLeft: '0.5rem' }}>
+                    {/* Bullet point indicator - positioned absolutely to not affect text layout */}
+                    {isActive && (
+                      <div className="absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-purple-600 dark:bg-purple-400 rounded-full -ml-3"></div>
+                    )}
+                    <div className={companyNameClass}>{experience.companyName}</div>
+                  </div>
+                  
+                  {/* Subtle hover effect */}
+                  {!isActive && !isTransitioning && (
+                    <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-200/50 dark:via-slate-600/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  )}
                 </div>
-                
-                {/* Subtle hover effect */}
-                {!isActive && !isTransitioning && (
-                  <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-slate-200/50 dark:via-slate-600/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                )}
               </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

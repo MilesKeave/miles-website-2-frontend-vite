@@ -36,9 +36,9 @@ export const WorkExperienceCard = ({
   hasTransparentBackground = false,
   backgroundClass = ''
 }: WorkExperienceCardProps): React.JSX.Element => {
-  const cardHeight = isMobile ? "h-[17.1rem]" : "h-[20.41rem] sm:h-[23.81rem] md:h-[27.22rem] lg:h-[30.62rem]";
-  const cardPadding = isMobile ? "p-3" : "p-3 sm:p-4 lg:p-6";
-  const cardGap = isMobile ? "gap-1" : "gap-1 sm:gap-1.5 lg:gap-2";
+  const cardHeight = isMobile ? "h-[70vh] max-h-[calc((100vh-14rem)*0.8)]" : "h-[20.41rem] sm:h-[23.81rem] md:h-[27.22rem] lg:h-[30.62rem]";
+  const cardPadding = isMobile ? "p-4" : "p-3 sm:p-4 lg:p-6";
+  const cardGap = isMobile ? "gap-2" : "gap-1 sm:gap-1.5 lg:gap-2";
   const cardRounded = isMobile ? "rounded-lg" : "rounded-lg sm:rounded-xl";
   
   return (
@@ -64,51 +64,51 @@ export const WorkExperienceCard = ({
         />
         <div className={`relative flex h-full flex-col justify-between ${cardGap} overflow-hidden ${cardRounded} ${cardPadding}`}>
           {/* Header */}
-          <div className={`flex items-start justify-between ${isMobile ? 'mb-2' : 'mb-3 sm:mb-4 lg:mb-6'}`}>
-            <div className={`flex items-center ${isMobile ? 'gap-2' : 'gap-2 sm:gap-3 lg:gap-4'}`}>
-              <div className={`${isMobile ? 'p-1.5' : 'p-2 sm:p-2.5 lg:p-3'} bg-white/10 ${cardRounded}`}>
-                <IconBriefcase className={`${isMobile ? 'h-3 w-3' : 'h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6'} text-white`} />
+          <div className={`flex items-start justify-between ${isMobile ? 'mb-3' : 'mb-3 sm:mb-4 lg:mb-6'}`}>
+            <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-2 sm:gap-3 lg:gap-4'}`}>
+              <div className={`${isMobile ? 'p-2.5' : 'p-2 sm:p-2.5 lg:p-3'} bg-white/10 ${cardRounded}`}>
+                <IconBriefcase className={`${isMobile ? 'h-5 w-5' : 'h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6'} text-white`} />
               </div>
               <div>
-                <h3 className={`${isMobile ? 'text-sm' : 'text-lg sm:text-xl lg:text-2xl'} font-bold text-white mb-1 text-left`}>
+                <h3 className={`${isMobile ? 'text-lg' : 'text-lg sm:text-xl lg:text-2xl'} font-bold text-white mb-1.5 text-left`}>
                   {experience.jobTitle}
                 </h3>
-                <div className={`flex items-center ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'} text-slate-300`}>
-                  <IconBuilding className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
-                  <span className={`font-medium ${isMobile ? 'text-xs' : 'text-sm sm:text-base'}`}>{experience.companyName}</span>
+                <div className={`flex items-center ${isMobile ? 'gap-1.5' : 'gap-1 sm:gap-2'} text-slate-300`}>
+                  <IconBuilding className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
+                  <span className={`font-medium ${isMobile ? 'text-sm' : 'text-sm sm:text-base'}`}>{experience.companyName}</span>
                 </div>
               </div>
             </div>
             <div className="text-right">
-              <div className={`flex items-center gap-1 text-slate-400 ${isMobile ? 'mb-1' : 'mb-1'}`}>
-                <IconCalendar className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
-                <span className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'}`}>{experience.date}</span>
+              <div className={`flex items-center gap-1.5 text-slate-400 ${isMobile ? 'mb-1.5' : 'mb-1'}`}>
+                <IconCalendar className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
+                <span className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'}`}>{experience.date}</span>
               </div>
-              <div className="flex items-center gap-1 text-slate-400">
-                <IconMapPin className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
-                <span className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'}`}>{experience.location}</span>
+              <div className="flex items-center gap-1.5 text-slate-400">
+                <IconMapPin className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
+                <span className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'}`}>{experience.location}</span>
               </div>
             </div>
           </div>
 
           {/* Bullet Points or Description */}
-          <div className={`${isMobile ? 'mb-2' : 'mb-3 sm:mb-4 lg:mb-6'} text-left flex-1 ${isMobile ? '' : 'overflow-y-auto'}`}>
-            <h4 className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} font-semibold text-slate-400 ${isMobile ? 'mb-1' : 'mb-2 sm:mb-3'} uppercase tracking-wide text-left`}>
+          <div className={`${isMobile ? 'mb-3' : 'mb-3 sm:mb-4 lg:mb-6'} text-left flex-1 ${isMobile ? 'overflow-y-auto' : 'overflow-y-auto'}`}>
+            <h4 className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-slate-400 ${isMobile ? 'mb-2' : 'mb-2 sm:mb-3'} uppercase tracking-wide text-left`}>
               Key Responsibilities & Achievements
             </h4>
             {experience.bulletPoints && Array.isArray(experience.bulletPoints) && experience.bulletPoints.length > 0 ? (
-              <ul className={`${isMobile ? 'space-y-1' : 'space-y-2 sm:space-y-3'} text-left`}>
+              <ul className={`${isMobile ? 'space-y-2' : 'space-y-2 sm:space-y-3'} text-left`}>
                 {experience.bulletPoints.map((bulletPoint, bulletIndex) => (
                   <li key={bulletIndex} className="text-slate-300 text-left">
-                    <div className={`flex items-start ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'} text-left`}>
-                      <span className={`text-blue-400 ${isMobile ? 'mt-0.5' : 'mt-1 sm:mt-1.5'} ${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} flex-shrink-0`}>•</span>
+                    <div className={`flex items-start ${isMobile ? 'gap-2' : 'gap-1 sm:gap-2'} text-left`}>
+                      <span className={`text-blue-400 ${isMobile ? 'mt-1' : 'mt-1 sm:mt-1.5'} ${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} flex-shrink-0`}>•</span>
                       <div className="flex-1 text-left">
-                        <span className={`leading-relaxed text-left block ${isMobile ? 'text-xs' : 'text-xs sm:text-sm lg:text-base'}`}>{bulletPoint.text}</span>
+                        <span className={`leading-relaxed text-left block ${isMobile ? 'text-sm' : 'text-xs sm:text-sm lg:text-base'}`}>{bulletPoint.text}</span>
                         {bulletPoint.subPoints && Array.isArray(bulletPoint.subPoints) && bulletPoint.subPoints.length > 0 && (
-                          <ul className={`${isMobile ? 'mt-1 ml-2 space-y-0.5' : 'mt-1 sm:mt-2 ml-2 sm:ml-4 space-y-1'} text-left`}>
+                          <ul className={`${isMobile ? 'mt-1.5 ml-3 space-y-1' : 'mt-1 sm:mt-2 ml-2 sm:ml-4 space-y-1'} text-left`}>
                             {bulletPoint.subPoints.map((subPoint, subIndex) => (
-                              <li key={subIndex} className={`flex items-start ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'} text-slate-400 text-left`}>
-                                <span className={`text-blue-300 ${isMobile ? 'mt-0.5' : 'mt-1 sm:mt-1.5'} text-xs flex-shrink-0`}>◦</span>
+                              <li key={subIndex} className={`flex items-start ${isMobile ? 'gap-1.5' : 'gap-1 sm:gap-2'} text-slate-400 text-left`}>
+                                <span className={`text-blue-300 ${isMobile ? 'mt-1' : 'mt-1 sm:mt-1.5'} ${isMobile ? 'text-xs' : 'text-xs'} flex-shrink-0`}>◦</span>
                                 <span className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} leading-relaxed text-left block`}>{subPoint}</span>
                               </li>
                             ))}
@@ -120,24 +120,24 @@ export const WorkExperienceCard = ({
                 ))}
               </ul>
             ) : experience.description ? (
-              <p className={`text-slate-300 leading-relaxed text-left ${isMobile ? 'text-xs' : 'text-xs sm:text-sm lg:text-base'}`}>
+              <p className={`text-slate-300 leading-relaxed text-left ${isMobile ? 'text-sm' : 'text-xs sm:text-sm lg:text-base'}`}>
                 {experience.description}
               </p>
             ) : (
-              <p className={`text-slate-400 ${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} italic text-left`}>No information available</p>
+              <p className={`text-slate-400 ${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} italic text-left`}>No information available</p>
             )}
           </div>
 
           {/* Technologies */}
           <div>
-            <h4 className={`${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} font-semibold text-slate-400 ${isMobile ? 'mb-1' : 'mb-2 sm:mb-3'} uppercase tracking-wide`}>
+            <h4 className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-slate-400 ${isMobile ? 'mb-2' : 'mb-2 sm:mb-3'} uppercase tracking-wide`}>
               Technologies Used
             </h4>
-            <div className={`flex flex-wrap ${isMobile ? 'gap-1' : 'gap-1 sm:gap-2'}`}>
+            <div className={`flex flex-wrap ${isMobile ? 'gap-1.5' : 'gap-1 sm:gap-2'}`}>
               {experience.technologiesUsed.map((tech, techIndex) => (
                 <span
                   key={techIndex}
-                  className={`${isMobile ? 'px-2 py-0.5' : 'px-2 sm:px-3 py-1'} bg-white/10 text-white ${isMobile ? 'text-xs' : 'text-xs sm:text-sm'} rounded-full border border-white/20`}
+                  className={`${isMobile ? 'px-3 py-1.5' : 'px-2 sm:px-3 py-1'} bg-white/10 text-white ${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} rounded-full border border-white/20`}
                 >
                   {tech}
                 </span>
