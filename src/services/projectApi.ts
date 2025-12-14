@@ -11,6 +11,7 @@ export interface Project {
   githubLink2?: string;
   youtubeLink: string;
   websiteLink: string;
+  index?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -88,6 +89,7 @@ export const projectApi = {
       githubLink2?: string;
       youtubeLink?: string;
       websiteLink?: string;
+      index?: number;
       projectImage?: File;
       projectImage2?: File;
     }
@@ -112,6 +114,9 @@ export const projectApi = {
     }
     if (data.websiteLink !== undefined) {
       formData.append('websiteLink', data.websiteLink);
+    }
+    if (data.index !== undefined) {
+      formData.append('index', data.index.toString());
     }
     if (data.projectImage) {
       formData.append('projectImage', data.projectImage);
