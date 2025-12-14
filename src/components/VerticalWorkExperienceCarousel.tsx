@@ -58,8 +58,14 @@ export const VerticalWorkExperienceCarousel = ({
           // Get the actual scroll container
           const scrollContainer = container;
           
-          // Get container dimensions
-          const containerHeight = scrollContainer.clientHeight;
+          // Get the outer parent container (the div with h-full relative overflow-hidden)
+          const outerContainer = scrollContainer.parentElement;
+          if (!outerContainer) return;
+          
+          // Get container dimensions and positions
+          const outerContainerRect = outerContainer.getBoundingClientRect();
+          const outerContainerHeight = outerContainer.clientHeight;
+          const scrollContainerHeight = scrollContainer.clientHeight;
           const cardHeight = targetCard.offsetHeight;
           
           // Special handling for first and last cards
@@ -67,7 +73,7 @@ export const VerticalWorkExperienceCarousel = ({
           const isLastCard = targetIndex === workExperiences.length - 1;
           
           // Calculate max scroll position (accounting for bottom padding)
-          const maxScroll = Math.max(0, scrollContainer.scrollHeight - containerHeight);
+          const maxScroll = Math.max(0, scrollContainer.scrollHeight - scrollContainerHeight);
           
           let targetScrollPosition: number;
           
@@ -78,25 +84,23 @@ export const VerticalWorkExperienceCarousel = ({
             // For the last card, always scroll to the bottom
             targetScrollPosition = maxScroll;
           } else {
-            // For middle cards, find the card's actual position in the scroll container
-            // Get the parent container that holds all cards
-            const cardsContainer = targetCard.parentElement;
-            if (!cardsContainer) return;
+            // For middle cards, calculate position to center in the outer container
+            // Use getBoundingClientRect to get current viewport positions
+            const cardRect = targetCard.getBoundingClientRect();
+            const outerContainerRect = outerContainer.getBoundingClientRect();
             
-            // Calculate the card's position relative to the cards container
-            let cardTop = 0;
-            let element: HTMLElement | null = targetCard;
+            // Card's center Y position in viewport
+            const cardCenterY = cardRect.top + (cardHeight / 2);
             
-            // Walk up to the cards container
-            while (element && element !== cardsContainer) {
-              cardTop += element.offsetTop;
-              element = element.offsetParent as HTMLElement;
-            }
+            // Outer container's center Y position in viewport (this is our target)
+            const outerContainerCenterY = outerContainerRect.top + (outerContainerHeight / 2);
             
-            // Calculate scroll position to center the card vertically
-            const cardCenter = cardTop + (cardHeight / 2);
-            const containerCenter = containerHeight / 2;
-            targetScrollPosition = cardCenter - containerCenter;
+            // Calculate how much we need to scroll to align card center with outer container center
+            // The difference in viewport positions tells us how much to scroll
+            const scrollOffset = cardCenterY - outerContainerCenterY;
+            
+            // Current scroll position + offset needed = target scroll position
+            targetScrollPosition = scrollContainer.scrollTop + scrollOffset;
           }
           
           // Clamp the scroll position to valid bounds
@@ -226,54 +230,115 @@ export const VerticalWorkExperienceCarousel = ({
     if (!carouselRef.current || workExperiences.length === 0) return;
     
     const container = carouselRef.current;
-    const containerTop = container.scrollTop;
     
-    // Calculate the exact card height and gap from the actual DOM elements
-    const firstCard = container.querySelector('[data-card-index="0"]') as HTMLElement;
+    // Get the outer container (h-full relative overflow-hidden)
+    const outerContainer = container.parentElement;
+    if (!outerContainer) return;
     
-    if (!firstCard) return;
+    const outerContainerRect = outerContainer.getBoundingClientRect();
+    const outerContainerHeight = outerContainer.clientHeight;
+    // Center of the outer container (in viewport coordinates)
+    const outerContainerCenterY = outerContainerRect.top + (outerContainerHeight / 2);
     
-    const cardHeight = firstCard.offsetHeight;
-    const gap = 4; // Gap between cards (from gap-1 class)
-    const cardSpacing = cardHeight + gap;
     const containerHeight = container.clientHeight;
-    const maxScroll = container.scrollHeight - containerHeight;
+    const containerScrollTop = container.scrollTop;
+    const maxScroll = Math.max(0, container.scrollHeight - containerHeight);
+    const lastCardIndex = workExperiences.length - 1;
     
-    // Calculate which card should be active based on scroll position
-    // If we're near the bottom (within 1 card height of max scroll), snap to last card
-    const isNearBottom = containerTop >= maxScroll - cardHeight;
-    let clampedIndex: number;
+    // Special handling: if we're at or near the bottom, always select the last card
+    // Check if we're at the absolute bottom, or if the last card is visible
+    const isAtBottom = containerScrollTop >= maxScroll - 1; // At or very close to bottom (1px tolerance)
+    const lastCard = container.querySelector(`[data-card-index="${lastCardIndex}"]`) as HTMLElement;
+    const isLastCardVisible = lastCard ? lastCard.getBoundingClientRect().bottom <= outerContainerRect.bottom + 50 : false;
+    const isNearBottom = isAtBottom || isLastCardVisible || containerScrollTop >= maxScroll - 150; // Within 150px of bottom
     
-    if (isNearBottom) {
-      // If near bottom, always snap to the last card
-      clampedIndex = workExperiences.length - 1;
+    let closestCardIndex = 0;
+    let closestDistance = Infinity;
+    
+    if (isNearBottom && lastCardIndex >= 0) {
+      // When near the bottom, always select the last card
+      closestCardIndex = lastCardIndex;
     } else {
-      const nearestIndex = Math.round(containerTop / cardSpacing);
-      clampedIndex = Math.max(0, Math.min(nearestIndex, workExperiences.length - 1));
+      // Find the card whose center is closest to the center of the outer container
+      // Check each card to find which one's center is closest to the outer container's center
+      workExperiences.forEach((_, index) => {
+        const card = container.querySelector(`[data-card-index="${index}"]`) as HTMLElement;
+        if (!card) return;
+        
+        // Use getBoundingClientRect to get the card's actual position in the viewport
+        const cardRect = card.getBoundingClientRect();
+        const cardHeight = cardRect.height;
+        // Card's center Y position in viewport coordinates
+        const cardCenterY = cardRect.top + (cardHeight / 2);
+        
+        // Calculate distance from the outer container's center
+        // Both are in viewport coordinates, so this gives the actual distance
+        const distance = Math.abs(cardCenterY - outerContainerCenterY);
+        
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestCardIndex = index;
+        }
+      });
     }
     
-    const isLastCard = clampedIndex === workExperiences.length - 1;
-    let targetScrollPosition: number;
+    // Update indices to match the closest card immediately
+    setCurrentIndex(closestCardIndex);
+    setVisualIndex(closestCardIndex);
+    
+    // Update the active experience in the parent to highlight/select the card
+    const newActiveExperience = workExperiences[closestCardIndex];
+    if (newActiveExperience && newActiveExperience.id !== activeExperienceId) {
+      // Set the programmatic scroll flag to prevent interference
+      isProgrammaticScrollRef.current = true;
+      // Call onCardClick to update the active experience in the parent
+      onCardClick(newActiveExperience.id);
+    }
+    
+    // Special handling for last card - always scroll to maxScroll
+    const isLastCard = closestCardIndex === lastCardIndex;
+    let finalScrollPosition: number;
     
     if (isLastCard) {
-      // For the last card, scroll to the maximum position
-      targetScrollPosition = maxScroll;
+      // For the last card, always scroll to the bottom
+      finalScrollPosition = maxScroll;
     } else {
-      // For other cards, center them vertically
-      const targetCardTop = clampedIndex * cardSpacing;
-      const offsetFromTop = (containerHeight - cardHeight) / 2;
-      targetScrollPosition = targetCardTop - offsetFromTop;
-      targetScrollPosition = Math.max(0, Math.min(targetScrollPosition, maxScroll));
+      // Now scroll to center the closest card
+      const targetCard = container.querySelector(`[data-card-index="${closestCardIndex}"]`) as HTMLElement;
+      if (!targetCard) {
+        // Reset flag if card not found
+        if (newActiveExperience && newActiveExperience.id !== activeExperienceId) {
+          isProgrammaticScrollRef.current = false;
+        }
+        return;
+      }
+      
+      // Use getBoundingClientRect to get current positions
+      const cardRect = targetCard.getBoundingClientRect();
+      const cardHeight = cardRect.height;
+      
+      // Calculate scroll offset needed to center the card in the outer container
+      const cardCenterY = cardRect.top + (cardHeight / 2);
+      const scrollOffset = cardCenterY - outerContainerCenterY;
+      const targetScrollPosition = containerScrollTop + scrollOffset;
+      
+      // Clamp to valid bounds
+      finalScrollPosition = Math.max(0, Math.min(targetScrollPosition, maxScroll));
     }
     
+    // Smoothly scroll to center the card
     container.scrollTo({
-      top: targetScrollPosition,
+      top: finalScrollPosition,
       behavior: "smooth",
     });
     
-    // Use updateActiveCard to properly set both currentIndex and visualIndex
-    updateActiveCard();
-  }, [workExperiences, updateActiveCard]);
+    // Reset the programmatic scroll flag after scroll completes
+    if (newActiveExperience && newActiveExperience.id !== activeExperienceId) {
+      setTimeout(() => {
+        isProgrammaticScrollRef.current = false;
+      }, 1000);
+    }
+  }, [workExperiences, activeExperienceId, onCardClick]);
 
 
 
@@ -286,22 +351,23 @@ export const VerticalWorkExperienceCarousel = ({
       return;
     }
     
-    // Update visual index during scrolling for visual feedback only
-    updateVisualIndex();
+    // During manual scrolling, don't update anything - just let the user scroll freely
+    // We'll only snap after they release
     
     // Clear existing timeout
     if (scrollTimeoutRef.current) {
       clearTimeout(scrollTimeoutRef.current);
     }
     
-    // Set new timeout to detect when scrolling stops - shorter delay for quicker snapping
+    // Set new timeout to detect when scrolling stops
+    // Use 500ms (half a second) delay to allow for quick re-scrolling without snapping
     scrollTimeoutRef.current = setTimeout(() => {
       // Double-check the flag hasn't been set during the timeout
       if (!isProgrammaticScrollRef.current) {
         snapToNearestCard();
       }
-    }, 300); // 300ms delay after scrolling stops - quicker snapping
-  }, [updateVisualIndex, snapToNearestCard]);
+    }, 500); // Half a second delay after scrolling stops before snapping
+  }, [snapToNearestCard]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
     // Prevent wheel events from bubbling up to parent page
@@ -337,15 +403,17 @@ export const VerticalWorkExperienceCarousel = ({
       const gap = 4; // Gap between cards (from gap-1 class)
       
       // To center any card, we need: (containerHeight - cardHeight) / 2 space above and below
-      // For the last card to be centered, we need:
-      // - The last card's position from top
-      // - Plus (containerHeight - cardHeight) / 2 space below it
-      // Last card position = (numberOfCards - 1) * (cardHeight + gap)
-      // Required padding = (containerHeight - cardHeight) / 2
-      // Add extra buffer (100px) to ensure smooth scrolling
-      const requiredPaddingForCentering = (containerHeight - cardHeight) / 2;
-      const buffer = 100; // Extra buffer for smooth scrolling
-      const calculatedPadding = Math.max(0, requiredPaddingForCentering + buffer);
+      // Get the outer container (h-full relative overflow-hidden)
+      const outerContainer = carouselRef.current?.parentElement;
+      if (!outerContainer) return;
+      
+      const outerContainerHeight = outerContainer.clientHeight;
+      
+      // For the first card to be centered, we need padding at the top
+      // For the last card to be centered, we need padding at the bottom
+      // Required padding = (outerContainerHeight - cardHeight) / 2
+      // This centers the card in the outer container
+      const calculatedPadding = Math.max(0, (outerContainerHeight - cardHeight) / 2);
       
       setBottomPadding(calculatedPadding);
     };
@@ -404,7 +472,10 @@ export const VerticalWorkExperienceCarousel = ({
       >
         <div 
           className="flex flex-col justify-start gap-1"
-          style={{ paddingBottom: `${bottomPadding}px` }}
+          style={{ 
+            paddingTop: `${bottomPadding}px`,
+            paddingBottom: `${bottomPadding}px` 
+          }}
         >
           {workExperiences.map((experience, index) => {
             const isActive = experience.id === activeExperienceId;

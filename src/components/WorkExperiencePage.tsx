@@ -120,7 +120,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
             {/* Bottom Section - Two Columns */}
             <div className="flex gap-4 sm:gap-6 lg:gap-8 h-[calc(100vh-16rem)] sm:h-[calc(100vh-18rem)] lg:h-[calc(100vh-20rem)]">
               {/* Left Column - Company List */}
-              <div className="w-64 sm:w-80 lg:w-96 flex-shrink-0 flex flex-col justify-start pt-6 sm:pt-9 lg:pt-12">
+              <div className="w-64 sm:w-80 lg:w-96 flex-shrink-0 flex flex-col justify-center">
                 <CompanyList 
                   workExperiences={sortedWorkExperiences}
                   activeExperienceId={activeExperienceId}
