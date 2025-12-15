@@ -13,6 +13,47 @@ interface VerticalWorkExperienceCarouselProps {
   isMobile?: boolean;
 }
 
+// Safari detection helper
+const isSafari = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+};
+
+// Safari-aware smooth scroll helper
+const smoothScrollTo = (element: HTMLElement, targetPosition: number, duration: number = 400): void => {
+  const isSafariBrowser = isSafari();
+  
+  if (isSafariBrowser) {
+    // Manual animation for Safari
+    const startPosition = element.scrollTop;
+    const distance = targetPosition - startPosition;
+    const startTime = performance.now();
+    
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      
+      // Easing function (ease-out cubic)
+      const easeOut = 1 - Math.pow(1 - progress, 3);
+      const currentPosition = startPosition + (distance * easeOut);
+      
+      element.scrollTop = currentPosition;
+      
+      if (progress < 1) {
+        requestAnimationFrame(animateScroll);
+      }
+    };
+    
+    requestAnimationFrame(animateScroll);
+  } else {
+    // Native smooth scrolling for other browsers
+    element.scrollTo({
+      top: targetPosition,
+      behavior: "smooth",
+    });
+  }
+};
+
 export const VerticalWorkExperienceCarousel = ({
   workExperiences,
   activeExperienceId,
@@ -53,66 +94,71 @@ export const VerticalWorkExperienceCarousel = ({
       }
       
       // Wait for layout to settle
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          // Get the actual scroll container
-          const scrollContainer = container;
-          
-          // Get the outer parent container (the div with h-full relative overflow-hidden)
-          const outerContainer = scrollContainer.parentElement;
-          if (!outerContainer) return;
-          
-          // Get container dimensions and positions
+      // Use single requestAnimationFrame for Safari, double for others
+      const performScroll = () => {
+        // Get the actual scroll container
+        const scrollContainer = container;
+        
+        // Get the outer parent container (the div with h-full relative overflow-hidden)
+        const outerContainer = scrollContainer.parentElement;
+        if (!outerContainer) return;
+        
+        // Get container dimensions and positions
+        const outerContainerRect = outerContainer.getBoundingClientRect();
+        const outerContainerHeight = outerContainer.clientHeight;
+        const scrollContainerHeight = scrollContainer.clientHeight;
+        const cardHeight = targetCard.offsetHeight;
+        
+        // Special handling for first and last cards
+        const isFirstCard = targetIndex === 0;
+        const isLastCard = targetIndex === workExperiences.length - 1;
+        
+        // Calculate max scroll position (accounting for bottom padding)
+        const maxScroll = Math.max(0, scrollContainer.scrollHeight - scrollContainerHeight);
+        
+        let targetScrollPosition: number;
+        
+        if (isFirstCard) {
+          // For the first card, scroll to the top
+          targetScrollPosition = 0;
+        } else if (isLastCard) {
+          // For the last card, always scroll to the bottom
+          targetScrollPosition = maxScroll;
+        } else {
+          // For middle cards, calculate position to center in the outer container
+          // Use getBoundingClientRect to get current viewport positions
+          const cardRect = targetCard.getBoundingClientRect();
           const outerContainerRect = outerContainer.getBoundingClientRect();
-          const outerContainerHeight = outerContainer.clientHeight;
-          const scrollContainerHeight = scrollContainer.clientHeight;
-          const cardHeight = targetCard.offsetHeight;
           
-          // Special handling for first and last cards
-          const isFirstCard = targetIndex === 0;
-          const isLastCard = targetIndex === workExperiences.length - 1;
+          // Card's center Y position in viewport
+          const cardCenterY = cardRect.top + (cardHeight / 2);
           
-          // Calculate max scroll position (accounting for bottom padding)
-          const maxScroll = Math.max(0, scrollContainer.scrollHeight - scrollContainerHeight);
+          // Outer container's center Y position in viewport (this is our target)
+          const outerContainerCenterY = outerContainerRect.top + (outerContainerHeight / 2);
           
-          let targetScrollPosition: number;
+          // Calculate how much we need to scroll to align card center with outer container center
+          // The difference in viewport positions tells us how much to scroll
+          const scrollOffset = cardCenterY - outerContainerCenterY;
           
-          if (isFirstCard) {
-            // For the first card, scroll to the top
-            targetScrollPosition = 0;
-          } else if (isLastCard) {
-            // For the last card, always scroll to the bottom
-            targetScrollPosition = maxScroll;
-          } else {
-            // For middle cards, calculate position to center in the outer container
-            // Use getBoundingClientRect to get current viewport positions
-            const cardRect = targetCard.getBoundingClientRect();
-            const outerContainerRect = outerContainer.getBoundingClientRect();
-            
-            // Card's center Y position in viewport
-            const cardCenterY = cardRect.top + (cardHeight / 2);
-            
-            // Outer container's center Y position in viewport (this is our target)
-            const outerContainerCenterY = outerContainerRect.top + (outerContainerHeight / 2);
-            
-            // Calculate how much we need to scroll to align card center with outer container center
-            // The difference in viewport positions tells us how much to scroll
-            const scrollOffset = cardCenterY - outerContainerCenterY;
-            
-            // Current scroll position + offset needed = target scroll position
-            targetScrollPosition = scrollContainer.scrollTop + scrollOffset;
-          }
-          
-          // Clamp the scroll position to valid bounds
-          const finalScrollPosition = Math.max(0, Math.min(targetScrollPosition, maxScroll));
-          
-          // Perform the scroll
-          scrollContainer.scrollTo({
-            top: finalScrollPosition,
-            behavior: "smooth",
-          });
+          // Current scroll position + offset needed = target scroll position
+          targetScrollPosition = scrollContainer.scrollTop + scrollOffset;
+        }
+        
+        // Clamp the scroll position to valid bounds
+        const finalScrollPosition = Math.max(0, Math.min(targetScrollPosition, maxScroll));
+        
+        // Perform the scroll (Safari-aware)
+        smoothScrollTo(scrollContainer, finalScrollPosition);
+      };
+      
+      // Use single requestAnimationFrame for Safari, double for others
+      if (isSafari()) {
+        requestAnimationFrame(performScroll);
+      } else {
+        requestAnimationFrame(() => {
+          requestAnimationFrame(performScroll);
         });
-      });
+      }
     };
     
     // Start the scroll process
@@ -326,11 +372,8 @@ export const VerticalWorkExperienceCarousel = ({
       finalScrollPosition = Math.max(0, Math.min(targetScrollPosition, maxScroll));
     }
     
-    // Smoothly scroll to center the card
-    container.scrollTo({
-      top: finalScrollPosition,
-      behavior: "smooth",
-    });
+    // Smoothly scroll to center the card (Safari-aware)
+    smoothScrollTo(container, finalScrollPosition);
     
     // Reset the programmatic scroll flag after scroll completes
     if (newActiveExperience && newActiveExperience.id !== activeExperienceId) {
@@ -462,11 +505,16 @@ export const VerticalWorkExperienceCarousel = ({
     <div className={`${containerHeight} ${isMobile ? 'relative overflow-hidden' : 'relative overflow-hidden'}`}>
       <div
         className={cn(
-          "flex flex-col overflow-y-scroll overscroll-y-auto scroll-smooth",
+          "flex flex-col overflow-y-scroll overscroll-y-auto",
           containerHeight,
           containerPadding,
-          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          "[scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          // Remove scroll-smooth for Safari to prevent glitches
+          !isSafari() && "scroll-smooth"
         )}
+        style={{
+          WebkitOverflowScrolling: 'touch', // Better Safari scrolling
+        }}
         ref={carouselRef}
         onScroll={handleScroll}
       >
