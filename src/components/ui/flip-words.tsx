@@ -12,15 +12,28 @@ export const FlipWords = ({
   duration?: number;
   className?: string;
 }) => {
-  const [currentWord, setCurrentWord] = useState(words[0]);
+  // Reorder words array to always start with "engineer" if it exists
+  const reorderedWords = (() => {
+    if (words.includes("engineer")) {
+      const engineerIndex = words.indexOf("engineer");
+      return [
+        "engineer",
+        ...words.slice(0, engineerIndex),
+        ...words.slice(engineerIndex + 1)
+      ];
+    }
+    return words;
+  })();
+
+  const [currentWord, setCurrentWord] = useState(reorderedWords[0]);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
   // thanks for the fix Julian - https://github.com/Julian-AT
   const startAnimation = useCallback(() => {
-    const word = words[words.indexOf(currentWord) + 1] || words[0];
+    const word = reorderedWords[reorderedWords.indexOf(currentWord) + 1] || reorderedWords[0];
     setCurrentWord(word);
     setIsAnimating(true);
-  }, [currentWord, words]);
+  }, [currentWord, reorderedWords]);
 
   useEffect(() => {
     if (!isAnimating)
