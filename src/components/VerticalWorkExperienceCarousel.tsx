@@ -19,28 +19,52 @@ const isSafari = (): boolean => {
   return /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 };
 
-// Safari-aware smooth scroll helper
-const smoothScrollTo = (element: HTMLElement, targetPosition: number, duration: number = 400): void => {
+// Safari-aware smooth scroll helper with improved smoothness
+const smoothScrollTo = (element: HTMLElement, targetPosition: number, duration: number = 600): void => {
   const isSafariBrowser = isSafari();
   
   if (isSafariBrowser) {
-    // Manual animation for Safari
+    // Manual animation for Safari with smoother easing
     const startPosition = element.scrollTop;
     const distance = targetPosition - startPosition;
+    
+    // Skip animation if distance is very small
+    if (Math.abs(distance) < 1) {
+      element.scrollTop = targetPosition;
+      return;
+    }
+    
     const startTime = performance.now();
+    let lastFrameTime = startTime;
+    
+    // Smoother easing function: ease-in-out cubic (more natural feeling)
+    const easeInOutCubic = (t: number): number => {
+      return t < 0.5
+        ? 4 * t * t * t
+        : 1 - Math.pow(-2 * t + 2, 3) / 2;
+    };
     
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime;
       const progress = Math.min(elapsed / duration, 1);
       
-      // Easing function (ease-out cubic)
-      const easeOut = 1 - Math.pow(1 - progress, 3);
-      const currentPosition = startPosition + (distance * easeOut);
+      // Use smoother easing function
+      const easedProgress = easeInOutCubic(progress);
+      const currentPosition = startPosition + (distance * easedProgress);
       
+      // Use delta time for smoother frame updates
+      const deltaTime = currentTime - lastFrameTime;
+      lastFrameTime = currentTime;
+      
+      // Update scroll position
       element.scrollTop = currentPosition;
       
+      // Continue animation if not complete
       if (progress < 1) {
         requestAnimationFrame(animateScroll);
+      } else {
+        // Ensure we end exactly at target position
+        element.scrollTop = targetPosition;
       }
     };
     
