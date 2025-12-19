@@ -90,7 +90,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
   return (
     <>
       <div className="work-experience-page min-h-screen">
-        <div className="container mx-auto px-1 sm:px-2 py-4 sm:py-8 lg:py-12">
+        <div className="container mx-auto px-1 sm:px-2 pt-16 sm:pt-20 lg:pt-24 pb-4 sm:pb-8 lg:pb-12">
           {/* Mobile Layout - Stacked */}
           <div className="block sm:hidden">
             <WorkExperienceHeader isMobile={true} />
@@ -118,7 +118,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
             </div>
             
             {/* Bottom Section - Two Columns */}
-            <div className="flex gap-4 sm:gap-6 lg:gap-8 h-[calc(100vh-16rem)] sm:h-[calc(100vh-18rem)] lg:h-[calc(100vh-20rem)]">
+            <div className="flex gap-4 sm:gap-6 lg:gap-8 h-[calc(100vh-20rem)] sm:h-[calc(100vh-22rem)] lg:h-[calc(100vh-24rem)]">
               {/* Left Column - Company List */}
               <div className="w-64 sm:w-80 lg:w-96 flex-shrink-0 flex flex-col justify-center">
                 <CompanyList 

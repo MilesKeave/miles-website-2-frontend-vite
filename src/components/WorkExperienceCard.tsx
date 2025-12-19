@@ -1,4 +1,4 @@
-import { IconBriefcase, IconCalendar, IconMapPin, IconBuilding } from "@tabler/icons-react";
+import { IconBriefcase, IconBuilding } from "@tabler/icons-react";
 import { GlowingEffect } from "./ui/glowing-effect";
 import type { WorkExperience } from "../services/workExperienceApi";
 
@@ -36,7 +36,7 @@ export const WorkExperienceCard = ({
   hasTransparentBackground = false,
   backgroundClass = ''
 }: WorkExperienceCardProps): React.JSX.Element => {
-  const cardHeight = isMobile ? "h-[70vh] max-h-[calc((100vh-14rem)*0.8)]" : "h-[20.41rem] sm:h-[23.81rem] md:h-[27.22rem] lg:h-[30.62rem]";
+  const cardHeight = isMobile ? "h-[65vh] max-h-[calc((100vh-18rem)*0.75)]" : "h-[18rem] sm:h-[20rem] md:h-[23rem] lg:h-[26rem]";
   const cardPadding = isMobile ? "p-4" : "p-3 sm:p-4 lg:p-6";
   const cardGap = isMobile ? "gap-2" : "gap-1 sm:gap-1.5 lg:gap-2";
   const cardRounded = isMobile ? "rounded-lg" : "rounded-lg sm:rounded-xl";
@@ -77,16 +77,6 @@ export const WorkExperienceCard = ({
                   <IconBuilding className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
                   <span className={`font-medium ${isMobile ? 'text-sm' : 'text-sm sm:text-base'}`}>{experience.companyName}</span>
                 </div>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className={`flex items-center gap-1.5 text-slate-400 ${isMobile ? 'mb-1.5' : 'mb-1'}`}>
-                <IconCalendar className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
-                <span className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'}`}>{experience.date}</span>
-              </div>
-              <div className="flex items-center gap-1.5 text-slate-400">
-                <IconMapPin className={`${isMobile ? 'h-4 w-4' : 'h-3 w-3 sm:h-4 sm:w-4'}`} />
-                <span className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'}`}>{experience.location}</span>
               </div>
             </div>
           </div>

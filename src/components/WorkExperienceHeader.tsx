@@ -4,7 +4,7 @@ interface WorkExperienceHeaderProps {
 
 export const WorkExperienceHeader = ({ isMobile = false }: WorkExperienceHeaderProps): React.JSX.Element => {
   const titleClass = isMobile 
-    ? "text-2xl font-bold text-slate-900 dark:text-slate-100 text-left"
+    ? "text-2xl font-bold text-slate-900 dark:text-slate-100 text-center"
     : "text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 text-left";
     
   const containerClass = isMobile 

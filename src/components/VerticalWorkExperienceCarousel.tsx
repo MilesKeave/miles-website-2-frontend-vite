@@ -93,7 +93,7 @@ export const VerticalWorkExperienceCarousel = ({
   const [bottomPadding, setBottomPadding] = useState<number>(0);
 
   const containerHeight = isMobile 
-    ? "h-[calc(100vh-14rem)]" 
+    ? "h-[calc(100vh-18rem)]" 
     : "h-full";
   
   const containerPadding = isMobile 
