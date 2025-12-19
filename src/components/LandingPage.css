@@ -222,35 +222,38 @@
 .profile-image {
   width: 27rem;
   height: 27rem;
+  max-height: calc(100vh - 300px); /* Prevent overlap with button container */
   object-fit: contain;
 }
 
 /* Mobile responsive profile image */
-@media (max-width: 360px) {
+@media (max-width: 375px) {
   .profile-image-container {
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 60px;
+    padding-bottom: 100px; /* Increased to sit above nav bar */
   }
   
   .profile-image {
-    width: 12rem;
-    height: 12rem;
+    width: 14rem; /* iPhone SE and smaller */
+    height: 14rem;
+    max-height: calc(100vh - 280px); /* Prevent overlap with button container */
   }
 }
 
-@media (min-width: 361px) and (max-width: 480px) {
+@media (min-width: 376px) and (max-width: 480px) {
   .profile-image-container {
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 60px;
+    padding-bottom: 100px; /* Increased to sit above nav bar */
   }
   
   .profile-image {
-    width: 14rem;
-    height: 14rem;
+    width: 20rem; /* Other iPhones */
+    height: 20rem;
+    max-height: calc(100vh - 280px); /* Prevent overlap with button container */
   }
 }
 
@@ -259,12 +262,13 @@
     width: 100%;
     padding-left: 20px;
     padding-right: 20px;
-    padding-bottom: 60px;
+    padding-bottom: 100px; /* Increased to sit above nav bar */
   }
   
   .profile-image {
-    width: 16rem;
-    height: 16rem;
+    width: 24rem;
+    height: 24rem;
+    max-height: calc(100vh - 300px); /* Prevent overlap with button container */
   }
 }
 
@@ -273,12 +277,13 @@
     width: 100%;
     padding-left: 40px;
     padding-right: 40px;
-    padding-bottom: 40px;
+    padding-bottom: 100px; /* Increased to sit above nav bar */
   }
   
   .profile-image {
-    width: 18rem;
-    height: 18rem;
+    width: 26rem;
+    height: 26rem;
+    max-height: calc(100vh - 320px); /* Prevent overlap with button container */
   }
 }
 
@@ -286,12 +291,13 @@
   .profile-image-container {
     width: 50%;
     padding-left: 60px;
-    padding-bottom: 10vh;
+    padding-bottom: 120px; /* Increased to sit above nav bar */
   }
   
   .profile-image {
     width: 22rem;
     height: 22rem;
+    max-height: calc(100vh - 350px); /* Prevent overlap with button container */
   }
 }
 
@@ -299,6 +305,7 @@
   .profile-image {
     width: 27rem;
     height: 27rem;
+    max-height: calc(100vh - 300px); /* Prevent overlap with button container */
   }
   
   .name-text {
@@ -376,6 +383,13 @@
   width: 100%;
   height: 100vh;
   position: relative;
+}
+
+/* Add bottom padding on mobile/iPad to prevent content from sitting behind navigation bar */
+@media (max-width: 1024px) {
+  .home-page, .projects-page, .work-experience-page {
+    padding-bottom: 120px; /* Space for nav bar (64px) + bottom offset (24px) + buffer (32px) */
+  }
 }
 
 .hello-world-container {

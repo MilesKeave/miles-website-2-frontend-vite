@@ -9,7 +9,7 @@ import {
   useSpring,
   useTransform,
 } from "motion/react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { PageId } from "../../types/pages";
 import { PAGE_CONFIG } from "../../config/pages";
 
@@ -62,11 +62,29 @@ const FloatingDockDesktop = ({
   items: { title: string; icon: React.ReactNode; action?: () => void; href?: string; isLink: boolean; isActive: boolean }[];
   className?: string;
 }) => {
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  
+  useEffect(() => {
+    // Detect if device supports touch or is mobile/iPad
+    const checkTouchDevice = () => {
+      return (
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        // @ts-ignore - some browsers have this
+        navigator.msMaxTouchPoints > 0 ||
+        window.matchMedia('(pointer: coarse)').matches
+      );
+    };
+    
+    setIsTouchDevice(checkTouchDevice());
+  }, []);
+  
   let mouseX = useMotionValue(Infinity);
+  
   return (
     <motion.div
-      onMouseMove={(e) => mouseX.set(e.pageX)}
-      onMouseLeave={() => mouseX.set(Infinity)}
+      onMouseMove={isTouchDevice ? undefined : (e) => mouseX.set(e.pageX)}
+      onMouseLeave={isTouchDevice ? undefined : () => mouseX.set(Infinity)}
       className={cn(
         "mx-auto h-16 items-end gap-4 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 px-4 pb-3 flex",
         className,
@@ -82,6 +100,7 @@ const FloatingDockDesktop = ({
           href={item.href}
           isLink={item.isLink}
           isActive={item.isActive}
+          isTouchDevice={isTouchDevice}
         />
       ))}
     </motion.div>
@@ -96,6 +115,7 @@ function IconContainer({
   href,
   isLink,
   isActive,
+  isTouchDevice,
 }: {
   mouseX: MotionValue;
   title: string;
@@ -104,12 +124,14 @@ function IconContainer({
   href?: string;
   isLink: boolean;
   isActive: boolean;
+  isTouchDevice: boolean;
 }) {
   let ref = useRef<HTMLDivElement>(null);
 
+  // Only calculate transforms on desktop (non-touch devices)
   let distance = useTransform(mouseX, (val) => {
+    if (isTouchDevice) return Infinity;
     let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
-
     return val - bounds.x - bounds.width / 2;
   });
 
@@ -155,22 +177,33 @@ function IconContainer({
     }
   };
 
+  // Fixed sizes for touch devices, dynamic for desktop
+  const containerStyle = isTouchDevice 
+    ? { width: 40, height: 40 }
+    : { width, height };
+  
+  const iconStyle = isTouchDevice
+    ? { width: 20, height: 20 }
+    : { width: widthIcon, height: heightIcon };
+
   return (
     <div onClick={handleClick}>
       <motion.div
         ref={ref}
-        style={{ width, height }}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
+        style={containerStyle}
+        onMouseEnter={isTouchDevice ? undefined : () => setHovered(true)}
+        onMouseLeave={isTouchDevice ? undefined : () => setHovered(false)}
         className={cn(
           "relative flex aspect-square items-center justify-center rounded-full cursor-pointer",
           isActive 
             ? "bg-white/30" // Lighter background for active page
-            : "bg-white/10 hover:bg-white/20"
+            : "bg-white/10",
+          // Only apply hover background on desktop
+          !isTouchDevice && !isActive && "hover:bg-white/20"
         )}
       >
         <AnimatePresence>
-          {hovered && (
+          {!isTouchDevice && hovered && (
             <motion.div
               initial={{ opacity: 0, y: 10, x: "-50%" }}
               animate={{ opacity: 1, y: 0, x: "-50%" }}
@@ -182,7 +215,7 @@ function IconContainer({
           )}
         </AnimatePresence>
         <motion.div
-          style={{ width: widthIcon, height: heightIcon }}
+          style={iconStyle}
           className="flex items-center justify-center text-white"
         >
           {icon}

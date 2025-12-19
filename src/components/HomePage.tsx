@@ -1,8 +1,19 @@
+import { useState, useEffect } from 'react';
 import { useProfile } from '../hooks/useProfile';
 import { FlipWords } from './ui/flip-words';
 
 export const HomePage = (): React.JSX.Element => {
   const { profile, downloadResume } = useProfile();
+  const [isHovered, setIsHovered] = useState(false);
+  
+  // Hover image URL (second image)
+  const hoverImageUrl = "https://firebasestorage.googleapis.com/v0/b/miles-website-2.firebasestorage.app/o/profile-images%2Fbf1797d1-2fe0-415f-bbfe-a112cc0f8758.png?alt=media";
+  
+  // Preload hover image for smooth transition
+  useEffect(() => {
+    const img = new Image();
+    img.src = hoverImageUrl;
+  }, [hoverImageUrl]);
 
   const rotatingWords = [
     "adventurer",
@@ -27,7 +38,7 @@ export const HomePage = (): React.JSX.Element => {
       <div className="button-container">
         <a 
           href="mailto:miles.j.keaveny@gmail.com"
-          className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200 inline-block text-center"
+          className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-300 transition-colors duration-200 inline-block text-center"
         >
           Get In Touch
         </a>
@@ -71,10 +82,15 @@ export const HomePage = (): React.JSX.Element => {
       {profile?.profileImageUrl && (
         <div className="profile-image-container">
           <img
-            src={profile.profileImageUrl}
+            src={isHovered ? hoverImageUrl : profile.profileImageUrl}
             alt="Miles Keaveny"
             className="profile-image"
-            style={{ mixBlendMode: 'normal' }}
+            style={{ 
+              mixBlendMode: 'normal',
+              transition: 'opacity 0.2s ease-in-out'
+            }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
             onError={(e) => {
               e.currentTarget.style.display = 'none';
             }}
