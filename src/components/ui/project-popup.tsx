@@ -58,7 +58,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
       
       {/* Modal */}
       <div 
-        className={`relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-[900px] h-[600px] overflow-hidden transition-all duration-300 ease-out ${
+        className={`relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-[900px] h-auto max-h-[90vh] md:h-[600px] overflow-hidden transition-all duration-300 ease-out ${
           isVisible ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
         }`}
       >
@@ -71,9 +71,9 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
         </button>
 
         {/* Content */}
-        <div className="flex h-full">
+        <div className="flex flex-col md:flex-row h-full">
           {/* Image section */}
-          <div className="w-1/2">
+          <div className="w-full md:w-1/2 h-64 md:h-full">
             <div className="relative h-full">
               {project.projectImageUrl2 || project.projectImageUrl ? (
                 <img
@@ -93,26 +93,26 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
           </div>
 
           {/* Details section */}
-          <div className="w-1/2 p-8 flex flex-col justify-between">
+          <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-between overflow-y-auto">
             <div>
               {/* Title */}
-              <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3 md:mb-4">
                 {project.projectName}
               </h2>
 
               {/* Description */}
-              <p className="text-slate-600 dark:text-slate-300 text-lg leading-relaxed mb-6">
+              <p className="text-slate-600 dark:text-slate-300 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
                 {project.paragraph}
               </p>
 
               {/* Links */}
-              <div className="flex flex-wrap gap-3 mb-6">
+              <div className="flex flex-col sm:flex-row flex-wrap gap-2 md:gap-3 mb-4 md:mb-6">
                 {project.githubLink && project.githubLink.trim() !== "" && (
                   <a
                     href={project.githubLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm md:text-base"
                   >
                     <IconBrandGithub className="h-4 w-4" />
                     GitHub
@@ -123,7 +123,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                     href={project.githubLink2}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg hover:bg-slate-800 transition-colors text-sm md:text-base"
                   >
                     <IconBrandGithub className="h-4 w-4" />
                     GitHub 2
@@ -134,7 +134,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                     href={project.youtubeLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm md:text-base"
                   >
                     <IconBrandYoutube className="h-4 w-4" />
                     YouTube
@@ -145,7 +145,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                     href={project.websiteLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm md:text-base"
                   >
                     <IconExternalLink className="h-4 w-4" />
                     Website
@@ -156,7 +156,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                     href={project.liveDemoLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm md:text-base"
                   >
                     <IconExternalLink className="h-4 w-4" />
                     Live Demo

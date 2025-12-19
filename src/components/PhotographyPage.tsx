@@ -163,79 +163,38 @@ export function PhotographyPage() {
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
         {/* Title and Button Container - Always present to maintain layout */}
         <div className="flex-shrink-0 flex flex-col">
-          {/* Title Container - Handles sliding animation between "My Photography" and album name */}
-          <div className="relative h-16 mt-8 overflow-hidden">
-            {/* "My Photography" Title */}
-            <h1 
-              className="text-4xl font-bold text-white text-center absolute inset-0 flex items-center justify-center"
-              style={{
-                transform: showAlbumTitle ? 'translateX(-100%)' : 'translateX(0)',
-                opacity: showAlbumTitle ? 0 : 1,
-                animation: showAlbumTitle && isTitleTransitioning
-                  ? 'titleSlideOutLeft 1s ease-out forwards'
-                  : !showAlbumTitle && isTitleTransitioning
-                  ? 'titleSlideInFromLeft 1s ease-out forwards'
-                  : 'none',
-                WebkitAnimation: showAlbumTitle && isTitleTransitioning
-                  ? 'titleSlideOutLeft 1s ease-out forwards'
-                  : !showAlbumTitle && isTitleTransitioning
-                  ? 'titleSlideInFromLeft 1s ease-out forwards'
-                  : 'none'
-              }}
-            >
-              My Photography
-            </h1>
-            
-            {/* Album Name Title */}
-            {selectedFolder && (
-              <h1 
-                className="text-4xl font-bold text-white text-center absolute inset-0 flex items-center justify-center"
+          {/* Title and Button Row - Title centered, button positioned absolutely */}
+          <div className="relative h-16 mt-8 flex items-center justify-center px-4">
+            {/* Back Button - Positioned absolutely on left, doesn't affect title */}
+            {showPhotos && selectedFolder && showBackButton && (
+              <div 
+                className="absolute left-4 z-10"
                 style={{
-                  transform: showAlbumTitle ? 'translateX(0)' : 'translateX(100%)',
-                  opacity: showAlbumTitle ? 1 : 0,
-                  animation: showAlbumTitle && isTitleTransitioning
-                    ? 'titleSlideInFromRight 1s ease-out forwards'
-                    : !showAlbumTitle && isTitleTransitioning
-                    ? 'titleSlideOutRight 1s ease-out forwards'
-                    : 'none',
-                  WebkitAnimation: showAlbumTitle && isTitleTransitioning
-                    ? 'titleSlideInFromRight 1s ease-out forwards'
-                    : !showAlbumTitle && isTitleTransitioning
-                    ? 'titleSlideOutRight 1s ease-out forwards'
-                    : 'none'
+                  animation: isButtonTransitioningOut 
+                    ? 'slideOutLeft 1s ease-out forwards'
+                    : 'slideInFromLeft 1s ease-out',
+                  WebkitAnimation: isButtonTransitioningOut
+                    ? 'slideOutLeft 1s ease-out forwards'
+                    : 'slideInFromLeft 1s ease-out'
                 }}
               >
-                {selectedFolder.name}
-              </h1>
-            )}
-          </div>
-          
-          {/* Back to Photo Albums Button - Conditionally rendered but container always exists */}
-          {showPhotos && selectedFolder && showBackButton && (
-            <div className="w-full mt-4" style={{
-              animation: isButtonTransitioningOut 
-                ? 'slideOutLeft 1s ease-out forwards'
-                : 'slideInFromLeft 1s ease-out',
-              WebkitAnimation: isButtonTransitioningOut
-                ? 'slideOutLeft 1s ease-out forwards'
-                : 'slideInFromLeft 1s ease-out'
-            }}>
-              <div className="max-w-5xl mx-auto w-full md:px-8 flex justify-start">
                 <button
                   onClick={handleBackToFolders}
-                  className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-full p-px text-xs font-semibold leading-6 text-white inline-block"
+                  className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-lg p-px text-xs font-semibold leading-6 text-white inline-block"
                 >
-                <span className="absolute inset-0 overflow-hidden rounded-full">
-                  <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <span className="absolute inset-0 overflow-hidden rounded-lg">
+                  <span className="absolute inset-0 rounded-lg bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
                 </span>
-                <div className="relative flex space-x-2 items-center z-10 rounded-full bg-zinc-950 py-0.5 px-4 ring-1 ring-white/10">
-                  <span>Back to Photo Albums</span>
+                <div className="relative flex items-center z-10 rounded-lg bg-zinc-950 py-2 px-2 md:px-4 ring-1 ring-white/10">
+                  <span className="hidden md:inline">Back to Photo Albums</span>
+                  <span className="md:hidden">Back</span>
                   <svg
                     fill="none"
                     height="16"
                     viewBox="0 0 24 24"
                     width="16"
                     xmlns="http://www.w3.org/2000/svg"
+                    className="ml-1 md:ml-2 flex-shrink-0"
                   >
                     <path
                       d="M10.75 8.75L14.25 12L10.75 15.25"
@@ -246,14 +205,62 @@ export function PhotographyPage() {
                     />
                   </svg>
                 </div>
-                <span className="absolute -bottom-0 left-[1.125rem] h-px w-[calc(100%-2.25rem)] bg-gradient-to-r from-emerald-400/0 via-emerald-400/90 to-emerald-400/0 transition-opacity duration-500 group-hover:opacity-40" />
                 </button>
               </div>
+            )}
+            
+            {/* Title Container - Centered, can expand fully */}
+            <div className="relative w-full h-full overflow-visible flex items-center justify-center">
+              {/* "My Photography" Title */}
+              <h1 
+                className="text-2xl md:text-4xl font-bold text-white text-center whitespace-nowrap"
+                style={{
+                  transform: showAlbumTitle ? 'translateX(-100%)' : 'translateX(0)',
+                  opacity: showAlbumTitle ? 0 : 1,
+                  animation: showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideOutLeft 1s ease-out forwards'
+                    : !showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideInFromLeft 1s ease-out forwards'
+                    : 'none',
+                  WebkitAnimation: showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideOutLeft 1s ease-out forwards'
+                    : !showAlbumTitle && isTitleTransitioning
+                    ? 'titleSlideInFromLeft 1s ease-out forwards'
+                    : 'none',
+                  transition: 'opacity 0.3s, transform 0.3s'
+                }}
+              >
+                My Photography
+              </h1>
+              
+              {/* Album Name Title */}
+              {selectedFolder && (
+                <h1 
+                  className="text-2xl md:text-4xl font-bold text-white text-center absolute inset-0 flex items-center justify-center whitespace-nowrap"
+                  style={{
+                    transform: showAlbumTitle ? 'translateX(0)' : 'translateX(100%)',
+                    opacity: showAlbumTitle ? 1 : 0,
+                    animation: showAlbumTitle && isTitleTransitioning
+                      ? 'titleSlideInFromRight 1s ease-out forwards'
+                      : !showAlbumTitle && isTitleTransitioning
+                      ? 'titleSlideOutRight 1s ease-out forwards'
+                      : 'none',
+                    WebkitAnimation: showAlbumTitle && isTitleTransitioning
+                      ? 'titleSlideInFromRight 1s ease-out forwards'
+                      : !showAlbumTitle && isTitleTransitioning
+                      ? 'titleSlideOutRight 1s ease-out forwards'
+                      : 'none',
+                    transition: 'opacity 0.3s, transform 0.3s'
+                  }}
+                >
+                  {selectedFolder.name}
+                </h1>
+              )}
             </div>
-          )}
+          </div>
         </div>
         
-        <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto min-h-0 flex items-start">
+        <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto min-h-0 flex items-start pb-24 md:pb-0">
           {/* Folders - fade out when clicking */}
           {showFolders && (
             <div 
@@ -413,7 +420,7 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
   return (
     <div 
       ref={gridRef}
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
+      className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-10 max-w-5xl mx-auto md:px-8 w-full py-4 pb-24 md:pb-4"
       style={{
         gridTemplateRows: 'auto',
         minHeight: 'calc(100vh - 250px)'
@@ -542,7 +549,7 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
         return (
           <div
             key={index}
-            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 h-[calc(100vh-250px)] md:h-auto"
+            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 h-[calc((100vh-280px)/3)] md:h-auto"
             style={{
               ...(Object.keys(slideInStyle).length > 0 ? slideInStyle : {}),
               ...(Object.keys(slideOutStyle).length > 0 ? slideOutStyle : {})

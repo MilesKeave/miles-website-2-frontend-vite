@@ -190,7 +190,7 @@ export const Card = React.memo(
         onClick={() => onCardClick?.(card)}
         className={cn(
           "rounded-lg relative bg-gray-100 dark:bg-neutral-900 overflow-hidden w-full cursor-pointer",
-          "h-[calc(100vh-250px)] md:h-auto",
+          "h-[calc((100vh-280px)/3)] md:h-auto",
           hovered !== null && hovered !== index && !isAnimating && "blur-sm scale-[0.98]"
         )}
         style={{
@@ -285,7 +285,7 @@ export function FocusCards({ cards, onCardClick, isAnimating, selectedFolder, on
   return (
     <div 
       ref={gridRef}
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 max-w-5xl mx-auto md:px-8 w-full py-4"
+      className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:gap-10 max-w-5xl mx-auto md:px-8 w-full py-4 pb-24 md:pb-4"
       style={{
         gridTemplateRows: 'auto',
         minHeight: 'calc(100vh - 250px)'
