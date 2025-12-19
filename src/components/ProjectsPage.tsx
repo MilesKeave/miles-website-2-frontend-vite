@@ -102,15 +102,15 @@ export const ProjectsPage = (): React.JSX.Element => {
               className="max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4 projects-scrollbar" 
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b #1e293b', overscrollBehavior: 'contain' }}
             >
-              <BentoGrid className="max-w-7xl mx-auto pb-8 pt-6">
+              <BentoGrid className="max-w-7xl mx-auto pb-8 pt-6 projects-grid-mobile">
                 {projects.map((project, index) => (
                   <CardSpotlight
                     key={project.id}
-                    className={`h-full min-h-[280px] md:min-h-0 flex flex-col cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-0 ${index === 0 ? "md:col-span-2" : ""}`}
+                    className={`h-full md:min-h-0 flex flex-col cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-0 project-tile-mobile ${index === 0 ? "md:col-span-2" : ""}`}
                     onClick={() => handleProjectClick(project)}
                   >
                     {/* Image section */}
-                    <div className="relative h-[200px] md:h-3/4 w-full overflow-hidden rounded-lg pt-8 px-8">
+                    <div className="project-image-section relative h-[140px] sm:h-[160px] md:h-3/4 w-full overflow-hidden rounded-lg pt-2 px-2 sm:pt-4 sm:px-4 md:pt-8 md:px-8">
                       {project.projectImageUrl ? (
                         <img
                           src={project.projectImageUrl}
@@ -120,7 +120,7 @@ export const ProjectsPage = (): React.JSX.Element => {
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center rounded-lg">
-                          <div className="text-4xl text-slate-500 dark:text-slate-400">
+                          <div className="text-2xl sm:text-3xl md:text-4xl text-slate-500 dark:text-slate-400">
                             {getCategoryIcon(project.projectName)}
                           </div>
                         </div>
@@ -128,8 +128,8 @@ export const ProjectsPage = (): React.JSX.Element => {
                     </div>
 
                     {/* Title section */}
-                    <div className="flex-1 flex items-center justify-center px-4 relative z-10">
-                      <h3 className="text-slate-900 dark:text-slate-100 font-bold text-lg text-center">
+                    <div className="flex-1 flex items-center justify-center px-2 sm:px-3 md:px-4 py-1 sm:py-2 relative z-10">
+                      <h3 className="text-slate-900 dark:text-slate-100 font-bold text-xs sm:text-sm md:text-lg text-center">
                         {project.projectName}
                       </h3>
                     </div>

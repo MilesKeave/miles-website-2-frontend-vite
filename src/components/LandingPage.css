@@ -489,4 +489,40 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Mobile-specific styles for projects grid */
+@media (max-width: 768px) {
+  .projects-grid-mobile {
+    grid-auto-rows: 1fr !important;
+    align-items: stretch !important;
+  }
+  
+  .project-tile-mobile {
+    aspect-ratio: 1 !important;
+    min-height: 0 !important;
+    height: 100% !important;
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Image section - fixed height proportion */
+  .project-tile-mobile .project-image-section {
+    height: 70% !important;
+    flex: none !important;
+    min-height: 0 !important;
+    max-height: 70% !important;
+  }
+  
+  /* Title section - fixed height proportion */
+  .project-tile-mobile > div:last-child {
+    height: 30% !important;
+    flex: none !important;
+    flex-shrink: 0 !important;
+    max-height: 30% !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 } 
