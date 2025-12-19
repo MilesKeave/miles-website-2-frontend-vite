@@ -163,50 +163,95 @@ export function PhotographyPage() {
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
         {/* Title and Button Container - Always present to maintain layout */}
         <div className="flex-shrink-0 flex flex-col">
-          {/* Title and Button Row - Title centered, button positioned absolutely */}
+          {/* Title Row - Title centered */}
           <div className="relative h-16 mt-8 flex items-center justify-center px-4">
-            {/* Back Button - Positioned absolutely on left, doesn't affect title */}
+            {/* Back Button - Mobile: absolutely positioned on left, Desktop: absolutely positioned aligned with photo grid */}
             {showPhotos && selectedFolder && showBackButton && (
-              <div 
-                className="absolute left-4 z-10"
-                style={{
-                  animation: isButtonTransitioningOut 
-                    ? 'slideOutLeft 1s ease-out forwards'
-                    : 'slideInFromLeft 1s ease-out',
-                  WebkitAnimation: isButtonTransitioningOut
-                    ? 'slideOutLeft 1s ease-out forwards'
-                    : 'slideInFromLeft 1s ease-out'
-                }}
-              >
-                <button
-                  onClick={handleBackToFolders}
-                  className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-lg p-px text-xs font-semibold leading-6 text-white inline-block"
+              <>
+                {/* Mobile Button */}
+                <div 
+                  className="absolute left-4 md:hidden z-10"
+                  style={{
+                    animation: isButtonTransitioningOut 
+                      ? 'slideOutLeft 1s ease-out forwards'
+                      : 'slideInFromLeft 1s ease-out',
+                    WebkitAnimation: isButtonTransitioningOut
+                      ? 'slideOutLeft 1s ease-out forwards'
+                      : 'slideInFromLeft 1s ease-out'
+                  }}
                 >
-                <span className="absolute inset-0 overflow-hidden rounded-lg">
-                  <span className="absolute inset-0 rounded-lg bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                </span>
-                <div className="relative flex items-center z-10 rounded-lg bg-zinc-950 py-2 px-2 md:px-4 ring-1 ring-white/10">
-                  <span className="hidden md:inline">Back to Photo Albums</span>
-                  <span className="md:hidden">Back</span>
-                  <svg
-                    fill="none"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    width="16"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="ml-1 md:ml-2 flex-shrink-0"
+                  <button
+                    onClick={handleBackToFolders}
+                    className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-lg p-px text-xs font-semibold leading-6 text-white inline-block"
                   >
-                    <path
-                      d="M10.75 8.75L14.25 12L10.75 15.25"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="1.5"
-                    />
-                  </svg>
+                  <span className="absolute inset-0 overflow-hidden rounded-lg">
+                    <span className="absolute inset-0 rounded-lg bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  </span>
+                  <div className="relative flex items-center z-10 rounded-lg bg-zinc-950 py-2 px-2 ring-1 ring-white/10">
+                    <span>Back</span>
+                    <svg
+                      fill="none"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="ml-1 flex-shrink-0"
+                    >
+                      <path
+                        d="M10.75 8.75L14.25 12L10.75 15.25"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                      />
+                    </svg>
+                  </div>
+                  </button>
                 </div>
-                </button>
-              </div>
+                
+                {/* Desktop Button - Absolutely positioned on left, aligned with photo grid */}
+                <div 
+                  className="hidden md:block absolute left-0 right-0 z-10"
+                  style={{
+                    animation: isButtonTransitioningOut 
+                      ? 'slideOutLeft 1s ease-out forwards'
+                      : 'slideInFromLeft 1s ease-out',
+                    WebkitAnimation: isButtonTransitioningOut
+                      ? 'slideOutLeft 1s ease-out forwards'
+                      : 'slideInFromLeft 1s ease-out'
+                  }}
+                >
+                  <div className="max-w-5xl mx-auto w-full px-8">
+                    <button
+                      onClick={handleBackToFolders}
+                      className="bg-slate-800 no-underline group cursor-pointer relative shadow-2xl shadow-zinc-900 rounded-lg p-px text-xs font-semibold leading-6 text-white block w-fit"
+                    >
+                  <span className="absolute inset-0 overflow-hidden rounded-lg">
+                    <span className="absolute inset-0 rounded-lg bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.6)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                  </span>
+                  <div className="relative flex items-center z-10 rounded-lg bg-zinc-950 py-2 px-4 ring-1 ring-white/10">
+                    <span>Back to Photo Albums</span>
+                    <svg
+                      fill="none"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="ml-2 flex-shrink-0"
+                    >
+                      <path
+                        d="M10.75 8.75L14.25 12L10.75 15.25"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.5"
+                      />
+                    </svg>
+                  </div>
+                  </button>
+                  </div>
+                </div>
+              </>
             )}
             
             {/* Title Container - Centered, can expand fully */}

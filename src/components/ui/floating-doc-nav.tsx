@@ -65,18 +65,28 @@ const FloatingDockDesktop = ({
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   
   useEffect(() => {
-    // Detect if device supports touch or is mobile/iPad
+    // Detect if device is mobile/iPad (not just touch-capable)
+    // Many laptops have touchscreens, so we need to check screen size too
     const checkTouchDevice = () => {
-      return (
-        'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0 ||
-        // @ts-ignore - some browsers have this
-        navigator.msMaxTouchPoints > 0 ||
-        window.matchMedia('(pointer: coarse)').matches
-      );
+      // Check if it's a small screen (mobile/iPad) OR if it's a touch-only device
+      const isSmallScreen = window.innerWidth < 1024; // iPad and below
+      const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+      const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
+      
+      // If it's a small screen with touch, or a touch-only device (no fine pointer), it's mobile/iPad
+      return (isSmallScreen && (hasCoarsePointer || 'ontouchstart' in window)) || 
+             (hasCoarsePointer && !hasFinePointer);
     };
     
     setIsTouchDevice(checkTouchDevice());
+    
+    // Re-check on resize
+    const handleResize = () => {
+      setIsTouchDevice(checkTouchDevice());
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
   
   let mouseX = useMotionValue(Infinity);
