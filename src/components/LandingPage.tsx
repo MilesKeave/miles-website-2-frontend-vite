@@ -31,6 +31,17 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
     startContainer: null,
     lastEventTime: 0
   });
+  const touchState = useRef<{
+    startY: number;
+    startX: number;
+    startTime: number;
+    isActive: boolean;
+  }>({
+    startY: 0,
+    startX: 0,
+    startTime: 0,
+    isActive: false
+  });
 
   // Dynamic navigation functions
   const navigateToPage = (targetPageId: PageId, mode: TransitionMode = 'direct') => {
@@ -184,6 +195,135 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
     }
   };
 
+  // Touch event handlers for mobile swipe navigation
+  const handleTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    const target = e.target as HTMLElement;
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
+    
+    // If touching a scrollable container, check if we're at a boundary
+    if (scrollableContainer) {
+      const container = scrollableContainer as HTMLElement;
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      
+      // Only track touch if we're at a boundary
+      if (isAtTop || isAtBottom) {
+        touchState.current = {
+          startY: touch.clientY,
+          startX: touch.clientX,
+          startTime: Date.now(),
+          isActive: true
+        };
+      }
+    } else {
+      // Not in scrollable container - track all touches for page navigation
+      touchState.current = {
+        startY: touch.clientY,
+        startX: touch.clientX,
+        startTime: Date.now(),
+        isActive: true
+      };
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchState.current.isActive) return;
+    
+    const touch = e.touches[0];
+    const target = e.target as HTMLElement;
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
+    
+    // If in a scrollable container, check if we're at boundary and trying to scroll beyond
+    if (scrollableContainer) {
+      const container = scrollableContainer as HTMLElement;
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      
+      const deltaY = touch.clientY - touchState.current.startY;
+      const isSwipingUp = deltaY < -10; // Swiping up (finger moving up)
+      const isSwipingDown = deltaY > 10; // Swiping down (finger moving down)
+      
+      // If at boundary and trying to swipe beyond it, prevent default scrolling
+      if ((isAtTop && isSwipingUp) || (isAtBottom && isSwipingDown)) {
+        e.preventDefault();
+      }
+    }
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchState.current.isActive) return;
+    
+    const now = Date.now();
+    const touch = e.changedTouches[0];
+    const deltaY = touch.clientY - touchState.current.startY;
+    const deltaX = touch.clientX - touchState.current.startX;
+    const deltaTime = now - touchState.current.startTime;
+    
+    // Check if it's a vertical swipe (not horizontal)
+    const isVerticalSwipe = Math.abs(deltaY) > Math.abs(deltaX);
+    const minSwipeDistance = 50; // Minimum distance for a swipe
+    const maxSwipeTime = 500; // Maximum time for a swipe (ms)
+    
+    // Check if we're in a scrollable container
+    const target = e.target as HTMLElement;
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
+    
+    if (scrollableContainer) {
+      const container = scrollableContainer as HTMLElement;
+      const scrollTop = container.scrollTop;
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+      
+      // Only allow page transition if:
+      // 1. It's a vertical swipe
+      // 2. Swipe distance is sufficient
+      // 3. Swipe time is reasonable
+      // 4. We're at the appropriate boundary
+      // 5. We're not in cooldown
+      const isSwipingUp = deltaY < -minSwipeDistance;
+      const isSwipingDown = deltaY > minSwipeDistance;
+      const isValidSwipe = isVerticalSwipe && Math.abs(deltaY) > minSwipeDistance && deltaTime < maxSwipeTime;
+      
+      if (isValidSwipe && (now - lastScrollTime.current) > scrollCooldown) {
+        const canTransitionToPrevious = isAtTop && isSwipingUp;
+        const canTransitionToNext = isAtBottom && isSwipingDown;
+        
+        if (canTransitionToNext) {
+          lastScrollTime.current = now;
+          goToNextPage();
+        } else if (canTransitionToPrevious) {
+          lastScrollTime.current = now;
+          goToPreviousPage();
+        }
+      }
+    } else {
+      // Not in scrollable container - allow page navigation with any vertical swipe
+      if (isVerticalSwipe && Math.abs(deltaY) > minSwipeDistance && deltaTime < maxSwipeTime && (now - lastScrollTime.current) > scrollCooldown) {
+        lastScrollTime.current = now;
+        
+        if (deltaY < 0) {
+          // Swipe up - go to next page
+          goToNextPage();
+        } else {
+          // Swipe down - go to previous page
+          goToPreviousPage();
+        }
+      }
+    }
+    
+    // Reset touch state
+    touchState.current.isActive = false;
+  };
+
   // Dynamic click/tap detection for mobile
   const handleClick = (e: React.MouseEvent) => {
     // Only trigger on the main container, not on buttons
@@ -215,7 +355,10 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
       ref={containerRef}
       onWheel={handleWheel}
       onClick={handleClick}
-      style={{ touchAction: 'none' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      style={{ touchAction: 'pan-y' }}
     >
       {/* Fixed Background - Always visible */}
       <BackgroundBeams />
