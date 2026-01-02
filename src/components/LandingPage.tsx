@@ -3,7 +3,7 @@ import { TechDiffPage } from './TechDiffPage';
 import { BackgroundBeams } from './ui/background-beams';
 import { useState, useRef, useEffect } from 'react';
 import type { PageId, TransitionMode } from '../types/pages';
-import { PAGE_CONFIG, getNextPage, getPreviousPage, getPageOrder, getTotalPages } from '../config/pages';
+import { PAGE_CONFIG, getNextPage, getPreviousPage, getPageOrder } from '../config/pages';
 import './LandingPage.css';
 
 interface LandingPageProps {
@@ -19,7 +19,7 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
   const [previousPage, setPreviousPage] = useState<PageId | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastScrollTime = useRef<number>(0);
-  const scrollCooldown = 800; // 800ms cooldown between scroll transitions
+  const scrollCooldown = 800;
   const scrollGestureState = useRef<{
     isActive: boolean;
     startPosition: number;
@@ -36,15 +36,11 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
     startX: number;
     startTime: number;
     isActive: boolean;
-    startScrollTop: number;
-    containerScrolled: boolean;
   }>({
     startY: 0,
     startX: 0,
     startTime: 0,
-    isActive: false,
-    startScrollTop: 0,
-    containerScrolled: false
+    isActive: false
   });
 
   const navigateToPage = (targetPageId: PageId, mode: TransitionMode = 'direct') => {
@@ -174,29 +170,25 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
     }
   };
 
-  // Touch event handlers for mobile swipe navigation
   const handleTouchStart = (e: React.TouchEvent) => {
     const touch = e.touches[0];
     const target = e.target as HTMLElement;
-    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"], [class*="overflow-y-scroll"]');
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
     
     if (scrollableContainer) {
       const container = scrollableContainer as HTMLElement;
       const scrollTop = container.scrollTop;
       const scrollHeight = container.scrollHeight;
       const clientHeight = container.clientHeight;
-      const tolerance = 10;
-      const isAtTop = scrollTop <= tolerance;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - tolerance;
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
       
       if (isAtTop || isAtBottom) {
         touchState.current = {
           startY: touch.clientY,
           startX: touch.clientX,
           startTime: Date.now(),
-          isActive: true,
-          startScrollTop: scrollTop,
-          containerScrolled: false
+          isActive: true
         };
       }
     } else {
@@ -204,9 +196,7 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
         startY: touch.clientY,
         startX: touch.clientX,
         startTime: Date.now(),
-        isActive: true,
-        startScrollTop: 0,
-        containerScrolled: false
+        isActive: true
       };
     }
   };
@@ -214,18 +204,24 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!touchState.current.isActive) return;
     
+    const touch = e.touches[0];
     const target = e.target as HTMLElement;
-    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"], [class*="overflow-y-scroll"]');
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
     
     if (scrollableContainer) {
       const container = scrollableContainer as HTMLElement;
       const scrollTop = container.scrollTop;
-      const scrollDelta = Math.abs(scrollTop - touchState.current.startScrollTop);
+      const scrollHeight = container.scrollHeight;
+      const clientHeight = container.clientHeight;
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
       
-      if (scrollDelta > 20) {
-        touchState.current.containerScrolled = true;
-        touchState.current.isActive = false;
-        return;
+      const deltaY = touch.clientY - touchState.current.startY;
+      const isSwipingUp = deltaY < -10;
+      const isSwipingDown = deltaY > 10;
+      
+      if ((isAtTop && isSwipingUp) || (isAtBottom && isSwipingDown)) {
+        e.preventDefault();
       }
     }
   };
@@ -244,31 +240,28 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
     const maxSwipeTime = 500;
     
     const target = e.target as HTMLElement;
-    const scrollableContainer = target.closest('[class*="overflow-y-scroll"], [class*="overflow-y-auto"], [class*="overflow-auto"], [class*="overflow-scroll"]') as HTMLElement;
+    const scrollableContainer = target.closest('[class*="overflow-y-auto"], [class*="overflow-auto"]');
     
     if (scrollableContainer) {
       const container = scrollableContainer as HTMLElement;
       const scrollTop = container.scrollTop;
       const scrollHeight = container.scrollHeight;
       const clientHeight = container.clientHeight;
-      const tolerance = 10;
-      const isAtTop = scrollTop <= tolerance;
-      const isAtBottom = scrollTop + clientHeight >= scrollHeight - tolerance;
-      
-      if (touchState.current.containerScrolled) {
-        touchState.current.isActive = false;
-        return;
-      }
+      const isAtTop = scrollTop === 0;
+      const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
       
       const isSwipingUp = deltaY < -minSwipeDistance;
       const isSwipingDown = deltaY > minSwipeDistance;
       const isValidSwipe = isVerticalSwipe && Math.abs(deltaY) > minSwipeDistance && deltaTime < maxSwipeTime;
       
       if (isValidSwipe && (now - lastScrollTime.current) > scrollCooldown) {
-        if (isAtBottom && isSwipingDown) {
+        const canTransitionToPrevious = isAtTop && isSwipingUp;
+        const canTransitionToNext = isAtBottom && isSwipingDown;
+        
+        if (canTransitionToNext) {
           lastScrollTime.current = now;
           goToNextPage();
-        } else if (isAtTop && isSwipingUp) {
+        } else if (canTransitionToPrevious) {
           lastScrollTime.current = now;
           goToPreviousPage();
         }
@@ -286,7 +279,6 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
     }
     
     touchState.current.isActive = false;
-    touchState.current.containerScrolled = false;
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -321,10 +313,8 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
       onTouchEnd={handleTouchEnd}
       style={{ touchAction: 'pan-y' }}
     >
-      {/* Fixed Background - Always visible */}
       <BackgroundBeams />
       
-      {/* Page Container with Teleportation Transition Effects */}
       <div className="page-container">
         {PAGE_CONFIG.map((pageConfig) => {
           const PageComponent = pageConfig.component;
@@ -365,8 +355,6 @@ export const LandingPage = ({ currentPage, onPageChange, isDirectNavigation }: L
           );
         })}
       </div>
-
-      {/* Dynamic Swipe Indicators */}
     </div>
   );
 }; 
