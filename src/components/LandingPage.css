@@ -1,8 +1,23 @@
 .landing-page {
-  min-height: 100vh;
   background-color: black;
   position: relative;
   overflow: hidden;
+}
+
+/* Mobile: use dynamic viewport height */
+@media (max-width: 1024px) {
+  .landing-page {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+}
+
+/* Desktop: use standard viewport height */
+@media (min-width: 1025px) {
+  .landing-page {
+    height: 100vh;
+    min-height: 100vh;
+  }
 }
 
 .loading-container {
@@ -323,8 +338,85 @@
 .page-container {
   position: relative;
   width: 100%;
-  height: 100vh;
   overflow: hidden;
+}
+
+/* Mobile: use dynamic viewport height */
+@media (max-width: 1024px) {
+  .page-container {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+  
+  .page-wrapper {
+    height: 100dvh;
+    max-height: 100dvh;
+    transform: translateY(100dvh) translateZ(0);
+  }
+  
+  .page-wrapper.active {
+    transform: translateY(0) translateZ(0);
+    opacity: 1;
+  }
+  
+  .page-wrapper.sequential-up {
+    transform: translateY(-100dvh) translateZ(0);
+    opacity: 0;
+  }
+  
+  .page-wrapper.sequential-down {
+    transform: translateY(100dvh) translateZ(0);
+    opacity: 0;
+  }
+  
+  .page-wrapper.direct-up {
+    transform: translateY(-100dvh) translateZ(0);
+    opacity: 0;
+  }
+  
+  .page-wrapper.direct-down {
+    transform: translateY(100dvh) translateZ(0);
+    opacity: 0;
+  }
+}
+
+/* Desktop: use standard viewport height */
+@media (min-width: 1025px) {
+  .page-container {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  .page-wrapper {
+    height: 100vh;
+    max-height: 100vh;
+    transform: translateY(100vh) translateZ(0);
+  }
+  
+  .page-wrapper.active {
+    transform: translateY(0) translateZ(0);
+    opacity: 1;
+  }
+  
+  .page-wrapper.sequential-up {
+    transform: translateY(-100vh) translateZ(0);
+    opacity: 0;
+  }
+  
+  .page-wrapper.sequential-down {
+    transform: translateY(100vh) translateZ(0);
+    opacity: 0;
+  }
+  
+  .page-wrapper.direct-up {
+    transform: translateY(-100vh) translateZ(0);
+    opacity: 0;
+  }
+  
+  .page-wrapper.direct-down {
+    transform: translateY(100vh) translateZ(0);
+    opacity: 0;
+  }
 }
 
 .page-wrapper {
@@ -332,44 +424,14 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 100vh;
   transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   will-change: transform, opacity;
-  /* Force hardware acceleration */
-  transform: translateZ(0);
   backface-visibility: hidden;
-  /* All pages start hidden off-screen */
-  transform: translateY(100vh);
+  /* All pages start hidden off-screen - transform and opacity set by media queries */
   opacity: 0;
 }
 
-/* Active page - currently visible */
-.page-wrapper.active {
-  transform: translateY(0);
-  opacity: 1;
-}
-
-/* Sequential transitions - pages slide in sequence */
-.page-wrapper.sequential-up {
-  transform: translateY(-100vh);
-  opacity: 0;
-}
-
-.page-wrapper.sequential-down {
-  transform: translateY(100vh);
-  opacity: 0;
-}
-
-/* Direct transitions - pages teleport directly */
-.page-wrapper.direct-up {
-  transform: translateY(-100vh);
-  opacity: 0;
-}
-
-.page-wrapper.direct-down {
-  transform: translateY(100vh);
-  opacity: 0;
-}
+/* Sequential and direct transitions are handled by media queries above */
 
 /* Page-specific wrapper classes for any additional styling */
 /* .home-page-wrapper,
@@ -379,16 +441,26 @@
 } */
 
 /* Page Content Styles */
-.home-page, .projects-page, .work-experience-page {
+.home-page, .projects-page, .work-experience-page, .photography-page-container {
   width: 100%;
-  height: 100vh;
   position: relative;
+  overflow: hidden;
 }
 
-/* Add bottom padding on mobile/iPad to prevent content from sitting behind navigation bar */
+/* Mobile: use dynamic viewport height */
 @media (max-width: 1024px) {
-  .home-page, .projects-page, .work-experience-page {
+  .home-page, .projects-page, .work-experience-page, .photography-page-container {
+    height: 100dvh;
+    max-height: 100dvh;
     padding-bottom: 120px; /* Space for nav bar (64px) + bottom offset (24px) + buffer (32px) */
+  }
+}
+
+/* Desktop: use standard viewport height */
+@media (min-width: 1025px) {
+  .home-page, .projects-page, .work-experience-page, .photography-page-container {
+    height: 100vh;
+    max-height: 100vh;
   }
 }
 
@@ -427,13 +499,13 @@
   overflow: hidden;
 }
 
-/* Touch interaction improvements - Prevent all scrolling */
+/* Touch interaction improvements - Prevent page scrolling but allow swipe navigation */
 .landing-page {
-  /* Completely disable scrolling */
+  /* Prevent page-level scrolling */
   overscroll-behavior: none;
   -webkit-overflow-scrolling: auto;
-  /* Prevent any touch scrolling */
-  touch-action: none;
+  /* Allow pan-y for swipe gestures, but prevent page scrolling */
+  touch-action: pan-y;
   /* Prevent text selection during swipes */
   user-select: none;
   -webkit-user-select: none;

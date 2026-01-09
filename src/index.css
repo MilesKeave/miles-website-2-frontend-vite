@@ -7,6 +7,49 @@ html, body {
   margin: 0;
   padding: 0;
   background-color: black;
+  overflow: hidden;
+  height: 100%;
+}
+
+/* On mobile, use dynamic viewport height to account for browser UI */
+@media (max-width: 1024px) {
+  html, body {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
+  
+  #root {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+  }
+}
+
+/* Desktop uses standard viewport height */
+@media (min-width: 1025px) {
+  html, body {
+    height: 100vh;
+    max-height: 100vh;
+  }
+  
+  #root {
+    height: 100vh;
+    max-height: 100vh;
+    overflow: hidden;
+  }
+}
+
+/* Override Tailwind's min-h-screen and h-screen on mobile to use 100dvh */
+@media (max-width: 1024px) {
+  .min-h-screen {
+    min-height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
+  
+  .h-screen {
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
 }
 
 /* Safari-specific optimizations for smooth animations */

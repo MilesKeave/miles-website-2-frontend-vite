@@ -437,13 +437,23 @@ export const VerticalWorkExperienceCarousel = ({
   }, [snapToNearestCard]);
 
   const handleWheel = useCallback((e: WheelEvent) => {
-    // Prevent wheel events from bubbling up to parent page
+    e.stopPropagation();
+  }, []);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    e.stopPropagation();
+  }, []);
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
     e.stopPropagation();
   }, []);
 
   useEffect(() => {
     if (carouselRef.current) {
-      // Add wheel event listener to prevent page navigation
       const container = carouselRef.current;
       container.addEventListener('wheel', handleWheel, { passive: false });
       
@@ -541,6 +551,9 @@ export const VerticalWorkExperienceCarousel = ({
         }}
         ref={carouselRef}
         onScroll={handleScroll}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div 
           className="flex flex-col justify-start gap-1"

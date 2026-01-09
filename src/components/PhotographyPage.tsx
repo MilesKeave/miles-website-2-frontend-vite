@@ -159,7 +159,7 @@ export function PhotographyPage() {
   }
 
   return (
-    <div className="h-screen bg-black overflow-hidden">
+    <div className="photography-page-container bg-black overflow-hidden">
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
         {/* Title and Button Container - Always present to maintain layout */}
         <div className="flex-shrink-0 flex flex-col">
@@ -305,7 +305,7 @@ export function PhotographyPage() {
           </div>
         </div>
         
-        <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto min-h-0 flex items-start pb-24 md:pb-0">
+        <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto min-h-[calc(100dvh-10rem)] md:min-h-0 flex items-start pb-24 md:pb-0">
           {/* Folders - fade out when clicking */}
           {showFolders && (
             <div 
@@ -594,7 +594,7 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
         return (
           <div
             key={index}
-            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out hover:scale-110 h-[calc((100vh-280px)/3)] md:h-auto"
+            className="rounded-lg relative overflow-hidden w-full cursor-pointer transition-transform duration-300 ease-in-out md:hover:scale-110 h-[calc((100vh-280px)/3)] md:h-auto"
             style={{
               ...(Object.keys(slideInStyle).length > 0 ? slideInStyle : {}),
               ...(Object.keys(slideOutStyle).length > 0 ? slideOutStyle : {})
