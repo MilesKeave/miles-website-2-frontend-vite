@@ -81,6 +81,8 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                   alt={project.projectName}
                   className="w-full h-full object-cover cursor-pointer hover:opacity-90 transition-opacity"
                   onClick={handleImageClick}
+                  decoding="async"
+                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
@@ -191,6 +193,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
             alt={project.projectName}
             className="max-w-full max-h-full object-contain"
             onClick={(e) => e.stopPropagation()}
+            decoding="async"
           />
         </div>
       )}

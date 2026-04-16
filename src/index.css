@@ -523,8 +523,24 @@ html, body {
 /* Ensure proper transparency support for images */
 img {
   background: transparent;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
+}
+
+/* Skeleton shimmer for images loading */
+.img-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0.10) 50%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  background-size: 200% 100%;
+  animation: img-shimmer 1.5s ease-in-out infinite;
+  border-radius: inherit;
+}
+
+@keyframes img-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 /* Custom scrollbar styles */

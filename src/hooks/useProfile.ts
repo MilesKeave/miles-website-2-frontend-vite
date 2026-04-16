@@ -21,9 +21,16 @@ export const useProfile = () => {
         }, 4000);
         
         const data = await apiService.getProfile();
-        
+
         // Clear the timer if we get data successfully
         clearTimeout(techDiffTimer);
+
+        // Kick off profile image download immediately — before React renders
+        if (data.profileImageUrl) {
+          const img = new Image();
+          img.src = data.profileImageUrl;
+        }
+
         setProfile(data);
         setShowTechDiff(false);
       } catch (err) {

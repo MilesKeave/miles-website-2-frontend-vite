@@ -2,6 +2,7 @@ export interface ProfileData {
   description: string;
   resumeUrl: string;
   profileImageUrl: string;
+  profileHoverImageUrl: string;
 }
 
 import { API_BASE_URL } from '../config/api';

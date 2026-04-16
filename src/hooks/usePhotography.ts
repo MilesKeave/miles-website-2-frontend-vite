@@ -12,6 +12,20 @@ export const usePhotography = () => {
       setLoading(true);
       setError(null);
       const folders = await photographyApi.getAllPhotoFolders();
+
+      // Kick off image downloads immediately — before React renders the grid
+      folders.forEach((folder) => {
+        if (folder.mainImageUrl) {
+          const img = new Image();
+          img.src = folder.mainImageUrl;
+        }
+        // Preload the first photo in each album too
+        if (folder.photoUrls?.[0]) {
+          const img = new Image();
+          img.src = folder.photoUrls[0];
+        }
+      });
+
       setPhotoFolders(folders);
     } catch (err) {
       setError('Failed to fetch photo folders');

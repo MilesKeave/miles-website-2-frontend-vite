@@ -387,6 +387,7 @@ export function PhotographyPage() {
                   alt={`Photo ${maxIndex + 1} of ${displayedPhotos.length}`}
                   className="max-w-full max-h-full object-contain"
                   onClick={(e) => e.stopPropagation()}
+                  decoding="async"
                 />
 
                 {displayedPhotos.length > 1 && (

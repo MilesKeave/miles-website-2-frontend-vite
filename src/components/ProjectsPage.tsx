@@ -1,6 +1,7 @@
 import { BentoGrid } from "./ui/bento-grid";
 import { CardSpotlight } from "./ui/card-spotlight";
 import { ProjectPopup } from "./ui/project-popup";
+import { ImageWithSkeleton } from "./ui/image-with-skeleton";
 import { IconCode, IconDatabase, IconGlobe, IconDeviceMobile, IconRobot } from "@tabler/icons-react";
 import { useProjects } from "../hooks/useProjects";
 import { useState } from "react";
@@ -112,11 +113,14 @@ export const ProjectsPage = (): React.JSX.Element => {
                     {/* Image section */}
                     <div className="project-image-section relative h-[140px] sm:h-[160px] md:h-3/4 w-full overflow-hidden rounded-lg pt-2 px-2 sm:pt-4 sm:px-4 md:pt-8 md:px-8">
                       {project.projectImageUrl ? (
-                        <img
+                        <ImageWithSkeleton
                           src={project.projectImageUrl}
                           alt={project.projectName}
-                          className="h-full w-full object-cover rounded-lg select-none pointer-events-none"
+                          wrapperClassName="h-full w-full rounded-lg"
+                          imgClassName="h-full w-full object-cover rounded-lg select-none pointer-events-none"
                           draggable={false}
+                          loading="lazy"
+                          decoding="async"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center rounded-lg">

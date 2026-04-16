@@ -47,7 +47,19 @@ export const useProjects = () => {
       
       // Filter out any undefined slots (in case index was beyond array length)
       const finalOrderedProjects = orderedProjects.filter((project) => project !== undefined);
-      
+
+      // Kick off image downloads immediately — before React renders the grid
+      finalOrderedProjects.forEach((project) => {
+        if (project.projectImageUrl) {
+          const img = new Image();
+          img.src = project.projectImageUrl;
+        }
+        if (project.projectImageUrl2) {
+          const img = new Image();
+          img.src = project.projectImageUrl2;
+        }
+      });
+
       setProjects(finalOrderedProjects);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to fetch projects');

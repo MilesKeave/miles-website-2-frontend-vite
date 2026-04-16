@@ -5,15 +5,14 @@ import { FlipWords } from './ui/flip-words';
 export const HomePage = (): React.JSX.Element => {
   const { profile, downloadResume } = useProfile();
   const [isHovered, setIsHovered] = useState(false);
-  
-  // Hover image URL (second image)
-  const hoverImageUrl = "https://firebasestorage.googleapis.com/v0/b/miles-website-2.firebasestorage.app/o/profile-images%2Fbf1797d1-2fe0-415f-bbfe-a112cc0f8758.png?alt=media";
-  
-  // Preload hover image for smooth transition
+
+  // Preload hover image for smooth transition once URL is available from API
   useEffect(() => {
-    const img = new Image();
-    img.src = hoverImageUrl;
-  }, [hoverImageUrl]);
+    if (profile?.profileHoverImageUrl) {
+      const img = new Image();
+      img.src = profile.profileHoverImageUrl;
+    }
+  }, [profile?.profileHoverImageUrl]);
 
   const rotatingWords = [
     "adventurer",
@@ -82,12 +81,18 @@ export const HomePage = (): React.JSX.Element => {
       {profile?.profileImageUrl && (
         <div className="profile-image-container">
           <img
-            src={isHovered ? hoverImageUrl : profile.profileImageUrl}
+            src={isHovered && profile.profileHoverImageUrl ? profile.profileHoverImageUrl : profile.profileImageUrl}
             alt="Miles Keaveny"
             className="profile-image"
-            style={{ 
+            loading="eager"
+            decoding="async"
+            fetchPriority="high"
+            style={{
               mixBlendMode: 'normal',
-              transition: 'opacity 0.2s ease-in-out'
+              transition: 'opacity 0.2s ease-in-out',
+              width: '100%',
+              height: '100%',
+              objectFit: 'contain',
             }}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
