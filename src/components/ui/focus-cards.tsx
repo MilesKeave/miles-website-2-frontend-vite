@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
-import { ImageWithSkeleton } from "./image-with-skeleton";
+
 
 export const Card = React.memo(
   ({
@@ -201,11 +201,10 @@ export const Card = React.memo(
           ...(Object.keys(slideInStyle).length === 0 && Object.keys(slideOutStyle).length === 0 && Object.keys(fadeOutStyle).length === 0 ? { opacity: defaultOpacity } : {})
         }}
       >
-        <ImageWithSkeleton
+        <img
           src={card.src}
           alt={card.title}
-          wrapperClassName="absolute inset-0"
-          imgClassName="object-cover object-center w-full h-full"
+          className="object-cover object-center absolute inset-0 w-full h-full"
           loading="lazy"
           decoding="async"
         />

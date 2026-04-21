@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 
 import { AnimatePresence, motion } from "motion/react";
 import { cn } from "@/lib/utils";
-import { ImageWithSkeleton } from "./image-with-skeleton";
+
 
 export const DirectionAwareHover = ({
   imageUrl,
@@ -86,14 +86,13 @@ export const DirectionAwareHover = ({
               ease: "easeOut",
             }}
           >
-            <ImageWithSkeleton
-              src={imageUrl}
+            <img
               alt="image"
-              wrapperClassName="h-full w-full"
-              imgClassName={cn(
+              className={cn(
                 "h-full w-full object-cover object-center scale-[1.15]",
                 imageClassName
               )}
+              src={imageUrl}
               decoding="async"
             />
           </motion.div>
