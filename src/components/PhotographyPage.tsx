@@ -151,7 +151,7 @@ export function PhotographyPage() {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
         <div className="text-white text-xl text-center">
-          <h1 className="text-4xl font-bold mb-4">My Photography</h1>
+          <h1 className="text-4xl font-bold mb-4">Photography</h1>
           <p>No photo folders found. Upload some photos via Postman to see them here!</p>
         </div>
       </div>
@@ -256,7 +256,7 @@ export function PhotographyPage() {
             
             {/* Title Container - Centered, can expand fully */}
             <div className="relative w-full h-full overflow-visible flex items-center justify-center">
-              {/* "My Photography" Title */}
+              {/* "Photography" Title */}
               <h1 
                 className="text-2xl md:text-4xl font-bold text-white text-center whitespace-nowrap"
                 style={{
@@ -271,11 +271,10 @@ export function PhotographyPage() {
                     ? 'titleSlideOutLeft 1s ease-out forwards'
                     : !showAlbumTitle && isTitleTransitioning
                     ? 'titleSlideInFromLeft 1s ease-out forwards'
-                    : 'none',
-                  transition: 'opacity 0.3s, transform 0.3s'
+                    : 'none'
                 }}
               >
-                My Photography
+                Photography
               </h1>
               
               {/* Album Name Title */}
@@ -294,8 +293,7 @@ export function PhotographyPage() {
                       ? 'titleSlideInFromRight 1s ease-out forwards'
                       : !showAlbumTitle && isTitleTransitioning
                       ? 'titleSlideOutRight 1s ease-out forwards'
-                      : 'none',
-                    transition: 'opacity 0.3s, transform 0.3s'
+                      : 'none'
                   }}
                 >
                   {selectedFolder.name}

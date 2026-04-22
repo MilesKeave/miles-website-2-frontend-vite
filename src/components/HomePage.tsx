@@ -5,6 +5,9 @@ import { FlipWords } from './ui/flip-words';
 export const HomePage = (): React.JSX.Element => {
   const { profile, downloadResume } = useProfile();
   const [isHovered, setIsHovered] = useState(false);
+  const [isTapped, setIsTapped] = useState(false);
+
+  const isActive = isHovered || isTapped;
 
   // Preload hover image for smooth transition once URL is available from API
   useEffect(() => {
@@ -24,7 +27,7 @@ export const HomePage = (): React.JSX.Element => {
   ];
 
   return (
-    <div className="home-page">
+    <div className="home-page" onClick={() => setIsTapped(false)}>
       {/* Name Text - Full Width */}
       <div className="name-text">
         Miles Keaveny, <FlipWords words={rotatingWords} duration={2500} className="text-white" />
@@ -80,26 +83,43 @@ export const HomePage = (): React.JSX.Element => {
       {/* Profile Image - Bottom Left Corner (centered in left 50% of screen) */}
       {profile?.profileImageUrl && (
         <div className="profile-image-container">
-          <img
-            src={isHovered && profile.profileHoverImageUrl ? profile.profileHoverImageUrl : profile.profileImageUrl}
-            alt="Miles Keaveny"
-            className="profile-image"
-            loading="eager"
-            decoding="async"
-            fetchPriority="high"
-            style={{
-              mixBlendMode: 'normal',
-              transition: 'opacity 0.2s ease-in-out',
-              width: '100%',
-              height: '100%',
-              objectFit: 'contain',
-            }}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
+          {/* Grid stack: both images occupy the same cell so neither collapses */}
+          <div
+            style={{ display: 'grid' }}
+            onPointerEnter={(e) => { if (e.pointerType === 'mouse') setIsHovered(true); }}
+            onPointerLeave={(e) => { if (e.pointerType === 'mouse') setIsHovered(false); }}
+            onClick={(e) => { e.stopPropagation(); setIsTapped(true); }}
+          >
+            {/* Base image */}
+            <img
+              src={profile.profileImageUrl}
+              alt="Miles Keaveny"
+              className="profile-image"
+              loading="eager"
+              decoding="async"
+              fetchPriority="high"
+              style={{
+                gridArea: '1/1',
+                opacity: isActive && profile.profileHoverImageUrl ? 0 : 1,
+              }}
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+            {/* Hover image — always in DOM so it stays decoded and ready */}
+            {profile.profileHoverImageUrl && (
+              <img
+                src={profile.profileHoverImageUrl}
+                alt="Miles Keaveny"
+                className="profile-image"
+                loading="eager"
+                decoding="sync"
+                style={{
+                  gridArea: '1/1',
+                  opacity: isActive ? 1 : 0,
+                }}
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
+              />
+            )}
+          </div>
         </div>
       )}
     </div>

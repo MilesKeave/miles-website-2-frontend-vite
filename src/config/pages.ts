@@ -32,7 +32,7 @@ export const PAGE_CONFIG: PageConfig[] = [
   },
   {
     id: 'photography',
-    title: 'My Photography',
+    title: 'Photography',
     component: PhotographyPage,
     order: 3
   }

@@ -41,7 +41,7 @@ export const ProjectsPage = (): React.JSX.Element => {
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-4">
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-              My Projects
+              Projects
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
               Loading projects...
@@ -61,7 +61,7 @@ export const ProjectsPage = (): React.JSX.Element => {
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-4">
             <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-              My Projects
+              Projects
             </h1>
             <p className="text-lg text-red-600 dark:text-red-400 max-w-2xl mx-auto">
               Error loading projects: {error}
@@ -83,7 +83,7 @@ export const ProjectsPage = (): React.JSX.Element => {
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-4">
           <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4">
-            My Projects
+            Projects
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             A collection of projects showcasing my skills in full-stack development.

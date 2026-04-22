@@ -45,28 +45,29 @@ export const apiService = {
   },
 
   async downloadResume(resumeUrl: string): Promise<void> {
-    try {
-      if (!resumeUrl) {
-        throw new Error('Resume URL is empty');
-      }
-
-      // Use direct download method - works seamlessly without CORS issues
-      // The download attribute will trigger browser download without opening a new tab
-      const link = document.createElement('a');
-      link.href = resumeUrl;
-      link.download = 'Miles_Keaveny_Resume.pdf';
-      link.style.display = 'none';
-      document.body.appendChild(link);
-      link.click();
-      
-      // Clean up immediately
-      setTimeout(() => {
-        document.body.removeChild(link);
-      }, 100);
-      
-    } catch (error) {
-      console.error('Error downloading resume:', error);
-      throw error;
+    if (!resumeUrl) {
+      throw new Error('Resume URL is empty');
     }
+
+    // Open in a new tab for viewing
+    window.open(resumeUrl, '_blank');
+
+    // Fetch through the backend proxy so we get same-origin bytes we can
+    // hand to a blob URL — the `download` attribute only works same-origin.
+    const response = await fetch(`${API_BASE_URL}/download-resume`);
+    if (!response.ok) {
+      throw new Error(`Resume download failed: ${response.status}`);
+    }
+    const blob = await response.blob();
+    const blobUrl = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = 'Miles_Keaveny_Resume.pdf';
+    link.style.display = 'none';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(blobUrl);
   }
 }; 
