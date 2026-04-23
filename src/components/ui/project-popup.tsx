@@ -98,7 +98,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
           <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-between overflow-y-auto">
             <div>
               {/* Title */}
-              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100 mb-3 md:mb-4">
+              <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
                 {project.projectName}
               </h2>
 

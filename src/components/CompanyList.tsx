@@ -144,7 +144,7 @@ export const CompanyList = ({
                   <div className={`relative z-10 text-left ${
                     isActive 
                       ? 'text-purple-600 dark:text-purple-400' 
-                      : 'group-hover:text-slate-900 dark:group-hover:text-slate-100'
+                      : 'group-hover:text-white'
                   }`} style={{ paddingTop: '1.5rem', paddingBottom: '1.5rem', paddingLeft: '0.5rem' }}>
                     {/* Bullet point indicator - positioned absolutely to not affect text layout */}
                     {isActive && (

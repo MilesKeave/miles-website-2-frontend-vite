@@ -40,7 +40,7 @@ export const ProjectsPage = (): React.JSX.Element => {
       <div className="projects-page min-h-screen">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               Projects
             </h1>
             <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -60,7 +60,7 @@ export const ProjectsPage = (): React.JSX.Element => {
       <div className="projects-page min-h-screen">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center mb-4">
-            <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+            <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               Projects
             </h1>
             <p className="text-lg text-red-600 dark:text-red-400 max-w-2xl mx-auto">
@@ -82,7 +82,7 @@ export const ProjectsPage = (): React.JSX.Element => {
     <div className="projects-page min-h-screen">
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-4">
-          <h1 className="text-4xl md:text-6xl font-bold text-slate-900 dark:text-slate-100 mb-4">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
             Projects
           </h1>
           <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
@@ -133,7 +133,7 @@ export const ProjectsPage = (): React.JSX.Element => {
 
                     {/* Title section */}
                     <div className="flex-1 flex items-center justify-center px-2 sm:px-3 md:px-4 py-1 sm:py-2 relative z-10">
-                      <h3 className="text-slate-900 dark:text-slate-100 font-bold text-xs sm:text-sm md:text-lg text-center">
+                      <h3 className="text-white font-bold text-xs sm:text-sm md:text-lg text-center">
                         {project.projectName}
                       </h3>
                     </div>
