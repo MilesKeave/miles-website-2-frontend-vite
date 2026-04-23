@@ -52,7 +52,7 @@ export const useProfile = () => {
     }
 
     try {
-      await apiService.downloadResume(profile.resumeUrl);
+      await apiService.downloadResume();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download resume');
       console.error('Error downloading resume:', err);

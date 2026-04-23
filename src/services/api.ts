@@ -44,14 +44,7 @@ export const apiService = {
     }
   },
 
-  async downloadResume(resumeUrl: string): Promise<void> {
-    if (!resumeUrl) {
-      throw new Error('Resume URL is empty');
-    }
-
-    // Open in a new tab for viewing
-    window.open(resumeUrl, '_blank');
-
+  async downloadResume(): Promise<void> {
     // Fetch through the backend proxy so we get same-origin bytes we can
     // hand to a blob URL — the `download` attribute only works same-origin.
     const response = await fetch(`${API_BASE_URL}/download-resume`);
