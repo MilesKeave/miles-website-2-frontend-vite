@@ -39,12 +39,12 @@ export const CompanyList = ({
     : "relative group cursor-pointer transition-all duration-300";
   
   const companyNameClass = isMobile
-    ? "font-medium text-sm text-slate-800 dark:text-slate-200 transition-colors duration-300"
-    : "font-medium text-base sm:text-lg lg:text-xl text-slate-800 dark:text-slate-200 transition-colors duration-300";
+    ? "font-medium text-sm text-white transition-colors duration-300"
+    : "font-medium text-base sm:text-lg lg:text-xl text-white transition-colors duration-300";
     
   const jobTitleClass = isMobile
-    ? "text-xs text-slate-600 dark:text-slate-400 transition-colors duration-300"
-    : "text-sm sm:text-base text-slate-600 dark:text-slate-400 transition-colors duration-300";
+    ? "text-xs text-slate-300 transition-colors duration-300"
+    : "text-sm sm:text-base text-slate-300 transition-colors duration-300";
 
   return (
     <div className={isMobile ? "mb-4" : ""}>

@@ -43,7 +43,7 @@ export const ProjectsPage = (): React.JSX.Element => {
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               Projects
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               Loading projects...
             </p>
           </div>
@@ -85,14 +85,14 @@ export const ProjectsPage = (): React.JSX.Element => {
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
             Projects
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
             A collection of projects showcasing my skills in full-stack development.
           </p>
         </div>
 
         {projects.length === 0 ? (
           <div className="text-center py-16">
-            <p className="text-slate-500 dark:text-slate-400 text-lg">
+            <p className="text-slate-300 text-lg">
               No projects found. Projects will appear here once they're added to the database.
             </p>
           </div>
@@ -124,7 +124,7 @@ export const ProjectsPage = (): React.JSX.Element => {
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center rounded-lg">
-                          <div className="text-2xl sm:text-3xl md:text-4xl text-slate-500 dark:text-slate-400">
+                          <div className="text-2xl sm:text-3xl md:text-4xl text-slate-300">
                             {getCategoryIcon(project.projectName)}
                           </div>
                         </div>

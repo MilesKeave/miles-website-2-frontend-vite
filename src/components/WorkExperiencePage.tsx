@@ -44,7 +44,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               Work Experience
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               My professional journey in software development and technology.
             </p>
           </div>
@@ -67,7 +67,7 @@ export const WorkExperiencePage = (): React.JSX.Element => {
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-4">
               Work Experience
             </h1>
-            <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+            <p className="text-lg text-slate-300 max-w-2xl mx-auto">
               My professional journey in software development and technology.
             </p>
           </div>

@@ -67,7 +67,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
           onClick={handleClose}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 hover:bg-white dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
         >
-          <IconX className="h-5 w-5 text-slate-600 dark:text-slate-300" />
+          <IconX className="h-5 w-5 text-slate-300" />
         </button>
 
         {/* Content */}
@@ -86,7 +86,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-700 dark:to-slate-800">
-                  <div className="text-6xl text-slate-500 dark:text-slate-400">
+                  <div className="text-6xl text-slate-300">
                     <IconCode className="h-16 w-16" />
                   </div>
                 </div>
@@ -103,7 +103,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
               </h2>
 
               {/* Description */}
-              <p className="text-slate-600 dark:text-slate-300 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
+              <p className="text-slate-300 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
                 {project.paragraph}
               </p>
 
