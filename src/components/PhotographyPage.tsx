@@ -30,7 +30,6 @@ export function PhotographyPage() {
   const [isGoingBackToFolders, setIsGoingBackToFolders] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Convert photo folders to focus cards format
   const cards = photoFolders.map(folder => ({
     title: folder.name,
     src: folder.mainImageUrl,
@@ -41,73 +40,63 @@ export function PhotographyPage() {
     if (isAnimating) return;
     
     setIsAnimating(true);
-    setIsGoingBackToFolders(false); // Reset going back state when clicking a folder
+    setIsGoingBackToFolders(false);
     setSelectedFolder(folder);
-    setPhotosOpacity(0); // Start with photos at 0 (they'll be positioned off-screen)
-    setFoldersOpacity(0); // Start animations (non-selected slide out in 1s, selected fades out in 3s)
-    setShowPhotos(true); // Show photos container but positioned off-screen
-    setShowBackButton(false); // Hide button until photos start sliding in
-    
-    // After selected folder fades out (1.5s), slide in photos immediately
+    setPhotosOpacity(0);
+    setFoldersOpacity(0);
+    setShowPhotos(true);
+    setShowBackButton(false);
+
     setTimeout(() => {
       setShowFolders(false);
-      // Scroll to top when showing photos
       if (scrollContainerRef.current) {
         scrollContainerRef.current.scrollTo({ top: 0, behavior: 'smooth' });
       }
-      // Use requestAnimationFrame to ensure initial state is rendered before animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          setPhotosOpacity(1); // Start slide in animation (from opposite directions)
-          setShowBackButton(true); // Show button when photos start sliding in
-          // Start title transition at the same time
+          setPhotosOpacity(1);
+          setShowBackButton(true);
           setIsTitleTransitioning(true);
           setShowAlbumTitle(true);
         });
       });
-      // Allow animation to complete
       setTimeout(() => {
         setIsAnimating(false);
         setIsTitleTransitioning(false);
-      }, 1100); // 1 second slide in + small buffer
-    }, 1600); // 1.6 seconds - start photos right after selected folder fades out (1.5s) + small buffer
+      }, 1100);
+    }, 1600);
   };
 
   const handleBackToFolders = () => {
     if (isAnimating) return;
     
     setIsAnimating(true);
-    setIsGoingBackToFolders(true); // Mark that we're going back to folders
-    setPhotosOpacity(0); // Start slide out animations
-    setFoldersOpacity(0); // Start with folders at 0 (they'll be positioned off-screen)
-    setShowFolders(true); // Show folders container but positioned off-screen
-    setIsButtonTransitioningOut(true); // Start button slide-out animation
-    
-    // After button and photos slide out (1 second), hide button and photos, then slide in folders
+    setIsGoingBackToFolders(true);
+    setPhotosOpacity(0);
+    setFoldersOpacity(0);
+    setShowFolders(true);
+    setIsButtonTransitioningOut(true);
+
     setTimeout(() => {
-      setShowBackButton(false); // Hide button after transition
-      setIsButtonTransitioningOut(false); // Reset transition state
+      setShowBackButton(false);
+      setIsButtonTransitioningOut(false);
       setShowPhotos(false);
-      // Start title transition back at the same time as folders slide in
       setIsTitleTransitioning(true);
       setShowAlbumTitle(false);
-      // Use requestAnimationFrame to ensure initial state is rendered before animation
       requestAnimationFrame(() => {
         requestAnimationFrame(() => {
-          setFoldersOpacity(1); // Start slide in animation (from opposite directions)
+          setFoldersOpacity(1);
         });
       });
-      // Allow animation to complete
       setTimeout(() => {
         setIsAnimating(false);
         setIsTitleTransitioning(false);
-        setIsGoingBackToFolders(false); // Reset going back state
+        setIsGoingBackToFolders(false);
         setSelectedFolder(null);
-      }, 1100); // 1 second slide in + small buffer
-    }, 1000); // 1 second slide out duration
+      }, 1100);
+    }, 1000);
   };
 
-  // Keyboard navigation for photo preview
   useEffect(() => {
     if (previewPhotoIndex !== null && selectedFolder?.photoUrls) {
       const handleKeyPress = (e: KeyboardEvent) => {
@@ -161,14 +150,10 @@ export function PhotographyPage() {
   return (
     <div className="photography-page-container bg-black overflow-hidden">
       <div className="container mx-auto px-4 py-8 h-full flex flex-col">
-        {/* Title and Button Container - Always present to maintain layout */}
         <div className="flex-shrink-0 flex flex-col">
-          {/* Title Row - Title centered */}
           <div className="relative h-16 mt-8 flex items-center justify-center px-4">
-            {/* Back Button - Mobile: absolutely positioned on left, Desktop: absolutely positioned aligned with photo grid */}
             {showPhotos && selectedFolder && showBackButton && (
               <>
-                {/* Mobile Button */}
                 <div 
                   className="absolute left-4 md:hidden z-10"
                   style={{
@@ -209,7 +194,6 @@ export function PhotographyPage() {
                   </button>
                 </div>
                 
-                {/* Desktop Button - Absolutely positioned on left, aligned with photo grid */}
                 <div 
                   className="hidden md:block absolute left-0 right-0 z-10"
                   style={{
@@ -254,9 +238,7 @@ export function PhotographyPage() {
               </>
             )}
             
-            {/* Title Container - Centered, can expand fully */}
             <div className="relative w-full h-full overflow-visible flex items-center justify-center">
-              {/* "Photography" Title */}
               <h1 
                 className="text-2xl md:text-4xl font-bold text-white text-center whitespace-nowrap"
                 style={{
@@ -277,7 +259,6 @@ export function PhotographyPage() {
                 Photography
               </h1>
               
-              {/* Album Name Title */}
               {selectedFolder && (
                 <h1 
                   className="text-2xl md:text-4xl font-bold text-white text-center absolute inset-0 flex items-center justify-center whitespace-nowrap"
@@ -304,7 +285,6 @@ export function PhotographyPage() {
         </div>
         
         <div ref={scrollContainerRef} className="relative flex-1 overflow-y-auto min-h-[calc(100dvh-10rem)] md:min-h-0 flex items-start pb-24 md:pb-0">
-          {/* Folders - fade out when clicking */}
           {showFolders && (
             <div 
               className="w-full absolute inset-0 flex items-start"
@@ -325,7 +305,6 @@ export function PhotographyPage() {
             </div>
           )}
           
-          {/* Photos - fade in after folders fade out */}
           {showPhotos && selectedFolder && (
             <div 
               className="w-full absolute inset-0 flex items-start"
@@ -343,7 +322,6 @@ export function PhotographyPage() {
           )}
         </div>
         
-        {/* Photo Preview Modal */}
         {previewPhotoIndex !== null && selectedFolder && selectedFolder.photoUrls && (
           (() => {
             const displayedPhotos = selectedFolder.photoUrls.slice(0, 6);
@@ -416,7 +394,6 @@ export function PhotographyPage() {
   );
 }
 
-// Simplified Photo Grid Component
 function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: { 
   photos: string[], 
   onPhotoClick?: (photoIndex: number) => void,
@@ -427,27 +404,19 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
   const gridRef = useRef<HTMLDivElement>(null);
   const isAnimatingOut = isAnimating && photosOpacity !== undefined && photosOpacity < 1;
 
-  // Check if we're in 2x3 layout (3 columns, 2 rows)
   useEffect(() => {
     const checkLayout = () => {
       if (!gridRef.current) return;
-      
+
       const computedStyle = window.getComputedStyle(gridRef.current);
       const gridTemplateColumns = computedStyle.gridTemplateColumns;
-      
-      // Check if we have 3 columns (for lg and up)
       const columnCount = gridTemplateColumns.split(' ').length;
       const hasThreeColumns = columnCount === 3;
-      
-      // For 2x3 layout, we need exactly 3 columns and the grid should naturally form 2 rows with 6 items
-      // Check window width to determine if we're in desktop mode (lg breakpoint)
       const isDesktop = window.innerWidth >= 1024;
-      
-      // Only 2x3 layout if we have 3 columns AND we're on desktop (lg breakpoint)
+
       setIsTwoByThreeLayout(hasThreeColumns && isDesktop);
     };
 
-    // Check on mount and resize
     checkLayout();
     const resizeObserver = new ResizeObserver(checkLayout);
     if (gridRef.current) {
@@ -471,28 +440,24 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
       }}
     >
       {photos.map((photo, index) => {
-        // Use simple fade transitions if NOT in 2x3 layout
         const useSimpleFade = !isTwoByThreeLayout;
-        
-        // Determine position in 2x3 grid (0-5) - only needed for directional transitions
-        const row = Math.floor(index / 3); // 0 = top row, 1 = bottom row
-        const col = index % 3; // 0 = left, 1 = middle, 2 = right
-        
-        // Assign slide out direction based on position (only for 2x3 layout)
+
+        const row = Math.floor(index / 3);
+        const col = index % 3;
+
         let slideOutDirection = '';
         if (isTwoByThreeLayout) {
-          if (row === 0) { // Top row
-            if (col === 0) slideOutDirection = 'left';      // Top left
-            else if (col === 1) slideOutDirection = 'up';   // Top middle
-            else slideOutDirection = 'right';                // Top right
-          } else { // Bottom row
-            if (col === 0) slideOutDirection = 'left';      // Bottom left
-            else if (col === 1) slideOutDirection = 'down'; // Bottom middle
-            else slideOutDirection = 'right';                // Bottom right
+          if (row === 0) {
+            if (col === 0) slideOutDirection = 'left';
+            else if (col === 1) slideOutDirection = 'up';
+            else slideOutDirection = 'right';
+          } else {
+            if (col === 0) slideOutDirection = 'left';
+            else if (col === 1) slideOutDirection = 'down';
+            else slideOutDirection = 'right';
           }
         }
-        
-        // Slide in direction is opposite of slide out
+
         let slideInDirection = '';
         if (isTwoByThreeLayout) {
           switch (slideOutDirection) {
@@ -510,18 +475,15 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
               break;
           }
         }
-        
-        // Slide out in assigned direction over 1s (or simple fade)
+
         let slideOutStyle = {};
         if (isAnimatingOut) {
           if (useSimpleFade) {
-            // Simple fade out
             slideOutStyle = {
               opacity: 0,
               transition: 'opacity 1s ease-in-out'
             };
           } else {
-            // Directional slide out
             let transform = '';
             switch (slideOutDirection) {
               case 'left':
@@ -544,19 +506,16 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
             };
           }
         }
-        
-        // Slide in from opposite direction over 1s (or simple fade in)
+
         const isAnimatingIn = isAnimating && photosOpacity !== undefined && photosOpacity > 0;
         let slideInStyle = {};
         if (isAnimatingIn && photosOpacity !== undefined) {
           if (useSimpleFade) {
-            // Simple fade in
             slideInStyle = {
               opacity: photosOpacity,
               transition: 'opacity 1s ease-in-out'
             };
           } else {
-            // Directional slide in
             let initialTransform = '';
             switch (slideInDirection) {
               case 'left':
@@ -574,13 +533,11 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
             }
             
             if (photosOpacity === 0) {
-              // Start off-screen with no transition
               slideInStyle = {
                 transform: initialTransform,
                 opacity: 0
               };
             } else {
-              // Animate to center position
               slideInStyle = {
                 transform: 'translateX(0) translateY(0)',
                 opacity: photosOpacity,
@@ -600,14 +557,12 @@ function PhotoGrid({ photos, onPhotoClick, isAnimating, photosOpacity }: {
             }}
             onClick={() => onPhotoClick?.(index)}
           >
-            <DirectionAwareHover 
+            <DirectionAwareHover
               imageUrl={photo}
               className="absolute inset-0 w-full h-full"
               imageClassName="h-full w-full"
             >
-              <div className="hidden">
-                {/* Empty children to maintain component structure */}
-              </div>
+              <div className="hidden"></div>
             </DirectionAwareHover>
           </div>
         );

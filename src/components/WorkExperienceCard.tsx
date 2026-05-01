@@ -63,7 +63,6 @@ export const WorkExperienceCard = ({
           borderWidth={2}
         />
         <div className={`relative flex h-full flex-col justify-between ${cardGap} overflow-hidden ${cardRounded} ${cardPadding}`}>
-          {/* Header */}
           <div className={`flex items-start justify-between ${isMobile ? 'mb-3' : 'mb-3 sm:mb-4 lg:mb-6'}`}>
             <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-2 sm:gap-3 lg:gap-4'}`}>
               <div className={`${isMobile ? 'p-2.5' : 'p-2 sm:p-2.5 lg:p-3'} bg-white/10 ${cardRounded}`}>
@@ -81,7 +80,6 @@ export const WorkExperienceCard = ({
             </div>
           </div>
 
-          {/* Bullet Points or Description */}
           <div className={`${isMobile ? 'mb-3' : 'mb-3 sm:mb-4 lg:mb-6'} text-left flex-1 ${isMobile ? 'overflow-y-auto' : 'overflow-y-auto'}`}>
             <h4 className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-slate-400 ${isMobile ? 'mb-2' : 'mb-2 sm:mb-3'} uppercase tracking-wide text-left`}>
               Key Responsibilities & Achievements
@@ -118,7 +116,6 @@ export const WorkExperienceCard = ({
             )}
           </div>
 
-          {/* Technologies */}
           <div>
             <h4 className={`${isMobile ? 'text-sm' : 'text-xs sm:text-sm'} font-semibold text-slate-400 ${isMobile ? 'mb-2' : 'mb-2 sm:mb-3'} uppercase tracking-wide`}>
               Technologies Used

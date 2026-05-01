@@ -12,7 +12,6 @@ export const FlipWords = ({
   duration?: number;
   className?: string;
 }) => {
-  // Reorder words array to always start with "engineer" if it exists
   const reorderedWords = (() => {
     if (words.includes("engineer")) {
       const engineerIndex = words.indexOf("engineer");
@@ -28,7 +27,6 @@ export const FlipWords = ({
   const [currentWord, setCurrentWord] = useState(reorderedWords[0]);
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
 
-  // thanks for the fix Julian - https://github.com/Julian-AT
   const startAnimation = useCallback(() => {
     const word = reorderedWords[reorderedWords.indexOf(currentWord) + 1] || reorderedWords[0];
     setCurrentWord(word);
@@ -76,7 +74,6 @@ export const FlipWords = ({
         )}
         key={currentWord}
       >
-        {/* edit suggested by Sajal: https://x.com/DewanganSajal */}
         {currentWord.split(" ").map((word, wordIndex) => (
           <motion.span
             key={word + wordIndex}

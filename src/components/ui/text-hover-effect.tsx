@@ -3,25 +3,10 @@ import React, { useRef, useEffect, useState } from "react";
 import { motion } from "motion/react";
 import { cn } from "../../lib/utils";
 
-// Font configuration - easy to change and experiment with
 const FONT_CONFIG = {
-  // Simple, clean fonts with minimal overlapping paths
   primary: 'Arial, Helvetica, sans-serif',
-  
-  // Alternative options - uncomment to try different fonts
-  // serif: 'Georgia, "Times New Roman", serif',
-  // display: '"Playfair Display", serif',
-  // modern: '"SF Pro Display", -apple-system, BlinkMacSystemFont, sans-serif',
-  // geometric: '"Montserrat", sans-serif',
-  // tech: '"JetBrains Mono", "Fira Code", monospace',
-  // simple: 'Arial, Helvetica, sans-serif',
-  // clean: 'Verdana, Geneva, sans-serif',
-  
-  // Font weight options
-  weight: '700', // 400, 500, 600, 700, 800, 900
-  
-  // Letter spacing options
-  letterSpacing: '-0.02em', // '-0.05em', '0em', '0.02em', '0.05em'
+  weight: '700',
+  letterSpacing: '-0.02em',
 };
 
 export const TextHoverEffect = ({
@@ -111,7 +96,6 @@ export const TextHoverEffect = ({
         </mask>
       </defs>
       
-      {/* Single clean white outlined text */}
       <text
         x="50%"
         y="50%"
@@ -124,7 +108,6 @@ export const TextHoverEffect = ({
         {text}
       </text>
       
-      {/* Gradient outlined text - only visible through the mask (spotlight effect) */}
       <text
         x="50%"
         y="50%"

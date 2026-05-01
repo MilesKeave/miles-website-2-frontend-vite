@@ -13,42 +13,33 @@ export const useProjects = () => {
       setError(null);
       const fetchedProjects = await projectApi.getAllProjects();
       
-      // Create ordered list based on index attribute
       const orderedProjects: Project[] = [];
       const projectsWithoutIndex: Project[] = [];
-      
-      // Separate projects with index and without index
+
       fetchedProjects.forEach((project) => {
         if (project.index !== undefined && project.index !== null) {
-          // Project has an index - place it at that position
           orderedProjects[project.index] = project;
         } else {
-          // Project doesn't have index - add to list to place later
           projectsWithoutIndex.push(project);
         }
       });
-      
-      // Fill in gaps and add projects without index
+
       let nextPosition = 0;
       for (let i = 0; i < orderedProjects.length; i++) {
         if (orderedProjects[i] === undefined) {
-          // Empty slot - fill with next project without index
           if (projectsWithoutIndex.length > 0) {
             orderedProjects[i] = projectsWithoutIndex.shift()!;
           }
         }
         nextPosition = i + 1;
       }
-      
-      // Add remaining projects without index to the end
+
       projectsWithoutIndex.forEach((project) => {
         orderedProjects.push(project);
       });
-      
-      // Filter out any undefined slots (in case index was beyond array length)
+
       const finalOrderedProjects = orderedProjects.filter((project) => project !== undefined);
 
-      // Kick off image downloads immediately — before React renders the grid
       finalOrderedProjects.forEach((project) => {
         if (project.projectImageUrl) {
           const img = new Image();

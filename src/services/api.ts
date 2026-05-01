@@ -11,7 +11,7 @@ export const apiService = {
   async getProfile(): Promise<ProfileData> {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      const timeoutId = setTimeout(() => controller.abort(), 10000);
       
       const response = await fetch(`${API_BASE_URL}/profile`, {
         signal: controller.signal
@@ -45,8 +45,6 @@ export const apiService = {
   },
 
   async downloadResume(): Promise<void> {
-    // Fetch through the backend proxy so we get same-origin bytes we can
-    // hand to a blob URL — the `download` attribute only works same-origin.
     const response = await fetch(`${API_BASE_URL}/download-resume`);
     if (!response.ok) {
       throw new Error(`Resume download failed: ${response.status}`);

@@ -26,7 +26,6 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
   const [showFullImage, setShowFullImage] = useState(false);
 
   useEffect(() => {
-    // Trigger grow-in animation on mount
     const timer = setTimeout(() => {
       setIsVisible(true);
     }, 10);
@@ -35,7 +34,6 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
 
   const handleClose = () => {
     setIsVisible(false);
-    // Wait for animation to complete before calling onClose
     setTimeout(() => {
       onClose();
     }, 300);
@@ -48,7 +46,6 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
       <div 
         className={`absolute inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300 ${
           isVisible ? 'opacity-100' : 'opacity-0'
@@ -56,13 +53,11 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
         onClick={handleClose}
       />
       
-      {/* Modal */}
       <div 
         className={`relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-[900px] h-auto max-h-[90vh] md:h-[600px] overflow-hidden transition-all duration-300 ease-out ${
           isVisible ? 'scale-100 opacity-100' : 'scale-50 opacity-0'
         }`}
       >
-        {/* Close button */}
         <button
           onClick={handleClose}
           className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/80 hover:bg-white dark:bg-slate-800 dark:hover:bg-slate-700 transition-colors"
@@ -70,9 +65,7 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
           <IconX className="h-5 w-5 text-slate-300" />
         </button>
 
-        {/* Content */}
         <div className="flex flex-col md:flex-row h-full">
-          {/* Image section */}
           <div className="w-full md:w-1/2 h-64 md:h-full">
             <div className="relative h-full">
               {project.projectImageUrl2 || project.projectImageUrl ? (
@@ -94,20 +87,16 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
             </div>
           </div>
 
-          {/* Details section */}
           <div className="w-full md:w-1/2 p-4 md:p-8 flex flex-col justify-between overflow-y-auto">
             <div>
-              {/* Title */}
               <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-3 md:mb-4">
                 {project.projectName}
               </h2>
 
-              {/* Description */}
               <p className="text-slate-300 text-base md:text-lg leading-relaxed mb-4 md:mb-6">
                 {project.paragraph}
               </p>
 
-              {/* Links */}
               <div className="flex flex-col sm:flex-row flex-wrap gap-2 md:gap-3 mb-4 md:mb-6">
                 {project.githubLink && project.githubLink.trim() !== "" && (
                   <a
@@ -171,7 +160,6 @@ export function ProjectPopup({ project, onClose }: ProjectPopupProps) {
         </div>
       </div>
 
-      {/* Full Image Modal */}
       {showFullImage && (project.projectImageUrl2 || project.projectImageUrl) && (
         <div 
           className="fixed inset-0 bg-black/90 z-[200] flex items-center justify-center p-4"

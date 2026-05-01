@@ -9,7 +9,6 @@ export const HomePage = (): React.JSX.Element => {
 
   const isActive = isHovered || isTapped;
 
-  // Preload hover image for smooth transition once URL is available from API
   useEffect(() => {
     if (profile?.profileHoverImageUrl) {
       const img = new Image();
@@ -28,7 +27,6 @@ export const HomePage = (): React.JSX.Element => {
 
   return (
     <div className="home-page" onClick={() => setIsTapped(false)}>
-      {/* Name Text - Full Width */}
       <div className="name-text">
         Miles Keaveny, <FlipWords words={rotatingWords} duration={2500} className="text-white" />
       </div>
@@ -36,7 +34,6 @@ export const HomePage = (): React.JSX.Element => {
         {profile?.description}
       </div>
 
-      {/* Button Container */}
       <div className="button-container">
         <a 
           href="mailto:miles.j.keaveny@gmail.com"
@@ -80,17 +77,14 @@ export const HomePage = (): React.JSX.Element => {
         )}
       </div>
 
-      {/* Profile Image - Bottom Left Corner (centered in left 50% of screen) */}
       {profile?.profileImageUrl && (
         <div className="profile-image-container">
-          {/* Grid stack: both images occupy the same cell so neither collapses */}
           <div
             style={{ display: 'grid' }}
             onPointerEnter={(e) => { if (e.pointerType === 'mouse') setIsHovered(true); }}
             onPointerLeave={(e) => { if (e.pointerType === 'mouse') setIsHovered(false); }}
             onClick={(e) => { e.stopPropagation(); setIsTapped(true); }}
           >
-            {/* Base image */}
             <img
               src={profile.profileImageUrl}
               alt="Miles Keaveny"
@@ -104,7 +98,6 @@ export const HomePage = (): React.JSX.Element => {
               }}
               onError={(e) => { e.currentTarget.style.display = 'none'; }}
             />
-            {/* Hover image — always in DOM so it stays decoded and ready */}
             {profile.profileHoverImageUrl && (
               <img
                 src={profile.profileHoverImageUrl}

@@ -10,32 +10,25 @@ export const WorkExperiencePage = (): React.JSX.Element => {
   const [activeExperienceId, setActiveExperienceId] = useState<string | null>(null);
   const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Sort work experiences by start date (most recent first)
   const sortedWorkExperiences = sortWorkExperiencesByDate(workExperiences);
 
-  // Set initial active experience to the first one (most recent)
   useEffect(() => {
     if (sortedWorkExperiences.length > 0 && !activeExperienceId) {
       setActiveExperienceId(sortedWorkExperiences[0].id);
     }
   }, [sortedWorkExperiences, activeExperienceId]);
 
-  // Set active experience with smooth carousel animation
   const setActiveExperience = useCallback((targetExperienceId: string) => {
     if (isTransitioning || targetExperienceId === activeExperienceId) return;
-    
+
     setIsTransitioning(true);
-    
-    // Direct transition - the smooth carousel handles the animation
     setActiveExperienceId(targetExperienceId);
-    
-    // Reset transition state after animation completes
+
     setTimeout(() => {
       setIsTransitioning(false);
-    }, 600); // Slightly longer to account for smooth animation
+    }, 600);
   }, [activeExperienceId, isTransitioning]);
 
-  // Loading state
   if (loading) {
     return (
       <div className="work-experience-page min-h-screen">
@@ -58,7 +51,6 @@ export const WorkExperiencePage = (): React.JSX.Element => {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="work-experience-page min-h-screen">
@@ -91,7 +83,6 @@ export const WorkExperiencePage = (): React.JSX.Element => {
     <>
       <div className="work-experience-page min-h-screen">
         <div className="container mx-auto px-1 sm:px-2 pt-16 sm:pt-20 lg:pt-24 pb-4 sm:pb-8 lg:pb-12">
-          {/* Mobile Layout - Stacked */}
           <div className="block sm:hidden">
             <WorkExperienceHeader isMobile={true} />
             <CompanyList 
@@ -110,16 +101,12 @@ export const WorkExperiencePage = (): React.JSX.Element => {
             />
           </div>
 
-          {/* Desktop Layout - Stacked with Two Columns Below */}
           <div className="hidden sm:block">
-            {/* Top Section - Title */}
             <div className="mb-6 sm:mb-8 lg:mb-10">
               <WorkExperienceHeader isMobile={false} />
             </div>
             
-            {/* Bottom Section - Two Columns */}
             <div className="flex gap-4 sm:gap-6 lg:gap-8 h-[calc(100vh-20rem)] sm:h-[calc(100vh-22rem)] lg:h-[calc(100vh-24rem)]">
-              {/* Left Column - Company List */}
               <div className="w-64 sm:w-80 lg:w-96 flex-shrink-0 flex flex-col justify-center">
                 <CompanyList 
                   workExperiences={sortedWorkExperiences}
@@ -130,7 +117,6 @@ export const WorkExperiencePage = (): React.JSX.Element => {
                 />
               </div>
 
-              {/* Right Column - Work experience carousel container */}
               <div className="flex-1">
               <VerticalWorkExperienceCarousel
                 workExperiences={sortedWorkExperiences}

@@ -7,7 +7,6 @@ import { useProjects } from "../hooks/useProjects";
 import { useState } from "react";
 import type { Project } from "../services/projectApi";
 
-// Icon mapping for different project categories (based on project name or content)
 const getCategoryIcon = (projectName: string) => {
   const name = projectName.toLowerCase();
   if (name.includes('mobile') || name.includes('app')) {
@@ -98,7 +97,6 @@ export const ProjectsPage = (): React.JSX.Element => {
           </div>
         ) : (
           <div className="max-w-7xl mx-auto">
-            {/* Scrollable container for projects */}
             <div 
               className="max-h-[65vh] md:max-h-[70vh] lg:max-h-[75vh] xl:h-[39rem] overflow-y-auto overflow-x-hidden pr-4 pl-4 projects-scrollbar" 
               style={{ scrollbarWidth: 'thin', scrollbarColor: '#64748b #1e293b', overscrollBehavior: 'contain' }}
@@ -110,7 +108,6 @@ export const ProjectsPage = (): React.JSX.Element => {
                     className={`h-full md:min-h-0 flex flex-col cursor-pointer hover:scale-[1.02] transition-transform duration-200 p-0 project-tile-mobile ${index === 0 ? "md:col-span-2" : ""}`}
                     onClick={() => handleProjectClick(project)}
                   >
-                    {/* Image section */}
                     <div className="project-image-section relative h-[140px] sm:h-[160px] md:h-3/4 w-full overflow-hidden rounded-lg pt-2 px-2 sm:pt-4 sm:px-4 md:pt-8 md:px-8">
                       {project.projectImageUrl ? (
                         <ImageWithSkeleton
@@ -131,7 +128,6 @@ export const ProjectsPage = (): React.JSX.Element => {
                       )}
                     </div>
 
-                    {/* Title section */}
                     <div className="flex-1 flex items-center justify-center px-2 sm:px-3 md:px-4 py-1 sm:py-2 relative z-10">
                       <h3 className="text-white font-bold text-xs sm:text-sm md:text-lg text-center">
                         {project.projectName}
@@ -145,7 +141,6 @@ export const ProjectsPage = (): React.JSX.Element => {
         )}
       </div>
 
-      {/* Project Popup */}
       {selectedProject && (
         <ProjectPopup
           project={selectedProject}

@@ -27,7 +27,6 @@ export interface CreateProjectData {
 }
 
 export const projectApi = {
-  // Get all projects
   async getAllProjects(): Promise<Project[]> {
     const response = await fetch(`${API_BASE_URL}/projects/getAll`);
     if (!response.ok) {
@@ -36,7 +35,6 @@ export const projectApi = {
     return response.json();
   },
 
-  // Get project by name
   async getProjectByName(projectName: string): Promise<Project> {
     const encodedName = encodeURIComponent(projectName);
     const response = await fetch(`${API_BASE_URL}/projects/${encodedName}`);
@@ -46,7 +44,6 @@ export const projectApi = {
     return response.json();
   },
 
-  // Create new project
   async createProject(data: CreateProjectData): Promise<Project> {
     const formData = new FormData();
     formData.append('projectName', data.projectName);
@@ -67,7 +64,6 @@ export const projectApi = {
     return response.json();
   },
 
-  // Delete project by name
   async deleteProject(projectName: string): Promise<void> {
     const encodedName = encodeURIComponent(projectName);
     const response = await fetch(`${API_BASE_URL}/projects/${encodedName}`, {
@@ -79,7 +75,6 @@ export const projectApi = {
     }
   },
 
-  // Partial update project - only updates fields that are provided
   async updateProject(
     projectName: string,
     data: {

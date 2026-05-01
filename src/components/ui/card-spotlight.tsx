@@ -30,9 +30,8 @@ export const CardSpotlight = ({
     const x = clientX - left;
     const y = clientY - top;
     
-    // Calculate opacity based on vertical position (increase opacity as we go down)
     const verticalPosition = y / height;
-    const opacityMultiplier = 1 + (verticalPosition * 0.8); // Increase opacity by 80% at bottom
+    const opacityMultiplier = 1 + (verticalPosition * 0.8);
     
     mouseX.set(x);
     mouseY.set(y);

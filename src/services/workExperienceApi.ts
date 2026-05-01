@@ -12,7 +12,7 @@ export interface WorkExperience {
   location: string;
   companyName: string;
   bulletPoints?: BulletPoint[];
-  description?: string; // Keep for backward compatibility
+  description?: string;
   technologiesUsed: string[];
   createdAt: string;
   updatedAt: string;
@@ -28,7 +28,6 @@ export interface CreateWorkExperienceData {
 }
 
 export const workExperienceApi = {
-  // Get all work experiences
   async getAllWorkExperience(): Promise<WorkExperience[]> {
     const response = await fetch(`${API_BASE_URL}/work-experience/getAll`);
     if (!response.ok) {
@@ -37,7 +36,6 @@ export const workExperienceApi = {
     return response.json();
   },
 
-  // Get work experience by company and job title
   async getWorkExperienceByCompanyAndTitle(companyName: string, jobTitle: string): Promise<WorkExperience> {
     const encodedCompanyName = encodeURIComponent(companyName);
     const encodedJobTitle = encodeURIComponent(jobTitle);
@@ -48,7 +46,6 @@ export const workExperienceApi = {
     return response.json();
   },
 
-  // Create new work experience
   async createWorkExperience(data: CreateWorkExperienceData): Promise<WorkExperience> {
     const response = await fetch(`${API_BASE_URL}/work-experience/create`, {
       method: 'POST',
@@ -64,7 +61,6 @@ export const workExperienceApi = {
     return response.json();
   },
 
-  // Delete work experience by company and job title
   async deleteWorkExperience(companyName: string, jobTitle: string): Promise<void> {
     const encodedCompanyName = encodeURIComponent(companyName);
     const encodedJobTitle = encodeURIComponent(jobTitle);
@@ -77,7 +73,6 @@ export const workExperienceApi = {
     }
   },
 
-  // Delete all work experience
   async deleteAllWorkExperience(): Promise<void> {
     const response = await fetch(`${API_BASE_URL}/work-experience/deleteAll`, {
       method: 'DELETE',

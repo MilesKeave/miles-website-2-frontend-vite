@@ -20,7 +20,6 @@ interface FloatingDocNavProps {
 }
 
 export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingDocNavProps) => {
-  // Dynamic icon mapping
   const getIconForPage = (pageId: PageId) => {
     switch (pageId) {
       case 'home':
@@ -36,7 +35,6 @@ export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingD
     }
   };
 
-  // Generate navigation items dynamically from page configuration
   const navigationItems = PAGE_CONFIG.map(pageConfig => ({
     title: pageConfig.title,
     icon: getIconForPage(pageConfig.id as PageId),
@@ -45,7 +43,6 @@ export const FloatingDocNav = ({ className, onNavigate, currentPage }: FloatingD
     isActive: currentPage === pageConfig.id
   }));
 
-  // Only use navigation items (removed external links)
   const items = navigationItems;
 
   return (
@@ -65,26 +62,21 @@ const FloatingDockDesktop = ({
   const [isTouchDevice, setIsTouchDevice] = useState(false);
   
   useEffect(() => {
-    // Detect if device is mobile/iPad (not just touch-capable)
-    // Many laptops have touchscreens, so we need to check screen size too
     const checkTouchDevice = () => {
-      // Check if it's a small screen (mobile/iPad) OR if it's a touch-only device
-      const isSmallScreen = window.innerWidth < 1024; // iPad and below
+      const isSmallScreen = window.innerWidth < 1024;
       const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
       const hasFinePointer = window.matchMedia('(pointer: fine)').matches;
-      
-      // If it's a small screen with touch, or a touch-only device (no fine pointer), it's mobile/iPad
-      return (isSmallScreen && (hasCoarsePointer || 'ontouchstart' in window)) || 
+
+      return (isSmallScreen && (hasCoarsePointer || 'ontouchstart' in window)) ||
              (hasCoarsePointer && !hasFinePointer);
     };
-    
+
     setIsTouchDevice(checkTouchDevice());
-    
-    // Re-check on resize
+
     const handleResize = () => {
       setIsTouchDevice(checkTouchDevice());
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -138,7 +130,6 @@ function IconContainer({
 }) {
   let ref = useRef<HTMLDivElement>(null);
 
-  // Only calculate transforms on desktop (non-touch devices)
   let distance = useTransform(mouseX, (val) => {
     if (isTouchDevice) return Infinity;
     let bounds = ref.current?.getBoundingClientRect() ?? { x: 0, width: 0 };
@@ -187,7 +178,6 @@ function IconContainer({
     }
   };
 
-  // Fixed sizes for touch devices, dynamic for desktop
   const containerStyle = isTouchDevice 
     ? { width: 40, height: 40 }
     : { width, height };
@@ -205,10 +195,9 @@ function IconContainer({
         onMouseLeave={isTouchDevice ? undefined : () => setHovered(false)}
         className={cn(
           "relative flex aspect-square items-center justify-center rounded-full cursor-pointer",
-          isActive 
-            ? "bg-white/30" // Lighter background for active page
+          isActive
+            ? "bg-white/30"
             : "bg-white/10",
-          // Only apply hover background on desktop
           !isTouchDevice && !isActive && "hover:bg-white/20"
         )}
       >

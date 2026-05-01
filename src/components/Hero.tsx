@@ -37,7 +37,6 @@ export const Hero = (): React.JSX.Element => {
     <BackgroundGradient className="min-h-screen flex items-center justify-center">
       <div className="text-center space-y-8 px-4">
         <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          {/* Profile Image */}
           {profile?.profileImageUrl && (
             <div className="flex-shrink-0">
               <img
@@ -48,7 +47,6 @@ export const Hero = (): React.JSX.Element => {
             </div>
           )}
           
-          {/* Name with Sparkles */}
           <div className="flex-shrink-0">
             <Sparkles
               className="text-6xl md:text-8xl font-bold text-white"
@@ -66,7 +64,6 @@ export const Hero = (): React.JSX.Element => {
             className="text-2xl md:text-4xl text-blue-400"
           />
           
-          {/* Description from backend */}
           {profile?.description && (
             <p className="text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
               {profile.description}
@@ -79,7 +76,6 @@ export const Hero = (): React.JSX.Element => {
             View My Work
           </button>
           
-          {/* Resume Download Button */}
           {profile?.resumeUrl && (
             <button 
               onClick={downloadResume}

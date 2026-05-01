@@ -10,19 +10,18 @@ function App(): React.JSX.Element {
   const [isDirectNavigation, setIsDirectNavigation] = useState(false);
 
   const handleNavigate = (page: string) => {
-    // Type-safe navigation - only allow valid page IDs
     if (['home', 'portfolio', 'work', 'photography'].includes(page)) {
-      setIsDirectNavigation(true); // Flag for direct navigation
+      setIsDirectNavigation(true);
       setCurrentPage(page as PageId);
     }
   };
 
   return (
     <div className="min-h-screen w-full bg-black">
-      <LandingPage 
-        currentPage={currentPage} 
+      <LandingPage
+        currentPage={currentPage}
         onPageChange={(page) => {
-          setIsDirectNavigation(false); // Reset flag for swipe navigation
+          setIsDirectNavigation(false);
           setCurrentPage(page);
         }}
         isDirectNavigation={isDirectNavigation}

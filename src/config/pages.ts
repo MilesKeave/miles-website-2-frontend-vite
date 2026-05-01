@@ -38,7 +38,6 @@ export const PAGE_CONFIG: PageConfig[] = [
   }
 ];
 
-// Helper functions for page navigation
 export const getPageById = (id: string): PageConfig | undefined => {
   return PAGE_CONFIG.find(page => page.id === id);
 };

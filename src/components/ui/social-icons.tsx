@@ -7,33 +7,28 @@ export const SocialIcons = ({ className }: { className?: string }) => {
   const [isPhotoPreviewOpen, setIsPhotoPreviewOpen] = useState(false);
 
   useEffect(() => {
-    // Check if photo preview modal is open by looking for elements with high z-index
     const checkPreviewModal = () => {
-      // Look for any fixed overlay with high z-index (photo preview modal uses z-[100])
       const allElements = document.querySelectorAll('*');
       let hasModal = false;
-      
+
       for (const el of allElements) {
         const htmlEl = el as HTMLElement;
         const zIndex = window.getComputedStyle(htmlEl).zIndex;
         const position = window.getComputedStyle(htmlEl).position;
-        
-        // Check if element is fixed/absolute with z-index >= 100 and covers the screen
-        if ((position === 'fixed' || position === 'absolute') && 
+
+        if ((position === 'fixed' || position === 'absolute') &&
             zIndex && parseInt(zIndex) >= 100 &&
             htmlEl.classList.contains('inset-0')) {
           hasModal = true;
           break;
         }
       }
-      
+
       setIsPhotoPreviewOpen(hasModal);
     };
 
-    // Check initially
     checkPreviewModal();
 
-    // Use MutationObserver to watch for modal appearance/disappearance
     const observer = new MutationObserver(checkPreviewModal);
     observer.observe(document.body, {
       childList: true,
@@ -42,7 +37,6 @@ export const SocialIcons = ({ className }: { className?: string }) => {
       attributeFilter: ['class', 'style']
     });
 
-    // Also check on a small interval as backup
     const interval = setInterval(checkPreviewModal, 200);
 
     return () => {
